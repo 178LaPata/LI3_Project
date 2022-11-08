@@ -1,4 +1,4 @@
-# LI3 Project
+# LI3_Project
 
 This project was developed for the LI3 subject. 
 
