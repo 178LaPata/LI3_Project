@@ -3,32 +3,27 @@
 #include <stdio.h>
 
 struct xd_date {
-    char* day;
-    char* month;
-    char* year;
+    int day;
+    int month;
+    int year;
 }
 
-char* get_date_day (XD_DATE date){
+int get_date_day (XD_DATE date){
     return date -> day;
 }
 
-char* get_date_month (XD_DATE date){
+int get_date_month (XD_DATE date){
     return date -> month;
 }
 
-char* get_date_year (XD_DATE date){
+int get_date_year (XD_DATE date){
     return date -> year;
 }
-char* set_date_day (XD_DATE date, char* day){
-    return date -> day = day;
-}
 
-char* set_date_month (XD_DATE date, char* month){
-    return date -> month = month;
-}
-
-char* set_date_year (XD_DATE date, char* year){
-    return date -> year = year;
+void set_date (XD_DATE date, int day, int month, int year){
+    date -> day   = day;
+    date -> month = month;
+    date -> year  = year;
 }
 
 XD_DATE validar_date (char str_date){
@@ -58,14 +53,4 @@ XD_DATE validar_date (char str_date){
     }
     return 0;
 } 
-    
-
-
-
-
-
-
-
-
-
 

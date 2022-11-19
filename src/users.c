@@ -72,14 +72,18 @@ int set_users_name (XD_USERS user, char* line){
     return strlen(line) > 0;
 }
 
-int set_users_gender (XD_USERS user, char* line){
-    user -> gender = strdu(line);
-    return strlen(line) > 0;
+int valid_users_gender (char sexo){
+    if ((sexo == 'F') || (sexo == 'M')) return 1;
+    else return 0;
+}
+
+int set_users_gender (XD_USERS user, char sexo){
+    if (valid_users_gender(sexo)) user -> gender = sexo;
 }
 
 int set_users_birth_date (XD_USERS user, char* line){
     int ola = atoi(line);
-    user -> date = ola;
+    user -> birth_date = ola;
     return (ola >= 0) && strlen(line) > 0;
 }
 
@@ -97,11 +101,17 @@ int set_users_account_creation (XD_USERS user, char* line){
 }
 
 int set_users_pay_method (XD_USERS user, char* line){
-    int 
+    user -> pay_method = strdu(line);
+    return strlen(line) > 0;
 }
 
-int set_users_account_status (XD_USERS user, char* line){
+int valid_users_account (char status){
+    if ((status == "active") || (sexo == "inactive")) return 1;
+    else return 0;
+}
 
+int set_users_account_status (XD_USERS user, char status){
+    if (valid_users_account(status)) user -> account_status = status;
 }
 
 XD_USERS build_users (char* line){ 
@@ -158,6 +168,32 @@ int write_users_file (char* path, XD_USERS_ARRAY users){
     return 0;
 }
 
+// não percebi o que faz 
+XD_USERS_ARRAY read_users_file (char* file_path){
+    FILE *f = fopen(file_path, "r");
+    if (!f) return NULL; 
+
+    char buffer[1000000], *buffer2;
+    XD_USERS_ARRAY users = malloc(sizeof(struct xd_users_array));
+    users->max_size = 100;
+    users->size = 0;
+    users->array = calloc(users->max_size, sizeof(struct xd_users));
+
+    while (fgets(buffer, 1000000, f)){
+        buffer2 = strdup(buffer);  
+        users->array[users->size] = build_user(buffer2); 
+        if(users->array[users->size]){
+            users->size++;
+            if (users->size == users->max_size){
+                users->max_size += (int)((float)users->max_size * 0.2); 
+                users->array = (XD_USERS *)realloc(users->array, users->max_size * sizeof(struct xd_users));
+            }
+        }
+    }
+    fclose(f);
+    sort_users_array(users, 0, users->size, get_users_username);
+    return users;
+}
 
 
 
