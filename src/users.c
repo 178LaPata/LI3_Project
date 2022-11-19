@@ -12,6 +12,28 @@ struct xd_users {
     char* account_status;
 };
 
+struct xd_users_array {
+    int max_size;
+    int size;
+    XD_USERS *array;
+};
+
+int get_users_array_max_size (XD_USERS_ARRAY array){
+    return array -> max_size;
+}
+int get_users_array_size (XD_USERS_ARRAY array){
+    return array -> size;
+}
+
+XD_USERS* get_users_array (XD_USERS_ARRAY array){
+    return array -> array;
+}
+
+XD_USERS get_users_index (XD_USERS_ARRAY array, int k){
+    if (k >= array -> size) return NULL;
+    return array -> array[k];
+}
+
 char* get_users_username (XD_USERS user){
     return user -> username;
 }
@@ -73,3 +95,10 @@ int set_users_account_creation (XD_USERS user, char* line){
 
     return (line[4]!='/') && (is_valid_date(user->account_creation));
 }
+
+int set_users_pay_method (XD_USERS user, char* line){
+    int 
+}
+
+
+
