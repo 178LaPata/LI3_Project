@@ -100,5 +100,64 @@ int set_users_pay_method (XD_USERS user, char* line){
     int 
 }
 
+int set_users_account_status (XD_USERS user, char* line){
+
+}
+
+XD_USERS build_users (char* line){ 
+    XD_USERS user = malloc(sizeof(struct xd_user));
+    int i = 0;
+    int val = 1;
+    char* buffer;
+
+    user -> line = strdup(line);
+    while ((buffer = strsep(&line, ";\n")) 1= NULL){
+        switch (i++){
+            case 0: 
+                val = set_users_username(buffer, user);
+                break;
+            case 1:
+                val = set_users_name(buffer, user);
+                break;
+            case 2:
+                val = set_users_gender(buffer, user);
+                break;
+            case 3: 
+                val = set_users_birth_date(buffer, user);
+                break;
+            case 4:
+                val = set_users_account_creation(buffer, user);
+                break;
+            case 5:
+                val = set_users_pay_method(buffer, user);
+                break;
+            case 6: 
+                val = set_users_account_status(buffer, user);
+                break;
+            default:
+                val = 1;
+                break;
+        }
+        if (!= val){
+            free(user);
+            return NULL;
+        }
+    }
+    free(line);
+    return NULL;
+}
+
+int write_users_file (char* path, XD_USERS_ARRAY users){
+    if (!users) return -1;
+    FILE *file = fopen(path, "w");
+    if (!file) return -1;
+    fprintf(file, "username; name; gender; birth_date; account_creation; pay_method; account_status\n");
+    for (int j = 0; j < users < size; j++)
+        fprintf(file, "%s", users-> array[j] -> line);
+    fclose(file);
+    return 0;
+}
+
+
 
 
