@@ -7,12 +7,11 @@ struct xd_users {
     char* name;
     char gender;
     XD_DATE* birth_date;
-    XD_DATE* account_creation;
+    struct tm account_creation;
     char* pay_method;
     char* account_status;
 };
 
-// GET
 char* get_users_username (XD_USERS user){
     return user -> username;
 }
@@ -29,7 +28,7 @@ XD_DATE* get_users_birth_date (XD_USERS user){
     return user -> birth_date;
 }
 
-XD_DATE* get_users_account_creation (XD_USERS user){
+struct tm get_users_account_creation (XD_USERS user){
     return user -> account_creation;
 }
 
@@ -41,7 +40,6 @@ char* get_users_account_status (XD_USERS user){
     return user -> account_status;
 }
 
-// SET
 int set_users_username (XD_USERS user, char* line){
     user -> username = strdup(line);
     return strlen(line) > 0;
@@ -64,46 +62,24 @@ int set_users_birth_date (XD_USERS user, char* line){
 }
 
 int set_users_account_creation (XD_USERS user, char* line){
-    int 
+    if (strlen(line) ) return 0;
+
 }
 
 
 
-
-// nao sei se preciso
-int print_user_info (GH_USER usr) // Function used to print a user's information
+int set_created_at (char* line, GH_USER usr)  // Funçao utilizada para preencher o campo da data de criaçao
 {
-    if(!usr) 
-        return 0;
+    if (strlen(line)<19) return 0;   // Se a linha tiver menos de 19 caracteres não tem informação suficente para fazer o parse
 
-    printf("%d;", usr->id);
-    printf("%s;", usr->login);
-    printf("%s;", type_to_str(usr->type));
-    print_date(usr);
-    printf("%d;", usr->followers);
-    print_follower_list(usr);
-    printf("%d;", usr->following);
-    print_following_list(usr);
-    printf("%d;", usr->public_gists);
-    printf("%d \n", usr->public_repos);
-    return 1;
-}
 
-int write_user_info (FILE *file, GH_USER usr)
-{
-    if(!usr) 
-        return 0;
+    //Coloca na data os valores segundo o formato especificado
+    sscanf(line, "%d-%d-%d %d:%d:%d", &usr->created_at.tm_year, &usr->created_at.tm_mon, &usr->created_at.tm_mday, &usr->created_at.tm_hour, &usr->created_at.tm_min, &usr->created_at.tm_sec);
+    usr->created_at.tm_year -= 1900; // Subtrai 1900 ao ano (porque na estrutura struct tm, o campo tm_year conta o numero de anos que passou desde 1900)
+    usr->created_at.tm_mon -= 1;     // Subtrai 1 ao mes (porque na estrutura struct tm, o campo tm_mon conta o numero de meses que passou desde janeiro)
+    usr->created_at.tm_isdst = 1;
+    usr->created_at.tm_wday = 3;
+    usr->created_at.tm_yday = (usr->created_at.tm_mon * 30) + usr->created_at.tm_mday;
 
-    fprintf(file, "%d;", usr->id);
-    fprintf(file, "%s;", usr->login);
-    fprintf(file, "%s;", type_to_str(usr->type));
-    write_date(file, usr);
-    fprintf(file, "%d;", usr->followers);
-    write_follower_list(file, usr);
-    fprintf(file, "%d;", usr->following);
-    write_following_list(file, usr);
-    fprintf(file, "%d;", usr->public_gists);
-    fprintf(file, "%d", usr->public_repos);
-    fputc('\n', file);
-    return 1;
+    return (line[4]!='/') && (is_valid_date(usr->created_at));   // Retorna o valor que a função retorna, que é verdadeiro se estiver entre a data atual e 2005-07-04 00:00:00
 }
