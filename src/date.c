@@ -1,6 +1,5 @@
 #include "../libs/date.h"
 #include <time.h>
-#include <stdio.h>
 
 struct xd_date {
     int day;
@@ -20,7 +19,7 @@ int get_date_year (XD_DATE date){
     return date -> year;
 }
 
-void set_date (XD_DATE date, int day, int month, int year){
+int get_date_year (XD_DATE date){
     date -> day   = day;
     date -> month = month;
     date -> year  = year;
@@ -53,4 +52,5 @@ XD_DATE validar_date (char str_date){
     }
     return 0;
 } 
+
 
