@@ -1,6 +1,8 @@
 #include "../libs/drivers.h"
 #include "../libs/date.h"
 
+#include <glib.h>
+
 struct xd_drivers {
     char* line;
     int id;
@@ -12,6 +14,9 @@ struct xd_drivers {
     char* city;
     XD_DATE account_creation;
     char* account_status;
+};
+struct xd_drivers_ht{
+    GHashTable* xd_drivers_hash;
 };
 
 int get_drivers_id (XD_DRIVERS driver){
@@ -196,11 +201,33 @@ XD_DRIVERS build_drivers (char* line){
                 val = 1;
                 break;
         }
-        if (!= val){
-            free(driver);
-            return NULL;
-        }
+    return driver;
+}
+
+XD_DRIVERS_HT* create_driverHt(char* file_ent){
+    FILE *f;
+    char open[50];
+
+    f = fopen("drivers.csv", "r");
+
+    if (!f){
+        perror("Error");
+        return NULL;
     }
-    free(line);
-    return NULL;
+
+    XD_DRIVERS_HT* new = malloc (sizeof(struct xd_drivers_ht));
+    new -> xd_drivers_hash = g_hash_table_new(g_int_hash, g_int_equal);
+
+    char line[1000];
+    int buffer_size = 1000;
+
+    while(fgets(line, buffer_size, f)) {
+        XD_DRIVERS driver = build_drivers(strdup(line));
+        if (driver != NULL) g_hash_table_insert(new -> xd_drivers_hash, driver -> id, driver);
+        printf("%s\n", line);
+    }
+    fclose(f);
+    return new;
+}
+
 }

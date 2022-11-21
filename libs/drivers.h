@@ -1,8 +1,9 @@
-#ifndef DRIVERS
-#define DRIVERS
+
+#pragma once
 
 typedef struct xd_drivers *XD_DRIVERS;
- 
+
+typedef struct xd_drivers_ht XD_DRIVERS_HT;
 
 int get_drivers_id (XD_DRIVERS driver);
 
