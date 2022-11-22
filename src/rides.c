@@ -63,7 +63,7 @@ char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
 
-double get_users_aval_med ( XD_RIDES_HT* rides1, int ){
+double get_users_aval_med (XD_RIDES_HT* rides1, int ){
     GHashTableIter iter;
     gpointer key, value;
 
@@ -75,18 +75,40 @@ double get_users_aval_med ( XD_RIDES_HT* rides1, int ){
         if ()
         
     }
-
-
-
-
+    
 }
+
+int get_users_num_viagens_city (XD_RIDES_HT* rides2, )
+    GHashTableIter iter;
+    gpointer key, value;
+  
+    g_hash_table_iter_init (&iter, XD_RIDES_HT);
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        XD_RIDES rides = (XD_RIDES) value;
+        if (){
+
+
+        }
+}
+
+int get_users_num_viagens_date (XD_RIDES_HT* rides3, )
+    GHashTableIter iter;
+    gpointer key, value;
+  
+    g_hash_table_iter_init (&iter, XD_RIDES_HT);
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        XD_RIDES rides = (XD_RIDES) value;
+        if (){
+
+        }
+        
+    }
 
 int print_rides_infos (XD_RIDES rides){
     if(!rides)
         return 0;
     printf("%d;", rides -> id);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //printf("%d/%d/%d;", rides -> date -> day, rides -> date -> month, rides -> date -> year); 
+    printf("%d/%d/%d;", get_date_day(rides -> date), get_date_month(rides -> date), get_date_year(rides -> date)); 
     printf("%d;", rides -> driver);
     printf("%s;", rides -> user);
     printf("%s;", rides -> city); 
@@ -103,8 +125,7 @@ int write_rides_infos (FILE *file, XD_RIDES rides){
     if(!rides)
         return 0;
     fprintf(file, "%d;", rides -> id);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //fprintf(file, "%d/%d/%d;", rides -> date -> day, rides -> date -> month, rides -> date -> year); 
+    fprintf(file, "%d/%d/%d;", get_date_day(rides -> date), get_date_month(rides -> date), get_date_year(rides -> date)); 
     fprintf(file, "%d;", rides -> driver);
     fprintf(file, "%s;", rides -> user); 
     fprintf(file, "%s;", rides -> city); 
@@ -252,4 +273,3 @@ XD_RIDES_HT* create_ridesHt(char* file_ent){
   fclose(f);
   return new;
 }
-

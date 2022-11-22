@@ -49,10 +49,8 @@ int get_age (XD_DATE date){
     return goat;
 }
 
-// void print em que dou a estrutura da data -- falta
- void 
 
-//testa se uma data é valida (return 0-> valida / return 1 -> nao valida)
+// testa se uma data é valida (return 0-> valida / return 1 -> nao valida)
 int validar_date (XD_DATE data){
     
     XD_DATE date = malloc(sizeof(struct xd_date));

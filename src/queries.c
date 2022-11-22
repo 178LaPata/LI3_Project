@@ -1,6 +1,6 @@
 #include "../libs/queries.h"
 
-int query1 (XD_USER_HT* user1, XD_DRIVERS_HT* driver1, XD_RIDES_HT rides1, char* path){
+int query1 (XD_USER_HT* user1, XD_DRIVERS_HT* driver1, XD_RIDES_HT* rides1, char* path){
 
     if (isdigit(path) == 0){
         FILE *f = fopen(path, "W");
@@ -19,7 +19,6 @@ int query1 (XD_USER_HT* user1, XD_DRIVERS_HT* driver1, XD_RIDES_HT rides1, char*
         return 0;        
     }
 }
-
 
 /*
 Fazer funçoes get

@@ -56,14 +56,12 @@ int print_drivers_infos (XD_DRIVERS driver){
         return 0;
     printf("%d;", driver -> id);
     printf("%s;", driver -> name);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    printf("%d/%d/%d;", get_date_day(driver -> birth_date), get_date_month(driver -> birth_date), get_date_year(driver -> birth_date)); 
     printf("%c;", driver -> gender);
     printf("%s;", driver -> car_class); 
     printf("%s;", driver -> license_plate);
     printf("%s;", driver -> city);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    printf("%d/%d/%d;", get_date_day(driver -> account_creation), get_date_month(driver -> account_creation), get_date_year(driver -> account_creation)); 
     printf("%s \n", driver -> account_status);
     return 1;
 }
@@ -73,14 +71,12 @@ int write_drivers_infos (FILE *file, XD_DRIVERS driver){
         return 0;
     fprintf(file, "%d;", driver -> id);
     fprintf(file, "%s;", driver -> name);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    fprintf(file, "%d/%d/%d;", get_date_day(driver -> birth_date), get_date_month(driver -> birth_date), get_date_year(driver -> birth_date)); 
     fprintf(file, "%c;", driver -> gender); 
     fprintf(file, "%s;", driver -> car_class); 
     fprintf(file, "%s;", driver-> license_plate);
     fprintf(file, "%s;", driver-> city);
-    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
-    //fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    fprintf(file, "%d/%d/%d;", get_date_day(driver -> account_creation), get_date_month(driver -> account_creation), get_date_year(driver -> account_creation)); 
     fprintf(file, "%s;", driver-> account_status);
     fputc('\n', file); 
     return 1;
@@ -127,7 +123,6 @@ int set_drivers_car_class (XD_DRIVERS driver, char* line){
     else if(strcmp(line, "Premium"))
         driver -> car_class = "Premium";
     else return -1;
-    
     return 0;
 }
 int set_drivers_license_plate (XD_DRIVERS driver, char* line){

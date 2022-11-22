@@ -21,9 +21,9 @@ GLIB = `pkg-config --cflags --libs glib-2.0`
 # Flags for compiler
 CC_FLAGS = -Wall -g
   
-
 run:
+	@mkdir resultados
 	@$(CC) $(CFLAGS) $(SRC) $(GLIB) -o $(PROJ_NAME)
 
 clean:
-	@rm -rf *.o $(PROJ_NAME)
+	@rm -rf *.o $(PROJ_NAME) *~ resultados

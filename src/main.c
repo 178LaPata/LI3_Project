@@ -23,7 +23,7 @@ int main (int argc, char* agrs[]){
         case '1':
             printf("Query1\n");
             //chamar a funcao da query1
-            query1(create_userHt(user), create_driverHt(drive), )
+            query1(create_userHt(user)1, create_driverHt(driver));
             break;
         
         default:
