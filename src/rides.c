@@ -1,5 +1,8 @@
 #include "../libs/rides.h"
 #include "../libs/date.h"
+#include "../libs/users.h"
+#include "../libs/drivers.h"
+
 
 #include <glib.h>
 
@@ -61,6 +64,18 @@ char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
 
+double get_users_aval_med (XD_RIDES rides){
+        
+    rides -> score_user = atoi
+}
+
+
+double get_drivers_aval_med (XD_RIDES rides){
+    
+}
+
+
+
 int print_rides_infos (XD_RIDES rides){
     if(!rides)
         return 0;
@@ -121,8 +136,8 @@ int set_rides_date (XD_RIDES rides, char* line){
 }
 
 int set_rides_driver (XD_RIDES rides, char* line){
-    rides -> driver = strdup(line);
-    return strlen(line) > 0;
+    rides -> driver = atoi(line);
+    return (strlen(line) > 0);
 }
 
 int set_rides_user (XD_RIDES rides, char* line){
@@ -219,7 +234,7 @@ XD_RIDES_HT* create_ridesHt(char* file_ent){
   }
 
   XD_RIDES_HT* new = malloc (sizeof(struct xd_rides_ht));
-  new -> xd_rides_hash = g_hash_table_new(g_str_hash, g_str_equal);
+  new -> xd_rides_hash = g_hash_table_new(g_int_hash, g_int_equal);
 
   char line[1000];
   int buffer_size = 1000;
@@ -232,3 +247,4 @@ XD_RIDES_HT* create_ridesHt(char* file_ent){
   fclose(f);
   return new;
 }
+

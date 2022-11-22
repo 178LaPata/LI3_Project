@@ -45,6 +45,7 @@ char* get_user_account_status (XD_USER user){
     return user -> account_status;
 }
 
+// Função usada para dar print das informações do user
 int print_user_infos (XD_USER user){
     if(!user)
         return 0;
@@ -72,21 +73,25 @@ int write_user_infos (FILE *file, XD_USER user){
     return 1;
 }
 
+// Funçao utilizada para preencher o username
 int set_user_username (XD_USER user, char* line){
     user -> username = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o name
 int set_user_name (XD_USER user, char* line){
     user -> name = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o gender
 int set_user_gender (XD_USER user, char *line){
     user -> gender = line[0];
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a birth_date
 int set_user_birth_date (XD_USER user, char* line){
     char* bufferbd1;
     char* bufferbd2;
@@ -104,6 +109,7 @@ int set_user_birth_date (XD_USER user, char* line){
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a account_creation
 int set_user_account_creation (XD_USER user, char* line){
     char* bufferac1;
     char* bufferac2;
@@ -120,11 +126,13 @@ int set_user_account_creation (XD_USER user, char* line){
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o pay_method
 int set_user_pay_method (XD_USER user, char* line){
     user -> pay_method = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para validar 
 int valid_user_account (char* status){
     if (strcmp(status, "active") || strcmp(status, "inactive")) return 1;
     else return 0;

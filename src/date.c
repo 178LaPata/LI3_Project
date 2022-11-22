@@ -1,4 +1,7 @@
 #include "../libs/date.h"
+#include "../libs/users.h"
+#include "../libs/drivers.h"
+
 #include <time.h>
 
 struct xd_date {
@@ -25,6 +28,32 @@ int set_date (XD_DATE date, char* day, char* month, char* year){
     date -> year  = atoi(year);
 }
 
+int get_age (XD_DATE date){
+    time_t rawtime;
+    struct tm *get_localtime;
+    char buffer [80];
+
+    time (&rawtime);
+    get_localtime = localtime(&rawtime);
+
+    strftime(buffer,80,"%d", get_localtime);
+
+    int goat = (get_localtime->tm_year+1900) - (date -> year);
+    if ((get_localtime->tm_mon+1) < (date->month)){
+        goat--;
+    }else if ((get_localtime->tm_mon+1) == (date->month)){
+            if ((get_localtime->tm_mday) < (date->day)){
+                goat--;
+            }
+    }
+
+
+    return goat;
+}
+
+// void print em que dou a estrutura da data -- falta
+
+
 //testa se uma data é valida (return 0-> valida / return 1 -> nao valida)
 int validar_date (XD_DATE data){
     
@@ -39,19 +68,7 @@ int validar_date (XD_DATE data){
                 printf("Day is not valid.\n");
             
                 return 1;    
-            }
-            /*
-            if (((atoi(date -> day)) day >= 1 && day) <= 31 && (atoi(date -> month)) month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-                printf("Date is valid.\n");
-            else if (((atoi(date -> day)) day >= 1 && day <= 30) && (atoi(date -> month)) month == 4 || month == 6 || month == 9 || month == 11)
-                printf("Date is valid.\n");
-            else if (((atoi(date -> day)) day >= 1 && day <= 28) && (atoi(date -> month)) month == 2)
-                printf("Date is valid.\n");
-            else if (((atoi(date -> day)) day == 29) && (atoi(date -> month) month == 2) && (atoi(date -> year) year%400 == 0) ||(year%4 == 0 && year%100 != 0))
-                printf("Date is valid.\n");
-            else
-                printf("Day is invalid.\n");
-            */             
+            }            
         }
         else {
             
@@ -59,15 +76,10 @@ int validar_date (XD_DATE data){
             
             return 1;
         }
-    
     } else{
-
-        printf("Year is not valid.\n");
-            
+        printf("Year is not valid.\n");   
         return 1;
-    }
-
-    
+    }    
     return 0;
 } 
 

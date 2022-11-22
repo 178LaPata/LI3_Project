@@ -15,4 +15,6 @@ int get_date_year (XD_DATE date);
 
 int set_date (XD_DATE date, char* day, char* month, char* year);
 
+int get_age (XD_DATE date);
+
 int validar_date (XD_DATE date);

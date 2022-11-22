@@ -28,7 +28,7 @@ char* get_drivers_name (XD_DRIVERS driver){
 }
 
 XD_DATE get_drivers_birth_date (XD_DRIVERS driver){
-    return driver -> account_creation;
+    return driver -> birth_date;
 }
 
 char get_drivers_gender (XD_DRIVERS driver){
