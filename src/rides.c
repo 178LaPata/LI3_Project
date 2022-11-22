@@ -3,7 +3,6 @@
 #include "../libs/users.h"
 #include "../libs/drivers.h"
 
-
 #include <glib.h>
 
 struct xd_rides {
@@ -64,9 +63,20 @@ char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
 
+
 double get_users_aval_med (XD_RIDES rides){
-        
-    rides -> score_user = atoi
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init (&iter, XD_USER_HT);
+    while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+        // do something with key and value
+    }
+
+
+
+
 }
 
 

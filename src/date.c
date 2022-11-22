@@ -46,8 +46,6 @@ int get_age (XD_DATE date){
                 goat--;
             }
     }
-
-
     return goat;
 }
 
