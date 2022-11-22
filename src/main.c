@@ -8,25 +8,22 @@ int main (int argc, char* agrs[]){
 
     FILE *file_query = fopen(agrs[2], "r");
 
-    if(file_query)
-    {
+    if(file_query){
         perror("ERRO");
     }
 
     char linha[100];
 
-    while(fgets(linha, 100, file_query))
-    {
+    while(fgets(linha, 100, file_query)){
         char *dupl = strdup(&linha), *nmr_query = strsep(linha, " "), *argumentos;
 
         argumentos = strsep(dupl, "\n");
 
-        switch (nmr_query)
-        {
+        switch (nmr_query[0]){
         case '1':
             printf("Query1\n");
             //chamar a funcao da query1
-    
+            query1(create_userHt(user), create_driverHt(drive), )
             break;
         
         default:

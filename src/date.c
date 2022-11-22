@@ -50,7 +50,7 @@ int get_age (XD_DATE date){
 }
 
 // void print em que dou a estrutura da data -- falta
-
+ void 
 
 //testa se uma data é valida (return 0-> valida / return 1 -> nao valida)
 int validar_date (XD_DATE data){

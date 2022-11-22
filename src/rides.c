@@ -63,28 +63,23 @@ char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
 
-
-double get_users_aval_med (XD_RIDES rides){
+double get_users_aval_med ( XD_RIDES_HT* rides1, int ){
     GHashTableIter iter;
     gpointer key, value;
 
+    int op1;
+    
     g_hash_table_iter_init (&iter, XD_USER_HT);
-    while (g_hash_table_iter_next (&iter, &key, &value))
-    {
-        // do something with key and value
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        XD_RIDES rides = (XD_RIDES) value;
+        if ()
+        
     }
 
 
 
 
 }
-
-
-double get_drivers_aval_med (XD_RIDES rides){
-    
-}
-
-
 
 int print_rides_infos (XD_RIDES rides){
     if(!rides)

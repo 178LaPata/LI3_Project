@@ -232,7 +232,6 @@ XD_DRIVERS_HT* create_driverHt(char* file_ent){
 
     while(fgets(line, buffer_size, f)) {
         XD_DRIVERS driver = build_drivers(strdup(line));
-        //a key que estas a usar nesta hashtable é um int e a  hashtable quer um char* (acho eu)
         if (driver != NULL) g_hash_table_insert(new -> xd_drivers_hash, driver -> id, driver);
         printf("%s\n", line);
     }
