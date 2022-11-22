@@ -20,18 +20,27 @@ int get_date_year (XD_DATE date){
 }
 
 int set_date (XD_DATE date, char* day, char* month, char* year){
-    date -> day   = day;
-    date -> month = month;
-    date -> year  = year;
+    date -> day   = atoi(day);
+    date -> month = atoi(month);
+    date -> year  = atoi(year);
 }
 
-XD_DATE validar_date (char* str_date, char* day, char* month, char* year){
-    if (strlen(str_date) != 10 || str_date[2] + str_date[5] != 2*'/') return NULL;
+//testa se uma data é valida (return 0-> valida / return 1 -> nao valida)
+int validar_date (XD_DATE data){
     
     XD_DATE date = malloc(sizeof(struct xd_date));
-    if ()
-    if (atoi(date -> year)) year >= 1990 && year <= 2022; {
-        if (atoi(date -> month)) month >= 1 && month <= 12; {
+    
+    if (date -> year >= 1990 && date->year <= 2022){
+
+        if (date -> month >= 1 && date->month <= 12){
+
+            if(date->day <= 0 && date->day >= 32){
+
+                printf("Day is not valid.\n");
+            
+                return 1;    
+            }
+            /*
             if (((atoi(date -> day)) day >= 1 && day) <= 31 && (atoi(date -> month)) month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
                 printf("Date is valid.\n");
             else if (((atoi(date -> day)) day >= 1 && day <= 30) && (atoi(date -> month)) month == 4 || month == 6 || month == 9 || month == 11)
@@ -41,12 +50,23 @@ XD_DATE validar_date (char* str_date, char* day, char* month, char* year){
             else if (((atoi(date -> day)) day == 29) && (atoi(date -> month) month == 2) && (atoi(date -> year) year%400 == 0) ||(year%4 == 0 && year%100 != 0))
                 printf("Date is valid.\n");
             else
-                printf("Day is invalid.\n");         
+                printf("Day is invalid.\n");
+            */             
         }
         else {
+            
             printf("Month is not valid.\n");
+            
+            return 1;
         }
+    
+    } else{
+
+        printf("Year is not valid.\n");
+            
+        return 1;
     }
+
     
     return 0;
 } 

@@ -7,7 +7,7 @@ struct xd_drivers {
     char* line;
     int id;
     char* name;
-    XD_DATE account_creation;
+    XD_DATE birth_date;
     char gender;
     char* car_class;
     char* license_plate;
@@ -56,12 +56,14 @@ int print_drivers_infos (XD_DRIVERS driver){
         return 0;
     printf("%d;", driver -> id);
     printf("%s;", driver -> name);
-    printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
-    printf("%s;", driver -> gender);
+    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
+    //printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    printf("%c;", driver -> gender);
     printf("%s;", driver -> car_class); 
     printf("%s;", driver -> license_plate);
     printf("%s;", driver -> city);
-    printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
+    //printf("%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
     printf("%s \n", driver -> account_status);
     return 1;
 }
@@ -71,21 +73,23 @@ int write_drivers_infos (FILE *file, XD_DRIVERS driver){
         return 0;
     fprintf(file, "%d;", driver -> id);
     fprintf(file, "%s;", driver -> name);
-    fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
-    fprintf(file, "%s;", driver -> gender); 
+    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
+    //fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    fprintf(file, "%c;", driver -> gender); 
     fprintf(file, "%s;", driver -> car_class); 
     fprintf(file, "%s;", driver-> license_plate);
     fprintf(file, "%s;", driver-> city);
-    fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
+    //nao podes aceder a estrutura da data daqui -> tens que criar funcoes para fazer isso no ficheiro de date
+    //fprintf(file, "%d/%d/%d;", driver -> account_creation -> day, driver -> account_creation -> month, driver -> account_creation -> year); 
     fprintf(file, "%s;", driver-> account_status);
     fputc('\n', file); 
     return 1;
 }
 
-int set_drivers_id (char*line , XD_DRIVERS driver){
+int set_drivers_id (char* line, XD_DRIVERS driver){
     int ola = atoi(line);  
     driver -> id = ola;
-    return (ola >= 0 && isNum(line)); 
+    return (strlen(line) > 0); 
 }
 
 int set_drivers_name (XD_DRIVERS driver, char* line){
@@ -94,24 +98,24 @@ int set_drivers_name (XD_DRIVERS driver, char* line){
 }
 
 int set_drivers_birth_date (XD_DRIVERS driver, char* line){
-    char* bufferbd;
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> birth_date -> day = atol(bufferbd);
+    char* bufferdriversbd1;
+    char* bufferdriversbd2;
+    char* bufferdriversbd3;
+    if((bufferdriversbd1 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     } 
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> birth_date -> month = atol(bufferbd);
+    if((bufferdriversbd2 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> birth_date -> year = atol(bufferbd);
+    if((bufferdriversbd3 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }   
+    set_date(driver -> birth_date, bufferdriversbd1, bufferdriversbd2, bufferdriversbd3);
     return strlen(line) > 0;
 }
 
-int set_drivers_gender (XD_DRIVERS drivers, char* line){
-    driver -> gender = strdup(line);
+int set_drivers_gender (XD_DRIVERS driver, char* line){
+    driver -> gender = line[0];
     return strlen(line) > 0;
 }
 
@@ -122,86 +126,91 @@ int set_drivers_car_class (XD_DRIVERS driver, char* line){
         driver -> car_class = "Green";
     else if(strcmp(line, "Premium"))
         driver -> car_class = "Premium";
-    else return
-    return strlen(line) > 0;
+    else return -1;
+    
+    return 0;
 }
 int set_drivers_license_plate (XD_DRIVERS driver, char* line){
-    driver -> license_plate = strdu(line);
+    driver -> license_plate = strdup(line);
     return strlen(line) > 0;
 }
 
 int set_drivers_city (XD_DRIVERS driver, char* line){
-    driver -> city = strdu(line);
+    driver -> city = strdup(line);
     return strlen(line) > 0;
 }
 
 int set_drivers_account_creation (XD_DRIVERS driver, char* line){
-    char* bufferac;
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> account_creation -> day = atol(bufferac);
+    char* bufferdriversac1;
+    char* bufferadriversc2;
+    char* bufferdriversac3;
+    if((bufferdriversac1 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     } 
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> account_creation -> month = atol(bufferac);
+    if((bufferadriversc2 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        driver -> account_creation -> year = atol(bufferac);
+    if((bufferdriversac3 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }   
     return strlen(line) > 0;
 }
 
 int valid_drivers_account (char* status){
-    if ((status == "active") || (sexo == "inactive")) return 1;
+    if ((status == "active") || (status == "inactive")) return 1;
     else return 0;
 }
 
-int set_drivers_account_status (XD_DRIVERS driver, char status){
-    if (valid_drivers_account(status)) driver -> account_status = status;
+int set_drivers_account_status (XD_DRIVERS driver, char* status){
+    if (valid_drivers_account(status)){
+
+      driver -> account_status = status;  
+
+      return 0; // sucesso
+    } 
+    else return 1; // falhanco
 }
 
 XD_DRIVERS build_drivers (char* line){ 
-    XD_DRIVERS driver = malloc(sizeof(struct xd_driver));
+    XD_DRIVERS driver = malloc(sizeof(struct xd_drivers));
     int i = 0;
     int val = 1;
     char* buffer;
-
-    driver -> line = strdup(line);
-    while ((buffer = strsep(&line, ";\n")) 1= NULL){
+    while ((buffer = strsep(&line, ";\n")) != NULL){
         switch (i++){
             case 0: 
                 val = set_drivers_id(buffer, driver);
                 break;
             case 1:
-                val = set_drivers_name(buffer, driver);
+                val = set_drivers_name(driver, buffer);
                 break;
             case 2:
-                val = set_drivers_birth_date(buffer, driver);
+                val = set_drivers_birth_date(driver, buffer);
                 break;
             case 3: 
-                val = set_drivers_gender(buffer, driver);
+                val = set_drivers_gender(driver, buffer);
                 break;
             case 4:
-                val = set_drivers_car_class(buffer, driver);
+                val = set_drivers_car_class(driver, buffer);
                 break;
             case 5:
-                val = set_drivers_license_plate(buffer, driver);
+                val = set_drivers_license_plate(driver, buffer);
                 break;
             case 6:
-                val = set_drivers_city(buffer, driver);
+                val = set_drivers_city(driver, buffer);
                 break;
             case 7:
-                val =set_drivers_account_creation(buffer, driver);
+                val =set_drivers_account_creation(driver, buffer);
                 break;
             case 8: 
-                val = set_drivers_account_status(buffer, driver);
+                val = set_drivers_account_status(driver, buffer);
                 break;
             default:
                 val = 1;
                 break;
         }
     return driver;
+}
 }
 
 XD_DRIVERS_HT* create_driverHt(char* file_ent){
@@ -223,6 +232,7 @@ XD_DRIVERS_HT* create_driverHt(char* file_ent){
 
     while(fgets(line, buffer_size, f)) {
         XD_DRIVERS driver = build_drivers(strdup(line));
+        //a key que estas a usar nesta hashtable é um int e a  hashtable quer um char* (acho eu)
         if (driver != NULL) g_hash_table_insert(new -> xd_drivers_hash, driver -> id, driver);
         printf("%s\n", line);
     }
@@ -230,4 +240,3 @@ XD_DRIVERS_HT* create_driverHt(char* file_ent){
     return new;
 }
 
-}

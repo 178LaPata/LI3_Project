@@ -1,5 +1,7 @@
-
 #pragma once
+
+#include "../libs/date.h"
+#include <stdio.h>
 
 typedef struct xd_drivers *XD_DRIVERS;
 
@@ -25,7 +27,7 @@ int print_drivers_infos (XD_DRIVERS driver);
 
 int write_drivers_infos (FILE *file, XD_DRIVERS driver);
 
-int set_drivers_id (char*line , XD_DRIVERS driver);
+int set_drivers_id (char* line , XD_DRIVERS driver);
 
 int set_drivers_name (XD_DRIVERS driver, char* line);
 
@@ -43,11 +45,11 @@ int set_drivers_account_creation (XD_DRIVERS driver, char* line);
 
 int valid_drivers_account (char* status);
 
-int set_drivers_account_status (XD_DRIVERS driver, char status);
+int set_drivers_account_status (XD_DRIVERS driver, char *status);
 
 XD_DRIVERS build_drivers (char* line); 
 
-
+XD_DRIVERS_HT* create_driverHt(char* file_ent);
 
 
 

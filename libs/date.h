@@ -13,6 +13,6 @@ int get_date_month (XD_DATE date);
 
 int get_date_year (XD_DATE date);
 
-int set_date (XD_DATE date);
+int set_date (XD_DATE date, char* day, char* month, char* year);
 
-XD_DATE validar_date (char str_date);
+int validar_date (XD_DATE date);

@@ -28,7 +28,7 @@ int set_user_username (XD_USER user, char* line);
 
 int set_user_name (XD_USER user, char* line);
 
-void set_user_gender (XD_USER user, char line);
+int set_user_gender (XD_USER user, char *line);
 
 int set_user_birth_date (XD_USER user, char* line);
 

@@ -82,40 +82,40 @@ int set_user_name (XD_USER user, char* line){
     return strlen(line) > 0;
 }
 
-void set_user_gender (XD_USER user, char line){
-    user -> gender = line;
+int set_user_gender (XD_USER user, char *line){
+    user -> gender = line[0];
+    return strlen(line) > 0;
 }
 
 int set_user_birth_date (XD_USER user, char* line){
-    char* bufferbd;
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_day(user -> birth_date) = atoi(bufferbd);
+    char* bufferbd1;
+    char* bufferbd2;
+    char* bufferbd3;
+    if((bufferbd1 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     } 
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_month(user -> birth_date) = atoi(bufferbd);
+    if((bufferbd2 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }
-    if((bufferbd = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_year(user -> birth_date) = atoi(bufferbd);
+    if((bufferbd3 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }   
+    set_date(user -> birth_date, bufferbd1, bufferbd2, bufferbd3);
     return strlen(line) > 0;
 }
 
 int set_user_account_creation (XD_USER user, char* line){
-    char* bufferac;
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_day(user -> account_creation) = atoi(bufferac);
+    char* bufferac1;
+    char* bufferac2;
+    char* bufferac3;
+    if((bufferac1 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     } 
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_month(user -> account_creation) = atoi(bufferac);
+    if((bufferac2 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }
-    if((bufferac = strsep(&line, "/\n")) != NULL){  
-      
-        get_date_year(user -> account_creation) = atoi(bufferac);
+    if((bufferac3 = strsep(&line, "/\n")) == NULL){  
+        return -1;
     }   
     return strlen(line) > 0;
 }
@@ -142,25 +142,25 @@ XD_USER build_user (char* line){
     while ((buffer = strsep(&line, ";\n")) != NULL){
         switch (i++){
             case 0: 
-                val = set_user_username(buffer, user);
+                val = set_user_username(user, buffer);
                 break;
             case 1:
-                val = set_user_name(buffer, user);
+                val = set_user_name(user, buffer);
                 break;
             case 2:
-                val = set_user_gender(buffer, user);
+                val = set_user_gender(user, buffer);
                 break;
             case 3: 
-                val = set_user_birth_date(buffer, user);
+                val = set_user_birth_date(user, buffer);
                 break;
             case 4:
-                val = set_user_account_creation(buffer, user);
+                val = set_user_account_creation(user, buffer);
                 break;
             case 5:
-                val = set_user_pay_method(buffer, user);
+                val = set_user_pay_method(user, buffer);
                 break;
             case 6: 
-                val = set_user_account_status(buffer, user);
+                val = set_user_account_status(user, buffer);
                 break;
             default:
                 val = 1;
