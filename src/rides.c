@@ -5,6 +5,7 @@
 
 #include <glib.h>
 
+
 struct xd_rides {
     char* line;
     int id;
@@ -62,8 +63,8 @@ double get_rides_tip (XD_RIDES rides){
 char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
-
-double get_users_aval_med (XD_RIDES_HT* rides1, int ){
+/*
+double get_users_aval_med (XD_RIDES_HT* rides1){
     GHashTableIter iter;
     gpointer key, value;
 
@@ -71,8 +72,7 @@ double get_users_aval_med (XD_RIDES_HT* rides1, int ){
     
     g_hash_table_iter_init (&iter, XD_USER_HT);
     while (g_hash_table_iter_next (&iter, &key, &value)){
-        XD_RIDES rides = (XD_RIDES) value;
-        if ()
+        //if (value = )
         
     }
     
@@ -91,18 +91,16 @@ int get_users_num_viagens_city (XD_RIDES_HT* rides2, )
         }
 }
 
-int get_users_num_viagens_date (XD_RIDES_HT* rides3, )
+
+int get_users_num_viagens_date (XD_RIDES_HT* rides3)
     GHashTableIter iter;
     gpointer key, value;
   
     g_hash_table_iter_init (&iter, XD_RIDES_HT);
     while (g_hash_table_iter_next (&iter, &key, &value)){
         XD_RIDES rides = (XD_RIDES) value;
-        if (){
-
-        }
-        
-    }
+       
+*/
 
 int print_rides_infos (XD_RIDES rides){
     if(!rides)

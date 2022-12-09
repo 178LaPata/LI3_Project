@@ -10,4 +10,4 @@
 #include <ctype.h>
 
 
-int query1 (XD_USER_HT* user1, XD_DRIVERS_HT* driver1, char* path);
+// int query1 (XD_USER_HT* user1, XD_DRIVERS_HT* driver1, XD_RIDES_HT *rides1, char* path);

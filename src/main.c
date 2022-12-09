@@ -2,7 +2,7 @@
 #include "../libs/drivers.h"
 #include "../libs/rides.h"
 #include "../libs/date.h"
-#include "../libs/queries.h"
+// #include "../libs/queries.h"
 
 int main (int argc, char* agrs[]){
 
@@ -22,8 +22,8 @@ int main (int argc, char* agrs[]){
         switch (nmr_query[0]){
         case '1':
             printf("Query1\n");
-            //chamar a funcao da query1
-            query1(create_userHt(user)1, create_driverHt(driver));
+            // chamar a funcao da query1
+            // query1(create_userHt(user)1, create_driverHt(driver));
             break;
         
         default:

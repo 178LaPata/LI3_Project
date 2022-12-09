@@ -25,7 +25,7 @@ double get_rides_tip (XD_RIDES rides);
 
 char* get_rides_comment (XD_RIDES rides);
 
-double get_users_aval_med ( XD_RIDES_HT* rides1, int );
+// double get_users_aval_med ( XD_RIDES_HT* rides1, int );
 
 int print_rides_infos (XD_RIDES rides);
 

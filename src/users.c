@@ -3,6 +3,7 @@
 
 #include <glib.h>
 
+
 struct xd_user {
     char* username;
     char* name;
