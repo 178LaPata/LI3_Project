@@ -5,7 +5,6 @@
 
 #include <glib.h>
 
-
 struct xd_rides {
     char* line;
     int id;
@@ -64,6 +63,8 @@ char* get_rides_comment (XD_RIDES rides){
     return rides -> comment;
 }
 /*
+// Funçoes query1
+ 
 double get_users_aval_med (XD_RIDES_HT* rides1){
     GHashTableIter iter;
     gpointer key, value;
@@ -102,6 +103,7 @@ int get_users_num_viagens_date (XD_RIDES_HT* rides3)
        
 */
 
+// Função usada para dar print das informações das rides
 int print_rides_infos (XD_RIDES rides){
     if(!rides)
         return 0;
@@ -118,7 +120,7 @@ int print_rides_infos (XD_RIDES rides){
 
     return 1;
 }
-
+// Função usada para dar write das informações das rides
 int write_rides_infos (FILE *file, XD_RIDES rides){
     if(!rides)
         return 0;
@@ -136,12 +138,14 @@ int write_rides_infos (FILE *file, XD_RIDES rides){
     return 1;
 }
 
+// Funçao utilizada para definir o id das rides
 int set_rides_id (char* line, XD_RIDES rides){
     int op = atoi(line);
     rides -> id = op;
     return (strlen(line) > 0); 
 }  
 
+// Funçao utilizada para definir a data da ride
 int set_rides_date (XD_RIDES rides, char* line){
     char* bufferridesbd1;
     char* bufferridesbd2;
@@ -159,46 +163,55 @@ int set_rides_date (XD_RIDES rides, char* line){
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o driver das rides
 int set_rides_driver (XD_RIDES rides, char* line){
     rides -> driver = atoi(line);
     return (strlen(line) > 0);
 }
 
+// Funçao utilizada para preencher o user das rides
 int set_rides_user (XD_RIDES rides, char* line){
     rides -> user = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a city das rides
 int set_rides_city (XD_RIDES rides, char* line){
     rides -> city = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a distance das rides
 int set_rides_distance (XD_RIDES rides, char* line){
     rides -> distance = atoi(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o score do user das rides
 int set_rides_score_user (XD_RIDES rides, char* line){
     rides -> score_user = atoi(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o score do driver das rides
 int set_rides_score_driver (XD_RIDES rides, char* line){
     rides -> score_driver = atoi(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a tip das rides
 int set_rides_tip (XD_RIDES rides, char* line){
     rides -> tip = atoi(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o comentario das rides
 int set_rides_comment (XD_RIDES rides, char* line){
     rides -> comment = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para construir rides
 XD_RIDES build_rides (char* line){ 
     XD_RIDES rides = malloc(sizeof(struct xd_rides));
     int i = 0;
@@ -246,6 +259,7 @@ XD_RIDES build_rides (char* line){
 }
 }
 
+// Funçao usada para criar a hash table das rides
 XD_RIDES_HT* create_ridesHt(char* file_ent){
   FILE *f;
   char open[50];

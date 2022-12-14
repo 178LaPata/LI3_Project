@@ -22,12 +22,14 @@ int get_date_year (XD_DATE date){
     return date -> year;
 }
 
+// Funçao utilizada para definir a data
 int set_date (XD_DATE date, char* day, char* month, char* year){
     date -> day   = atoi(day);
     date -> month = atoi(month);
     date -> year  = atoi(year);
 }
 
+// Funcao utilizada para calcular a idade
 int get_age (XD_DATE date){
     time_t rawtime;
     struct tm *get_localtime;

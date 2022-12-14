@@ -51,6 +51,7 @@ XD_DATE get_drivers_account_creation (XD_DRIVERS driver){
     return driver -> account_creation;
 }
 
+// Função usada para dar print das informações dos drivers
 int print_drivers_infos (XD_DRIVERS driver){
     if(!driver)
         return 0;
@@ -65,7 +66,7 @@ int print_drivers_infos (XD_DRIVERS driver){
     printf("%s \n", driver -> account_status);
     return 1;
 }
-
+// Função usada para dar write das informações dos drivers
 int write_drivers_infos (FILE *file, XD_DRIVERS driver){
     if(!driver)
         return 0;
@@ -82,17 +83,20 @@ int write_drivers_infos (FILE *file, XD_DRIVERS driver){
     return 1;
 }
 
+// Funçao utilizada para definir o id 
 int set_drivers_id (char* line, XD_DRIVERS driver){
     int ola = atoi(line);  
     driver -> id = ola;
     return (strlen(line) > 0); 
 }
 
+// Funçao utilizada para preencher o nome
 int set_drivers_name (XD_DRIVERS driver, char* line){
     driver -> name = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a data de nascimento
 int set_drivers_birth_date (XD_DRIVERS driver, char* line){
     char* bufferdriversbd1;
     char* bufferdriversbd2;
@@ -110,11 +114,13 @@ int set_drivers_birth_date (XD_DRIVERS driver, char* line){
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher o genero
 int set_drivers_gender (XD_DRIVERS driver, char* line){
     driver -> gender = line[0];
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a car class
 int set_drivers_car_class (XD_DRIVERS driver, char* line){
     if(strcmp(line, "Basic"))
         driver -> car_class = "Basic";
@@ -125,16 +131,20 @@ int set_drivers_car_class (XD_DRIVERS driver, char* line){
     else return -1;
     return 0;
 }
+
+// Funçao utilizada para preencher a matricula
 int set_drivers_license_plate (XD_DRIVERS driver, char* line){
     driver -> license_plate = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para preencher a cidade
 int set_drivers_city (XD_DRIVERS driver, char* line){
     driver -> city = strdup(line);
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para definir a data de criaçao
 int set_drivers_account_creation (XD_DRIVERS driver, char* line){
     char* bufferdriversac1;
     char* bufferadriversc2;
@@ -151,11 +161,13 @@ int set_drivers_account_creation (XD_DRIVERS driver, char* line){
     return strlen(line) > 0;
 }
 
+// Funçao utilizada para validar uma conta
 int valid_drivers_account (char* status){
     if ((status == "active") || (status == "inactive")) return 1;
     else return 0;
 }
 
+// Funçao utilizada para definir o status da conta 
 int set_drivers_account_status (XD_DRIVERS driver, char* status){
     if (valid_drivers_account(status)){
 
@@ -166,6 +178,7 @@ int set_drivers_account_status (XD_DRIVERS driver, char* status){
     else return 1; // falhanco
 }
 
+// Funçao usada para construir driver
 XD_DRIVERS build_drivers (char* line){ 
     XD_DRIVERS driver = malloc(sizeof(struct xd_drivers));
     int i = 0;
@@ -208,6 +221,7 @@ XD_DRIVERS build_drivers (char* line){
 }
 }
 
+// Funçao usada para criar a hash table dos drivers
 XD_DRIVERS_HT* create_driverHt(char* file_ent){
     FILE *f;
     char open[50];

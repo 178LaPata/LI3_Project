@@ -60,6 +60,7 @@ int print_user_infos (XD_USER user){
     return 1;
 }
 
+// Função usada para dar write as informações do user
 int write_user_infos (FILE *file, XD_USER user){
     if(!user)
         return 0;
@@ -133,16 +134,18 @@ int set_user_pay_method (XD_USER user, char* line){
     return strlen(line) > 0;
 }
 
-// Funçao utilizada para validar 
+// Funçao utilizada para validar uma conta de utlizador
 int valid_user_account (char* status){
     if (strcmp(status, "active") || strcmp(status, "inactive")) return 1;
     else return 0;
 }
 
+// Funçao utilizada para definir o status de uma conta
 int set_user_account_status (XD_USER user, char* status){
     if (valid_user_account(status)) user -> account_status = status;
 }
 
+// Funçao usada para construir utilizador
 XD_USER build_user (char* line){
     XD_USER user = malloc(sizeof(struct xd_user));
     int i = 0;
@@ -179,6 +182,7 @@ XD_USER build_user (char* line){
 }
 }
 
+// Funçao usada para criar a hash table dos users
 XD_USER_HT* create_userHt(char* file_ent){
   FILE *f;
   char open[50];
@@ -198,7 +202,7 @@ XD_USER_HT* create_userHt(char* file_ent){
 
   while(fgets(line, buffer_size, f)) {
       XD_USER user = build_user(strdup(line));
-      if (user != NULL) g_hash_table_insert(new -> xd_user_hash, user -> username, user);
+      if (user != NULL) g_hash_table_insert(new -> xd_user_hash, user -> username, user); // recebe a hash table, a key e o valor que quero guardar
       printf("%s\n", line);
 }
   fclose(f);
