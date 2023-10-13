@@ -1,7 +1,7 @@
 #include "date.h"
 
-#define DATE "2023/10/10"
-#define DATETIME "2023/10/10 00:00:00"
+#define DATE "2023/10/01"
+#define DATETIME "2023/10/01 00:00:00"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -34,10 +34,10 @@ Date valid_date(char *date_str) {
             else return NULL;
         }
         else return NULL;
-    }
-    else return NULL;
+    } else return NULL;
 
-    return date;
+    free(date);
+    return NULL;
 }
 
 

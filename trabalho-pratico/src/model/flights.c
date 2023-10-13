@@ -13,10 +13,10 @@ struct flights {
     int total_seats;
     char *origin;
     char *destination;
-    DateTime schedule_departure_date; // tem de ter data e hora
-    DateTime schedule_arrival_date; // tem de ter data e hora
-    DateTime real_departure_date; // tem de ter data e hora
-    DateTime real_arrival_date; // tem de ter data e hora
+    DateTime schedule_departure_date;  
+    DateTime schedule_arrival_date;  
+    DateTime real_departure_date;  
+    DateTime real_arrival_date;  
     char *pilot;
     char *copilot;
     char *notes;
@@ -50,29 +50,25 @@ Flights *create_flights(char *line){
                 flights->id = (int) strtol(buffer, (char **) NULL, 10);
                 break;
             case 1:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->airline = strdup(buffer);
                     break;
-                }
             case 2:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->plane_model = strdup(buffer);
                     break; 
-                }
             case 3: 
                 flights->total_seats = verify_total_seats(buffer);
                 if (flights->total_seats == 0) val = 0;
                 break;
             case 4:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->origin = strdup(buffer);
                     break;
-                }
             case 5:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->destination = strdup(buffer);
                     break;
-                }
             case 6:
                 flights->schedule_departure_date = verify_dateTime(buffer);
                 if (flights->schedule_departure_date == 0) val = 0;
@@ -90,20 +86,17 @@ Flights *create_flights(char *line){
                 if (flights->real_arrival_date == 0) val = 0;
                 break;
             case 10:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->pilot = strdup(buffer);
                     break;
-                }
             case 11:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->copilot = strdup(buffer);
                     break;
-                }
             case 12:
-                if (strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     flights->notes = strdup(buffer);
                     break;
-                }
             default:
                 val = 0;
                 break;

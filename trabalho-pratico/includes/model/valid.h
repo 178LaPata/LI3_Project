@@ -1,8 +1,10 @@
 
-// pode vir a mudar
 enum pay_method{
     cash,
-    card
+    card,
+    mbway,
+    paypal,
+    noPayMethod
 };
 
 enum account_status{

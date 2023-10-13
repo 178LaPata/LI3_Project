@@ -6,41 +6,32 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-/*
-    TODO:
-    - ver o que e necessario validar 
-    - fazer as funcoes de parse
-    - criar hash table
-    - dar free a tudo
-    
 
-*/
 struct users {
     int id;
     char *name;
     char *email;
-    int phone_number; // nao é definitivo
+    int phone_number;
     Date birth_date;
     char *sex; 
     int passport;
-    int country_code;
+    char *country_code;
     char *adress;
     Date account_creation;
-    enum pay_method pay_method; // ig maybe
+    enum pay_method pay_method;
     enum account_status account_status;
-
 };
 
 struct cat_users {
     GHashTable *users_hashtable;
 };
 
-// da free a um user e as suas variaveis
 void delete_users(void *data){
     Users *users = (Users *) data;
     free(users->name);
     free(users->email);
     free(users->sex);
+    free(users->country_code);
     free(users->adress);
     free(users);
 }
@@ -53,15 +44,13 @@ Users *create_users(char *line){
     while((buffer = strsep(&line, ";")) ! NULL){
         switch(i++){
             case 0:
-                if(strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     users->name = strdup(buffer);
                     break;
-                }
             case 1:
-                if(strlen(buffer) == 0){
+                if (strlen(buffer) == 0) val = 0;
                     users->email = strdup(buffer);
                     break;
-                }
             case 2:
                 users->phone_number = verify_phoneNumber(buffer);
                 if(users->phone_number == 0) val = 0;
@@ -71,34 +60,34 @@ Users *create_users(char *line){
                 if(users->birth_date == 0) val = 0;
                 break;
             case 4:
-                if(strlen(buffer) == 0){
+                // usar funcao tolower e strcmp
+                if (strlen(buffer) == 0) val = 0;
                     users->sex = strdup(buffer);
                     break;
-                }
             case 5:
                 users->passport = verify_passport(buffer);
                 if(users->passport == 0) val = 0;
                 break;
             case 6:
-                users->country_code = verify_countryCode(buffer);
-                if(users->country_code == 0) val = 0;
-                break;
+                // usar funcao tolwer e strcmp com a primeira e ultima do abecedario  
+                if (strlen(buffer) == 0) val = 0;
+                    users->country_code == strdup(buffer);
+                    break;
             case 7:
-                if(strlen(buffer) == 0){
+                if(strlen(buffer) == 0) val = 0;
                     users->adress = strdup(buffer);
                     break;
-                }
             case 8:
                 users->account_creation = verify_Date(buffer);
                 if(users->account_creation == 0) val = 0;
                 break;
             case 9:
                 users->pay_method = verify_payMethod(buffer);
-                if(users->pay_method == 0) val = 0; // mudar 0 para inativo ou wtv
+                if(users->pay_method == noPayMethod) val = 0;
                 break;
             case 10:
                 users->account_status = verify_accountStatus(buffer);
-                if(users->account_status == 0) val = 0; // mudar 0 para inativo ou wtv
+                if(users->account_status == NoStatus) val = 0;
                 break;
         }
     }
@@ -148,7 +137,7 @@ CAT_USERS *create_cat_users(char *entry_files){
     free(line);
     fclose(fp);
 
-    return cu;
+    return cat_users;
 }
     
 void delete_cat_users(CAT_USERS *cat_users){

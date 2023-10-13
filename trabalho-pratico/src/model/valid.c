@@ -4,8 +4,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-// verificacao basica de um numero de telefone
-// TODO: sq add mais restricoes ??
 int verify_phoneNumber(char *token){
     if (strlen(token)!=9) return 0;
     char *val;
@@ -44,4 +42,35 @@ enum account_status verify_accountStatus (char* token){
         return Inactive;
     }
     else return NoStatus;
+}
+
+int verify_email(char *email) {
+    int i, atCount = 0, dotCount = 0;
+    int usernameLength = 0, domainLength = 0, tldLength = 0;
+    int lastDotPosition = -1, atPosition = -1;
+
+    for(i = 0; i < strlen(email); i++) {
+        if(email[i] == '@') {
+            atCount++;
+            atPosition = i;
+        }
+        else if(email[i] == '.') {
+            dotCount++;
+            lastDotPosition = i;
+        }
+    }
+
+    if(atCount != 1 || dotCount < 1 || atPosition < 1 || lastDotPosition < atPosition+2 || lastDotPosition == strlen(email)-1) {
+        return 0; 
+    }
+
+    usernameLength = atPosition;
+    domainLength = lastDotPosition - (atPosition + 1);
+    tldLength = strlen(email) - (lastDotPosition + 1);
+
+    if(usernameLength < 1 || domainLength < 1 || tldLength < 2) {
+        return 0;
+    }
+
+    return 1;
 }
