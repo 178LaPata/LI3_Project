@@ -1,5 +1,7 @@
-#include "users.h"
-#include "date.h"
+#include "../../includes/model/users.h"
+#include "../../includes/model/date.h"
+#include "../../includes/model/valid.h"
+
 
 
 #include <glib.h>
@@ -41,7 +43,7 @@ Users *create_users(char *line){
     char *buffer;
     int i = 0;
     int val = 1;
-    while((buffer = strsep(&line, ";")) ! NULL){
+    while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
                 if (strlen(buffer) == 0) val = 0;
@@ -65,7 +67,7 @@ Users *create_users(char *line){
                     users->sex = strdup(buffer);
                     break;
             case 5:
-                users->passport = verify_passport(buffer);
+                //users->passport = verify_passport(buffer);
                 if(users->passport == 0) val = 0;
                 break;
             case 6:
@@ -125,8 +127,8 @@ CAT_USERS *create_cat_users(char *entry_files){
     start = clock();
     while (getline(&line, &len, fp) > 0) {
         line[strcspn(line, "\n")] = 0;
-        User *u = create_User(line);
-        if (u != NULL) insert_User(cu, u);
+        Users *u = create_users(line);
+        if (u != NULL) insert_users(cat_users, u);
     }
     end = clock();
 

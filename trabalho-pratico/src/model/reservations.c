@@ -1,5 +1,6 @@
-#include "reservations.h"
-#include "date.h"
+#include "../../includes/model/reservations.h"
+#include "../../includes/model/date.h"
+
 
 #include <glib.h>
 #include <string.h>
@@ -10,7 +11,7 @@ struct reservations {
     int id;
     int user_id;
     int hotel_id;
-    char *hotel_name
+    char *hotel_name;
     int hotel_stars;
     int city_tax;
     char *adress;
@@ -31,7 +32,7 @@ void delete_reservations(void *data){
     Reservations *reservations = (Reservations *) data;
     free(reservations->hotel_name);
     free(reservations->adress);
-    free(reservations->includes_breakfast)
+    free(reservations->includes_breakfast);
     free(reservations->room_details);
     free(reservations->comments);
     free(reservations);
@@ -61,11 +62,11 @@ Reservations *create_reservations(char *line){
                     reservations->hotel_name = strdup(buffer);
                     break;
             case 4:
-                reservations->hotel_stars = verify_hotel_stars(buffer);
+                //reservations->hotel_stars = verify_hotel_stars(buffer);
                 if (reservations->hotel_stars == 0) val = 0;
                 break;
             case 5:
-                reservations->city_tax = verify_city_tax(buffer);
+                //reservations->city_tax = verify_city_tax(buffer);
                 if (reservations->city_tax == 0) val = 0;
                 break;
             case 6:
@@ -87,14 +88,14 @@ Reservations *create_reservations(char *line){
                 }
             case 10:
                 if (strlen(buffer) == 0) val = 0;
-                    reservations->includes_breakfast = verify_includesBreakfast(buffer);
+                    //reservations->includes_breakfast = verify_includesBreakfast(buffer);
                     break;
             case 11:
                 if (strlen(buffer) == 0) val = 0;
                     reservations->room_details = strdup(buffer);
                     break;
             case 12:
-                reservations->rating = verify_rating(buffer);
+                //reservations->rating = verify_rating(buffer);
                 if (reservations->rating == 0) val = 0;
                 break;
             case 13:
@@ -113,16 +114,16 @@ Reservations *create_reservations(char *line){
     return reservations;
 }
 
-void insert_reservations(Reservations *reservations, Cat_Reservations *cat_reservations){
+void insert_reservations(Reservations *reservations, CAT_RESERVATIONS *cat_reservations){
     g_hash_table_insert(cat_reservations->reservations_hashtable, &reservations->id, reservations);
 }
 
 CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
     
-    FILE *fp
+    FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fb = fopen(strcat(open, "/reservations.csv"), "r");
+    fp = fopen(strcat(open, "/reservations.csv"), "r");
     if (!fp) {
         perror("Error opening file");
         return NULL;

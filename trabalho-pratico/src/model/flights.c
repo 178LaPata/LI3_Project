@@ -1,5 +1,5 @@
-#include "flights.h"
-#include "date.h"
+#include "../../includes/model/flights.h"
+#include "../../includes/model/date.h"
 
 #include <glib.h>
 #include <string.h>
@@ -58,7 +58,7 @@ Flights *create_flights(char *line){
                     flights->plane_model = strdup(buffer);
                     break; 
             case 3: 
-                flights->total_seats = verify_total_seats(buffer);
+                //flights->total_seats = verify_total_seats(buffer);
                 if (flights->total_seats == 0) val = 0;
                 break;
             case 4:
@@ -109,7 +109,7 @@ Flights *create_flights(char *line){
     return flights;
 }
 
-void insert_flights(Cat_Flights *cat_flights, Flights *flights){
+void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights){
     g_hash_table_insert(cat_flights->flights_hashtable, &flights->id, flights);
 }
 

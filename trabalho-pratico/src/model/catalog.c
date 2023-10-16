@@ -1,7 +1,9 @@
-#include "catalog.h"
-#include "users.h"
-#include "flights.h"
-#include "reservations.h"
+#include "../../includes/model/catalog.h"
+#include "../../includes/model/users.h"
+#include "../../includes/model/flights.h"
+#include "../../includes/model/reservations.h"
+#include "../../includes/model/passengers.h"
+
 
 #include <string.h>
 #include <stdlib.h>
@@ -14,7 +16,6 @@ typedef struct catalog {
     CAT_FLIGHTS *cat_flights;
     CAT_RESERVATIONS *cat_reservations;
 } Catalog;
-
 
 Catalog *create_Catalog(char *entry_files) {
     Catalog *c = malloc(sizeof(struct catalog));

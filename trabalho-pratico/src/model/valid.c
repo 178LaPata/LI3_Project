@@ -1,4 +1,4 @@
-#include "valid.h"
+#include "../../includes/model/valid.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -12,26 +12,20 @@ int verify_phoneNumber(char *token){
     else return 0;
 }
 
-int verify_total_seats(char *token){
-
-}
-
-int verify_passport(char *token){
-
-}
-
-int verify_countryCode(char *token){
-
-}
-
 enum pay_method verify_payMethod(char *token){
     if (strcasecmp(token,"cash") == 0){
-        return Cash;
+        return cash;
     }
     else if (strcasecmp(token,"card") == 0){
-        return Card;
+        return card;
     }
-    else return NoMethod;
+    else if (strcasecmp(token,"mbway") == 0){
+        return mbway;
+    }
+    else if (strcasecmp(token,"paypal") == 0){
+        return paypal;
+    }
+    else return noPayMethod;
 }
 
 enum account_status verify_accountStatus (char* token){
