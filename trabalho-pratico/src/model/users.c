@@ -2,8 +2,6 @@
 #include "../../includes/model/date.h"
 #include "../../includes/model/valid.h"
 
-
-
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -14,12 +12,12 @@ struct users {
     char *name;
     char *email;
     int phone_number;
-    Date birth_date;
+    date birth_date;
     char *sex; 
     int passport;
     char *country_code;
     char *adress;
-    Date account_creation;
+    date account_creation;
     enum pay_method pay_method;
     enum account_status account_status;
 };
@@ -58,7 +56,7 @@ Users *create_users(char *line){
                 if(users->phone_number == 0) val = 0;
                 break;
             case 3:
-                users->birth_date = verify_Date(buffer);
+                users->birth_date = valid_date(buffer);
                 if(users->birth_date == 0) val = 0;
                 break;
             case 4:
@@ -73,14 +71,14 @@ Users *create_users(char *line){
             case 6:
                 // usar funcao tolwer e strcmp com a primeira e ultima do abecedario  
                 if (strlen(buffer) == 0) val = 0;
-                    users->country_code == strdup(buffer);
+                    users->country_code = strdup(buffer);
                     break;
             case 7:
                 if(strlen(buffer) == 0) val = 0;
                     users->adress = strdup(buffer);
                     break;
             case 8:
-                users->account_creation = verify_Date(buffer);
+                users->account_creation = valid_date(buffer);
                 if(users->account_creation == 0) val = 0;
                 break;
             case 9:
@@ -101,7 +99,11 @@ Users *create_users(char *line){
 }
 
 void insert_users(CAT_USERS *cat_users, Users *users){
-    g_hash_table_insert(cat_users->users_hashtable, users->id, users);
+    char id_str[100000]; 
+    sprintf(id_str, "%d", users->id);
+    g_hash_table_insert(cat_users->users_hashtable, id_str, users);
+
+    //g_hash_table_insert(cat_users->users_hashtable, users->id, users);
 }
 
 CAT_USERS *create_cat_users(char *entry_files){
@@ -109,7 +111,7 @@ CAT_USERS *create_cat_users(char *entry_files){
     FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fp = fopen(strcat(open, "/users.csv"), "r");
+    fp = fopen(strcat(open, "../../dataset/users.csv"), "r");
     if (!fp) {
         perror("Error opening users.csv");
         return NULL;
@@ -133,8 +135,7 @@ CAT_USERS *create_cat_users(char *entry_files){
     end = clock();
 
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("Time to parse users.csv", cpu_time_used);
-
+    printf("Time to parse users.csv: %f\n", cpu_time_used);
 
     free(line);
     fclose(fp);

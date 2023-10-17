@@ -1,15 +1,4 @@
 #include "../../includes/model/catalog.h"
-#include "../../includes/model/users.h"
-#include "../../includes/model/flights.h"
-#include "../../includes/model/reservations.h"
-#include "../../includes/model/passengers.h"
-
-
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <stdio.h>
-#include <ctype.h>
 
 typedef struct catalog {
     CAT_USERS *cat_users;
@@ -34,4 +23,40 @@ void delete_Catalog(Catalog *c) {
 
 
 // queries
+
+// funcao parse queries
+
+
+/* função responsável por abrir o ficheiro de input com as queries
+ * chama a função parseQueries para dar parse a cada linha */
+int runBatch(char **input_file) {
+
+    Catalog *c = create_Catalog(input_file[1]);
+
+    system("exec rm -rf Resultados/*");
+
+    FILE *fp;
+    fp = fopen(input_file[2], "r");
+    if (!fp) {
+        perror("Error");
+        return -1;
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    int output_number = 1;
+
+    while (getline(&line, &len, fp) != -1) {
+        line[strcspn(line, "\n")] = 0;
+        parseQueries(line, c, output_number);
+        output_number++;
+    }
+
+    free(line);
+    fclose(fp);
+
+    delete_Catalog(c);
+
+    return 0;
+}
 

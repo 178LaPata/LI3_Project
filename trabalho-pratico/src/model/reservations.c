@@ -1,7 +1,6 @@
 #include "../../includes/model/reservations.h"
 #include "../../includes/model/date.h"
 
-
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -15,8 +14,8 @@ struct reservations {
     int hotel_stars;
     int city_tax;
     char *adress;
-    Date begin_date;
-    Date end_date;
+    date begin_date;
+    date end_date;
     int price_per_night;
     char *includes_breakfast;
     char *room_details;
@@ -123,7 +122,7 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
     FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fp = fopen(strcat(open, "/reservations.csv"), "r");
+    fp = fopen(strcat(open, "../../dataset/reservations.csv"), "r");
     if (!fp) {
         perror("Error opening file");
         return NULL;

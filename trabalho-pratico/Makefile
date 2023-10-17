@@ -1,15 +1,15 @@
 all: programa-principal 
 
-IDIR = $/Includes
+IDIR = $/includes
 
 CC = gcc
 CFLAGS = -Wall -I$(IDIR) -g `pkg-config --cflags glib-2.0` -c
 LDFLAGS = `pkg-config --libs glib-2.0` -lm
 
-SDIR = Code/SRC
-ODIR = Code/SRC/obj
+SDIR = scr/model
+ODIR = scr/model/obj
 
-_OBJ = users.o flights.o reservations.o valid.o date.o catalog.o
+_OBJ = users.o flights.o reservations.o passengers.o valid.o date.o catalog.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.c

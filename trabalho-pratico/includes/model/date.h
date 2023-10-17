@@ -1,4 +1,7 @@
-typedef struct date Date;
+typedef struct date *date;
 
-typedef struct dateTime DateTime;
+typedef struct datetime *datetime;
 
+date valid_date (char *date_str);
+
+datetime valid_date_time(char *datetime_str);

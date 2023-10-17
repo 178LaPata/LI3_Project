@@ -13,10 +13,10 @@ struct flights {
     int total_seats;
     char *origin;
     char *destination;
-    DateTime schedule_departure_date;  
-    DateTime schedule_arrival_date;  
-    DateTime real_departure_date;  
-    DateTime real_arrival_date;  
+    datetime schedule_departure_date;  
+    datetime schedule_arrival_date;  
+    datetime real_departure_date;  
+    datetime real_arrival_date;  
     char *pilot;
     char *copilot;
     char *notes;
@@ -70,19 +70,19 @@ Flights *create_flights(char *line){
                     flights->destination = strdup(buffer);
                     break;
             case 6:
-                flights->schedule_departure_date = verify_dateTime(buffer);
+                flights->schedule_departure_date = valid_date_time(buffer);
                 if (flights->schedule_departure_date == 0) val = 0;
                 break;
             case 7:
-                flights->schedule_arrival_date = verify_dateTime(buffer);
+                flights->schedule_arrival_date = valid_date_time(buffer);
                 if (flights->schedule_arrival_date == 0) val = 0;
                 break;
             case 8:
-                flights->real_departure_date = verify_dateTime(buffer);
+                flights->real_departure_date = valid_date_time(buffer);
                 if (flights->real_departure_date == 0) val = 0;
                 break;
             case 9:
-                flights->real_arrival_date = verify_dateTime(buffer);
+                flights->real_arrival_date = valid_date_time(buffer);
                 if (flights->real_arrival_date == 0) val = 0;
                 break;
             case 10:
@@ -118,7 +118,7 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
     FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fp = fopen(strcat(open, "/flights.csv"), "r");
+    fp = fopen(strcat(open, "../../dataset/flights.csv"), "r");
     if (!fp) {
         perror("Error opening flights.csv");
         return NULL;

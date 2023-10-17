@@ -1,6 +1,7 @@
 #include "../../includes/model/valid.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -8,7 +9,7 @@ int verify_phoneNumber(char *token){
     if (strlen(token)!=9) return 0;
     char *val;
     int phone = (int) strtol(token, &val, 10);
-    if(strcmp(val, "\0" == 0) & phone > 0) return phone;
+    if (*val == '\0' && phone > 0) return phone;
     else return 0;
 }
 
