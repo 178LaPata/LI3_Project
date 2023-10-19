@@ -52,7 +52,7 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fp = fopen(strcat(open, "/passengers.csv"), "r");
+    fp = fopen(open, "r");
     if (!fp) {
         perror("Error opening passengers.csv");
         return NULL;

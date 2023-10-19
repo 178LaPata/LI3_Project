@@ -2,10 +2,9 @@
 #define VALID_H
 
 enum pay_method{
+    debit_card,
+    credit_card,
     cash,
-    card,
-    mbway,
-    paypal,
     noPayMethod
 };
 
@@ -15,10 +14,11 @@ enum account_status{
     Inactive
 };
 
-int verify_phoneNumber(char *token);
 enum pay_method verify_payMethod(char *token);
 enum account_status verify_accountStatus (char* token);
-int verify_email(char *email);
+char *verify_email(char *email);
+char *verify_passport(char *passport);
+char *verify_phone_number(char *phone_number);
 
 
 #endif // VALID_H

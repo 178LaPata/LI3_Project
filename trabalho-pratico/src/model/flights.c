@@ -51,56 +51,56 @@ Flights *create_flights(char *line){
                 break;
             case 1:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->airline = strdup(buffer);
-                    break;
+                flights->airline = strdup(buffer);
+                break;
             case 2:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->plane_model = strdup(buffer);
-                    break; 
+                flights->plane_model = strdup(buffer);
+                break; 
             case 3: 
-                //flights->total_seats = verify_total_seats(buffer);
-                if (flights->total_seats == 0) val = 0;
+                if (strlen(buffer) == 0) val = 0;
+                flights->total_seats = atoi(buffer);
                 break;
             case 4:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->origin = strdup(buffer);
-                    break;
+                flights->origin = strdup(buffer);
+                break;
             case 5:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->destination = strdup(buffer);
-                    break;
+                flights->destination = strdup(buffer);
+                break;
             case 6:
+                if(strlen(buffer) == 0) val = 0;
                 flights->schedule_departure_date = valid_date_time(buffer);
                 if (flights->schedule_departure_date == 0) val = 0;
                 break;
             case 7:
+                if(strlen(buffer) == 0) val = 0;
                 flights->schedule_arrival_date = valid_date_time(buffer);
                 if (flights->schedule_arrival_date == 0) val = 0;
                 break;
             case 8:
+                if(strlen(buffer) == 0) val = 0;
                 flights->real_departure_date = valid_date_time(buffer);
                 if (flights->real_departure_date == 0) val = 0;
                 break;
             case 9:
+                if(strlen(buffer) == 0) val = 0;
                 flights->real_arrival_date = valid_date_time(buffer);
                 if (flights->real_arrival_date == 0) val = 0;
                 break;
             case 10:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->pilot = strdup(buffer);
-                    break;
+                flights->pilot = strdup(buffer);
+                break;
             case 11:
                 if (strlen(buffer) == 0) val = 0;
-                    flights->copilot = strdup(buffer);
-                    break;
-            case 12:
-                if (strlen(buffer) == 0) val = 0;
-                    flights->notes = strdup(buffer);
-                    break;
-            default:
-                val = 0;
+                flights->copilot = strdup(buffer);
                 break;
-        }
+            case 12:
+                flights->notes = strdup(buffer);
+                break;
+        } 
     }
     if(val == 0){
         delete_flights(flights);
@@ -118,7 +118,7 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
     FILE *fp;
     char open[50];
     strcpy(open, entry_files);
-    fp = fopen(strcat(open, "../../dataset/flights.csv"), "r");
+    fp = fopen(open, "r");
     if (!fp) {
         perror("Error opening flights.csv");
         return NULL;
@@ -143,6 +143,8 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
 
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse flights.csv: %f\n", cpu_time_used);
+
+    printf("Number of flights: %d\n", g_hash_table_size(cat_flights->flights_hashtable));
 
     free(line);
     fclose(fp);

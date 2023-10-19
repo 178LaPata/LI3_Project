@@ -17,7 +17,6 @@ char* pointer_file (char *path, char *file){
   return file_name; 
 }
 
-
 int str_is_num (char* str){
     unsigned i;
     int p=0;
@@ -29,7 +28,6 @@ int str_is_num (char* str){
     }
     return p;
 }
-
 
 void print_hash_table(GHashTable *hash_table) {
     GHashTableIter iter;
@@ -45,21 +43,20 @@ void print_hash_table(GHashTable *hash_table) {
 int main (int argc, char **argv) {
     
     char *users = pointer_file(argv[1],"users.csv"), *flights =  pointer_file(argv[1],"flights.csv"), *reservations = pointer_file(argv[1],"reservations.csv"), *passengers = pointer_file(argv[1],"passengers.csv");
-
     CAT_USERS *cat_users = create_cat_users(users);
     CAT_FLIGHTS *cat_flights = create_cat_flights(flights);
-    CAT_RESERVATIONS *cat_reservations = create_cat_reservations(reservations);
-    CAT_PASSENGERS *cat_passengers = create_cat_passengers(passengers);
-
-    print_hash_table(cat_users);
-    print_hash_table(cat_flights);
-    print_hash_table(cat_reservations);
-    print_hash_table(cat_passengers);
-
-    delete_cat_users(cat_users);
-    delete_cat_flights(cat_flights);
-    delete_cat_reservations(cat_reservations);
-    delete_cat_passengers(cat_passengers);
+    //CAT_RESERVATIONS *cat_reservations = create_cat_reservations(reservations);
+    //CAT_PASSENGERS *cat_passengers = create_cat_passengers(passengers);
+//
+    // print_hash_table(cat_users);
+    //print_hash_table(cat_flights);
+    //print_hash_table(cat_reservations);
+    //print_hash_table(cat_passengers);
+    //
+    //delete_cat_users(cat_users);
+    //delete_cat_flights(cat_flights);
+    //delete_cat_reservations(cat_reservations);
+    //delete_cat_passengers(cat_passengers);
 
     free(users);
     free(flights);
