@@ -72,22 +72,22 @@ Flights *create_flights(char *line){
             case 6:
                 if(strlen(buffer) == 0) val = 0;
                 flights->schedule_departure_date = valid_date_time(buffer);
-                if (flights->schedule_departure_date == 0) val = 0;
+                if (flights->schedule_departure_date == NULL) val = 0;
                 break;
             case 7:
                 if(strlen(buffer) == 0) val = 0;
                 flights->schedule_arrival_date = valid_date_time(buffer);
-                if (flights->schedule_arrival_date == 0) val = 0;
+                if (flights->schedule_arrival_date == NULL) val = 0;
                 break;
             case 8:
                 if(strlen(buffer) == 0) val = 0;
                 flights->real_departure_date = valid_date_time(buffer);
-                if (flights->real_departure_date == 0) val = 0;
+                if (flights->real_departure_date == NULL) val = 0;
                 break;
             case 9:
                 if(strlen(buffer) == 0) val = 0;
                 flights->real_arrival_date = valid_date_time(buffer);
-                if (flights->real_arrival_date == 0) val = 0;
+                if (flights->real_arrival_date == NULL) val = 0;
                 break;
             case 10:
                 if (strlen(buffer) == 0) val = 0;

@@ -43,12 +43,16 @@ void delete_users(void *data){
     free(users);
 }
 
-
 Users *create_users(char *line){
     Users *users = malloc(sizeof(Users));
     char *buffer;
     int i = 0;
     int val = 1;
+    
+    if (strstr(line, "id;name;email;phone_number;birth_date;sex;passport;country_code;address;account_creation;pay_method;account_status") != NULL) {
+        return NULL; // Retorna NULL para indicar que a linha foi ignorada
+    }
+    
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -101,6 +105,7 @@ Users *create_users(char *line){
                 break;
         }
     }
+
     if(val == 0){
         delete_users(users);
         return NULL;

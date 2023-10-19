@@ -19,6 +19,10 @@ enum account_status verify_accountStatus (char* token);
 char *verify_email(char *email);
 char *verify_passport(char *passport);
 char *verify_phone_number(char *phone_number);
+int verify_stars(int stars);
+int verify_maior_que_zero(int number);
+char *verify_includes_breakfast(char *includes_breakfast);
+char *verify_rating(char *rating);
 
 
 #endif // VALID_H

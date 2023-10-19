@@ -83,3 +83,40 @@ char *verify_phone_number(char *phone_number){
     return strdup(phone_number);
 
 }
+
+int verify_stars(int stars){
+    if (stars <= 1 || stars >= 5) return 0;
+    return stars;
+}
+
+int verify_maior_que_zero(int number){
+    if (number < 0) return 0;
+    return number;
+}
+
+char *verify_includes_breakfast(char *includes_breakfast) {
+    // Converte a string para minúsculas
+    for(int i = 0; includes_breakfast[i]; i++){
+        includes_breakfast[i] = tolower(includes_breakfast[i]);
+    }
+
+    if (strcmp(includes_breakfast, "f") == 0 || strcmp(includes_breakfast, "false") == 0 || 
+        strcmp(includes_breakfast, "0") == 0) {
+        return "false";
+    } else if (strcmp(includes_breakfast, "t") == 0 || strcmp(includes_breakfast, "true") == 0 || 
+               strcmp(includes_breakfast, "1") == 0) {
+        return "true";
+    } else {
+        return NULL; // Valor inválido
+    }
+}
+
+char *verify_rating(char *rating){
+    int i;
+    int len = strlen(rating);
+    for (i = 0; i < len; i++){
+        if (!isdigit(rating[i])) return NULL;
+    }
+    if (atoi(rating) < 0 || atoi(rating) > 5) return NULL;
+    return strdup(rating);
+}
