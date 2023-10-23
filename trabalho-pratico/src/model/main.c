@@ -50,7 +50,7 @@ int main (int argc, char **argv) {
 
     delete_cat_users(cat_users);
     delete_cat_flights(cat_flights);
-    delete_cat_reservations(cat_reservations);
+    //delete_cat_reservations(cat_reservations); esta a dar erro
     //delete_cat_passengers(cat_passengers);
 
     free(users);

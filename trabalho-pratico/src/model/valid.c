@@ -84,14 +84,25 @@ char *verify_phone_number(char *phone_number){
 
 }
 
-int verify_stars(int stars){
-    if (stars <= 1 || stars >= 5) return 0;
-    return stars;
+int verify_stars(char *stars){
+    int i;
+    int len = strlen(stars);
+    for (i = 0; i < len; i++){
+        if (!isdigit(stars[i])) return 0;
+    }
+    if (atoi(stars) < 0 || atoi(stars) > 5) return 0;
+    return atoi(stars);
+
 }
 
-int verify_maior_que_zero(int number){
-    if (number < 0) return 0;
-    return number;
+int verify_maior_que_zero(char *number){
+    int i;
+    int len = strlen(number);
+    for (i = 0; i < len; i++){
+        if (!isdigit(number[i])) return 0;
+    }
+    if (atoi(number) < 0) return 0;
+    return atoi(number);
 }
 
 char *verify_includes_breakfast(char *includes_breakfast) {

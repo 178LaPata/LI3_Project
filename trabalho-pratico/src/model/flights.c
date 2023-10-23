@@ -1,5 +1,6 @@
 #include "../../includes/model/flights.h"
 #include "../../includes/model/date.h"
+#include "../../includes/model/valid.h"
 
 #include <glib.h>
 #include <string.h>
@@ -58,34 +59,27 @@ Flights *create_flights(char *line){
                 flights->plane_model = strdup(buffer);
                 break; 
             case 3: 
-                if (strlen(buffer) == 0) val = 0;
                 flights->total_seats = atoi(buffer);
                 break;
             case 4:
-                if (strlen(buffer) == 0) val = 0;
                 flights->origin = strdup(buffer);
                 break;
             case 5:
-                if (strlen(buffer) == 0) val = 0;
                 flights->destination = strdup(buffer);
                 break;
             case 6:
-                if(strlen(buffer) == 0) val = 0;
                 flights->schedule_departure_date = valid_date_time(buffer);
                 if (flights->schedule_departure_date == NULL) val = 0;
                 break;
             case 7:
-                if(strlen(buffer) == 0) val = 0;
                 flights->schedule_arrival_date = valid_date_time(buffer);
                 if (flights->schedule_arrival_date == NULL) val = 0;
                 break;
             case 8:
-                if(strlen(buffer) == 0) val = 0;
                 flights->real_departure_date = valid_date_time(buffer);
                 if (flights->real_departure_date == NULL) val = 0;
                 break;
             case 9:
-                if(strlen(buffer) == 0) val = 0;
                 flights->real_arrival_date = valid_date_time(buffer);
                 if (flights->real_arrival_date == NULL) val = 0;
                 break;
@@ -133,8 +127,15 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
     clock_t start, end;
     double cpu_time_used;
 
+    int first_line = 1;
+
     start = clock();
-    while (getline(&line, &len, fp) > 0){
+
+    while (getline(&line, &len, fp) > 0) {
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
         line[strcspn(line, "\n")] = 0;
         Flights *flights = create_flights(line);
         if(flights != NULL) insert_flights(cat_flights, flights);

@@ -49,10 +49,6 @@ Users *create_users(char *line){
     int i = 0;
     int val = 1;
     
-    if (strstr(line, "id;name;email;phone_number;birth_date;sex;passport;country_code;address;account_creation;pay_method;account_status") != NULL) {
-        return NULL; // Retorna NULL para indicar que a linha foi ignorada
-    }
-    
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -144,12 +140,18 @@ CAT_USERS *create_cat_users(char *entry_files){
     clock_t start, end;
     double cpu_time_used;
 
+    int first_line = 1;
+
     start = clock();
 
     while (getline(&line, &len, fp) > 0) {
-       line[strcspn(line, "\n")] = 0;
-       Users *u = create_users(line);
-       if (u != NULL) insert_users(cat_users, u);
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
+        line[strcspn(line, "\n")] = 0;
+        Users *u = create_users(line);
+        if (u != NULL) insert_users(cat_users, u);
     }
 
     end = clock();

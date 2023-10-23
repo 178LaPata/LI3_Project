@@ -17,18 +17,18 @@ struct datetime{
 };
 
 struct date* valid_date (char *date_str){
-    if (strlen(date_str) != 10 || date_str[2] != '/' || date_str[5] != '/') return NULL;
 
+    if (strlen(date_str) != 10 || date_str[4] != '/' || date_str[7] != '/') return NULL;
     for (int i=0 ; date_str[i] ; i++){
-        if (i==2 || i==5) continue;
+        if (i==4 || i==7) continue;
         if (date_str[i]<'0' || date_str[i]>'9') return NULL;
     }
 
     struct date* date = malloc(sizeof(struct date));
 
-    date->day = strsep(&date_str, "/");
+    date->year  = strsep(&date_str, "/");
     date->month = strsep(&date_str, "/");
-    date->year  = strsep(&date_str, " ");
+    date->day = strsep(&date_str, " ");
 
     if(atoi(date->year) >= 1900 && atoi(date->year) <= 9999){
         if(atoi(date->month) >= 1 && atoi(date->month) <= 12){
