@@ -7,7 +7,7 @@
 
 struct passengers {
     int flight_id;
-    int user_id;
+    char *user_id;
 };
 
 struct cat_passengers {
@@ -16,6 +16,7 @@ struct cat_passengers {
 
 void delete_passengers(void *data){
     Passengers *passengers = (Passengers *) data;
+    free(passengers->user_id);
     free(passengers);
 }
 
@@ -32,7 +33,7 @@ Passengers *create_passengers(char *line){
                 break;
             case 1:
                 if (strlen(buffer) == 0) val = 0;
-                passengers->user_id = (int) strtol(buffer, (char **) NULL, 10);
+                passengers->user_id = strdup(buffer);
                 break;
         }
     }
@@ -66,17 +67,27 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
 
     clock_t start, end;
     double cpu_time_used;
+    int first_line = 1;
 
     start = clock();
-    while (getline(&line, &len, fp) > 0){
+
+    while (getline(&line, &len, fp) > 0) {
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
         line[strcspn(line, "\n")] = 0;
         Passengers *passengers = create_passengers(line);
-        if(passengers != NULL) insert_passengers(cat_passengers, passengers);
+        if(passengers != NULL){
+            insert_passengers(cat_passengers, passengers);
+        }
     }
     end = clock();
 
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse passengers.csv: %f\n", cpu_time_used);
+
+    printf("Number of passengers: %d\n", g_hash_table_size(cat_passengers->passengers_hashtable));
 
     free(line);
     fclose(fp);
@@ -84,7 +95,9 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     return cat_passengers;
 }
 
+
 void delete_cat_passengers(CAT_PASSENGERS *cat_passengers){
     g_hash_table_destroy(cat_passengers->passengers_hashtable);
     free(cat_passengers);
 }
+

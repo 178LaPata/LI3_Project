@@ -29,29 +29,18 @@ int str_is_num (char* str){
     return p;
 }
 
-void print_hash_table(GHashTable *hash_table) {
-    GHashTableIter iter;
-    gpointer key, value;
-
-    g_hash_table_iter_init(&iter, hash_table);
-
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        g_print("Key: %s, Value: %s\n", (char *)key, (char *)value);
-    }
-}
-
 int main (int argc, char **argv) {
     
     char *users = pointer_file(argv[1],"users.csv"), *flights =  pointer_file(argv[1],"flights.csv"), *reservations = pointer_file(argv[1],"reservations.csv"), *passengers = pointer_file(argv[1],"passengers.csv");
     CAT_USERS *cat_users = create_cat_users(users);
     CAT_FLIGHTS *cat_flights = create_cat_flights(flights);
     CAT_RESERVATIONS *cat_reservations = create_cat_reservations(reservations);
-    //CAT_PASSENGERS *cat_passengers = create_cat_passengers(passengers);
+    CAT_PASSENGERS *cat_passengers = create_cat_passengers(passengers);
 
     delete_cat_users(cat_users);
     delete_cat_flights(cat_flights);
-    //delete_cat_reservations(cat_reservations); esta a dar erro
-    //delete_cat_passengers(cat_passengers);
+    delete_cat_reservations(cat_reservations); 
+    delete_cat_passengers(cat_passengers);
 
     free(users);
     free(flights);

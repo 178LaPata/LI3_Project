@@ -11,7 +11,7 @@
 a.out
 *.o
 *.exe
-*todo*.txt
+*.txt
 *users*.csv
 *flights*.csv
 *reservations*.csv

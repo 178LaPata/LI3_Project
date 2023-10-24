@@ -35,7 +35,7 @@ void delete_reservations(void *data){
     free(reservations->hotel_id);
     free(reservations->hotel_name);
     free(reservations->adress);
-    //free(reservations->includes_breakfast);
+    //free(reservations->includes_breakfast); // PERGUNTAR CHAKALL
     free(reservations->room_details);
     free(reservations->rating);
     free(reservations->comments);
@@ -103,11 +103,12 @@ Reservations *create_reservations(char *line){
                 reservations->rating = strdup(buffer);
                 break;
             case 13:
-                if(buffer == "\n") reservations->comments = " ";
+                if(strlen(buffer) == 0) reservations->comments = "no comments";
                 reservations->comments = strdup(buffer);
                 break;
         }
     }
+    
     if(val == 0){
         delete_reservations(reservations);
         return NULL;

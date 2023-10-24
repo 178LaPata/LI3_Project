@@ -114,7 +114,6 @@ Users *create_users(char *line){
    return users;
 }
 
-
 void insert_users(CAT_USERS *cat_users, Users *users){
     g_hash_table_insert(cat_users->users_hashtable, users->id, users);
 }
@@ -151,7 +150,9 @@ CAT_USERS *create_cat_users(char *entry_files){
         }
         line[strcspn(line, "\n")] = 0;
         Users *u = create_users(line);
-        if (u != NULL) insert_users(cat_users, u);
+        if (u != NULL){
+            insert_users(cat_users, u);
+        } 
     }
 
     end = clock();
@@ -172,22 +173,31 @@ void delete_cat_users(CAT_USERS *cat_users){
     free(cat_users);
 }
 
-//char *users_profile(CAT_USERS *cat_users, char *id) {
-//    Users *users = g_hash_table_lookup(cat_users->users_hashtable, id);
-//
-//    if (users == NULL || users->account_status == Inactive) return NULL;  
-//
-//    char *name = users->name;
-//    char *sex = users->sex;
-//    int age = calculate_age(users->birth_date);
-//    char *country_code = users->country_code;
-//    int number_of_flights = users->flights_total;
-//    int number_of_reservations = users->reservations_total;
-//    int total_spent = users->spent_total;
-//
-//    char *answer = malloc(snprintf(NULL, 0, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent) + 1);
-//
-//    snprintf(answer, 100, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent);
-//
-//    return answer;
-//}
+void update_users(CAT_USERS *cat_users, char *id, int flights, int reservations, int spent){
+    Users *users = g_hash_table_lookup(cat_users->users_hashtable, id);
+
+    users->flights_total += flights;
+    users->reservations_total += reservations;
+    users->spent_total += spent;
+}
+
+char *users_profile(CAT_USERS *cat_users, char *id) {
+    Users *users = g_hash_table_lookup(cat_users->users_hashtable, id);
+
+    if (users == NULL || users->account_status == Inactive) return "";  
+
+    char *name = users->name;
+    char *sex = users->sex;
+    int age = calculate_age(users->birth_date);
+    printf("%d\n", age);
+    char *country_code = users->country_code;
+    int number_of_flights = users->flights_total;
+    int number_of_reservations = users->reservations_total;
+    int total_spent = users->spent_total;
+
+    char *answer = malloc(snprintf(NULL, 0, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent) + 1);
+
+    snprintf(answer, 100, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent);
+
+    return answer;
+}

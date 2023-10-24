@@ -7,25 +7,15 @@
 #include <ctype.h>
 
 enum pay_method verify_payMethod(char *token){
-    if (strcasecmp(token,"debit_card") == 0){
-        return debit_card;
-    }
-    else if (strcasecmp(token,"credit_card") == 0){
-        return credit_card;
-    }
-    else if (strcasecmp(token,"cash") == 0){
-        return cash;
-    }
+    if (strcasecmp(token,"debit_card") == 0) return debit_card;
+    else if (strcasecmp(token,"credit_card") == 0) return credit_card;
+    else if (strcasecmp(token,"cash") == 0) return cash;
     else return noPayMethod;
 }
 
 enum account_status verify_accountStatus (char* token){
-    if (strcasecmp(token,"active") == 0){
-        return Active;
-    }
-    else if (strcasecmp(token,"inactive") == 0){
-        return Inactive;
-    }
+    if (strcasecmp(token,"active") == 0) return Active;
+    else if (strcasecmp(token,"inactive") == 0) return Inactive;
     else return NoStatus;
 }
 
@@ -45,32 +35,27 @@ char *verify_email(char *email) {
         }
     }
 
-    if(atCount != 1 || dotCount < 1 || atPosition < 1 || lastDotPosition < atPosition+2 || lastDotPosition == strlen(email)-1) {
-        return NULL; // Retorna NULL para indicar que o email é inválido
-    }
-
+    if(atCount != 1 || dotCount < 1 || atPosition < 1 || lastDotPosition < atPosition+2 || lastDotPosition == strlen(email)-1) return NULL; 
+    
     usernameLength = atPosition;
     domainLength = lastDotPosition - (atPosition + 1);
     tldLength = strlen(email) - (lastDotPosition + 1);
 
-    if(usernameLength < 1 || domainLength < 1 || tldLength < 2) {
-        return NULL; // Retorna NULL para indicar que o email é inválido
-    }
+    if(usernameLength < 1 || domainLength < 1 || tldLength < 2) return NULL;
 
-    // Aloca memória para a string do email e a copia
     char *validEmail = malloc(strlen(email) + 1);
     strcpy(validEmail, email);
 
-    return validEmail; // Retorna o email válido
+    return validEmail;
 }
 
 char *verify_passport(char *passport) {
     int len = strlen(passport);
-    if (!isalpha(passport[0]) || !isalpha(passport[1])) return NULL; // Os dois primeiros caracteres devem ser letras
+    if (!isalpha(passport[0]) || !isalpha(passport[1])) return NULL;
     for (int i = 2; i < len; i++) {
-        if (!isdigit(passport[i])) return NULL; // Os restantes caracteres devem ser dígitos
+        if (!isdigit(passport[i])) return NULL;
     }
-    return strdup(passport); // Retorna uma cópia válida do passaporte
+    return strdup(passport); 
 }
 
 char *verify_phone_number(char *phone_number){
@@ -106,11 +91,9 @@ int verify_maior_que_zero(char *number){
 }
 
 char *verify_includes_breakfast(char *includes_breakfast) {
-    // Converte a string para minúsculas
     for(int i = 0; includes_breakfast[i]; i++){
         includes_breakfast[i] = tolower(includes_breakfast[i]);
     }
-
     if (strcmp(includes_breakfast, "f") == 0 || strcmp(includes_breakfast, "false") == 0 || 
         strcmp(includes_breakfast, "0") == 0) {
         return "false";
@@ -118,7 +101,7 @@ char *verify_includes_breakfast(char *includes_breakfast) {
                strcmp(includes_breakfast, "1") == 0) {
         return "true";
     } else {
-        return NULL; // Valor inválido
+        return NULL; 
     }
 }
 

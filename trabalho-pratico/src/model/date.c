@@ -74,29 +74,27 @@ struct datetime* valid_date_time(char *datetime_str) {
     return NULL;
 }
 
+int calculate_age(date birth_date){
+    struct tm data_hora_atual;
+    sscanf(DATETIME, "%d/%d/%d %d:%d:%d",
+           &data_hora_atual.tm_year,
+           &data_hora_atual.tm_mon,
+           &data_hora_atual.tm_mday,
+           &data_hora_atual.tm_hour,
+           &data_hora_atual.tm_min,
+           &data_hora_atual.tm_sec);
 
-//int calculate_age(Date birth_date){
-//    struct tm data_hora_atual;
-//    sscanf(DATETIME, "%d/%d/%d %d:%d:%d",
-//           &data_hora_atual.tm_year,
-//           &data_hora_atual.tm_mon,
-//           &data_hora_atual.tm_mday,
-//           &data_hora_atual.tm_hour,
-//           &data_hora_atual.tm_min,
-//           &data_hora_atual.tm_sec);
-//
-//    data_hora_atual.tm_year -= 1900;
-//    data_hora_atual.tm_mon -= 1;
-//
-//    int idade = (data_hora_atual.tm_year) - atoi(birth_date->year);
-//    if (data_hora_atual.tm_mon+1 < atoi(birth_date->month)){
-//        idade--;
-//    }else if(data_hora_atual.tm_mon+1 == atoi(birth_date->month)){
-//        if(data_hora_atual.tm_mday < atoi(birth_date->day)){
-//            idade--;
-//        }
-//    }
-//
-//    return idade;
-//}
-//
+    data_hora_atual.tm_year -= 1900;
+    data_hora_atual.tm_mon -= 1;
+
+    int idade = (data_hora_atual.tm_year) - atoi(birth_date->year);
+    if (data_hora_atual.tm_mon+1 < atoi(birth_date->month)){
+        idade--;
+    }else if(data_hora_atual.tm_mon+1 == atoi(birth_date->month)){
+        if(data_hora_atual.tm_mday < atoi(birth_date->day)){
+            idade--;
+        }
+    }
+
+    return idade;
+}

@@ -8,7 +8,7 @@ LDFLAGS = `pkg-config --libs glib-2.0` -lm
 SDIR = src/model
 ODIR = src/model/obj
 
-_OBJ = users.o flights.o reservations.o passengers.o valid.o date.o main.o
+_OBJ = users.o flights.o reservations.o passengers.o valid.o catalog.o date.o output.o programa-principal.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.c
@@ -17,7 +17,7 @@ $(ODIR)/%.o: $(SDIR)/%.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 
-main: $(OBJ) $(ODIR)/main.o
+programa-principal: $(OBJ) $(ODIR)/programa-principal.o
 	$(CC) $^ $(LDFLAGS) -o $@
 
 
@@ -26,4 +26,4 @@ main: $(OBJ) $(ODIR)/main.o
 clean:
 	rm -r $(ODIR)
 	rm -r Resultados
-	rm main
+	rm programa-principal
