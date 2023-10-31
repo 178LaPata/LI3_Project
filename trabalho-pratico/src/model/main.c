@@ -37,6 +37,8 @@ int main (int argc, char **argv) {
     CAT_RESERVATIONS *cat_reservations = create_cat_reservations(reservations);
     CAT_PASSENGERS *cat_passengers = create_cat_passengers(passengers);
 
+    
+
     delete_cat_users(cat_users);
     delete_cat_flights(cat_flights);
     delete_cat_reservations(cat_reservations); 
@@ -47,5 +49,17 @@ int main (int argc, char **argv) {
     free(reservations);
     free(passengers);
 
+    return 0;
+}
+
+int run_batch(char **input_file) {
+
+    catalog *cat = create_catalog(input_file[1]);
+
+    update_values_users(cat->cat_users, cat->cat_passengers);
+
+    query1(cat, "JéssiTavares910");
+
+    delete_catalog(cat);
     return 0;
 }

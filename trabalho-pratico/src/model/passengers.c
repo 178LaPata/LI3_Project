@@ -87,7 +87,7 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse passengers.csv: %f\n", cpu_time_used);
 
-    printf("Number of passengers: %d\n", g_hash_table_size(cat_passengers->passengers_hashtable));
+    printf("Number of passengers: %d\n\n", g_hash_table_size(cat_passengers->passengers_hashtable));
 
     free(line);
     fclose(fp);
@@ -95,9 +95,26 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     return cat_passengers;
 }
 
-
 void delete_cat_passengers(CAT_PASSENGERS *cat_passengers){
     g_hash_table_destroy(cat_passengers->passengers_hashtable);
     free(cat_passengers);
 }
 
+int calculate_total_flights(CAT_PASSENGERS *cat_passengers, char *id){
+    int total_flights = 0;
+    GHashTableIter iter;
+    gpointer key, value;
+    //printf("id recebido: %s\n", id);
+    g_hash_table_iter_init(&iter, cat_passengers->passengers_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)){
+        Passengers *passengers = (Passengers *) value;
+        printf("username: %s flight: %d\n", passengers->user_id, passengers->flight_id);
+        if(strcmp(passengers->user_id, id)==0){
+            total_flights++;
+            //printf("id %s\n", passengers->user_id);
+        }
+    }
+    printf("user id: %s\n", id);
+    printf("Total flights: %d\n\n", total_flights);
+    return total_flights;
+}

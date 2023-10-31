@@ -1,6 +1,4 @@
 #include "../../includes/model/users.h"
-#include "../../includes/model/date.h"
-#include "../../includes/model/valid.h"
 
 #include <glib.h>
 #include <string.h>
@@ -23,8 +21,8 @@ struct users {
     enum account_status account_status;
 
     int flights_total;
-    int reservations_total;
-    int spent_total;
+    //int reservations_total;
+    //int spent_total;
 };
 
 struct cat_users {
@@ -43,12 +41,119 @@ void delete_users(void *data){
     free(users);
 }
 
+// gets e sets
+
+char *get_id(Users *users){
+    return users->id;
+}
+
+char *get_name(Users *users){
+    return users->name;
+}
+
+char *get_email(Users *users){
+    return users->email;
+}
+
+char *get_phone_number(Users *users){
+    return users->phone_number;
+}
+
+date get_birth_date(Users *users){
+    return users->birth_date;
+}
+
+char *get_sex(Users *users){
+    return users->sex;
+}
+
+char *get_passport(Users *users){
+    return users->passport;
+}
+
+char *get_country_code(Users *users){
+    return users->country_code;
+}
+
+char *get_adress(Users *users){
+    return users->adress;
+}
+
+datetime get_account_creation(Users *users){
+    return users->account_creation;
+}
+
+enum pay_method get_pay_method(Users *users){
+    return users->pay_method;
+}
+
+enum account_status get_account_status(Users *users){
+    return users->account_status;
+}
+
+int get_flights_total(Users *users){
+    return users->flights_total;
+}
+
+
+void set_id(Users *users, char *id){
+    users->id = strdup(id);
+}
+
+void set_name(Users *users, char *name){
+    users->name = strdup(name);
+}
+
+void set_email(Users *users, char *email){
+    users->email = strdup(email);
+}
+
+void set_phone_number(Users *users, char *phone_number){
+    users->phone_number = strdup(phone_number);
+}
+
+void set_birth_date(Users *users, date birth_date){
+    users->birth_date = birth_date;
+}
+
+void set_sex(Users *users, char *sex){
+    users->sex = sex;
+}
+
+void set_passport(Users *users, char *passport){
+    users->passport = strdup(passport);
+}
+
+void set_country_code(Users *users, char *country_code){
+    users->country_code = strdup(country_code);
+}
+
+void set_adress(Users *users, char *adress){
+    users->adress = strdup(adress);
+}
+
+void set_account_creation(Users *users, datetime account_creation){
+    users->account_creation = account_creation;
+}
+
+void set_pay_method(Users *users, enum pay_method pay_method){
+    users->pay_method = pay_method;
+}
+
+void set_account_status(Users *users, enum account_status account_status){
+    users->account_status = account_status;
+}
+
+void set_flights_total(Users *users, int flights_total){
+    users->flights_total = flights_total;
+}
+
 Users *create_users(char *line){
     Users *users = malloc(sizeof(Users));
     char *buffer;
     int i = 0;
     int val = 1;
-    
+
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -108,14 +213,15 @@ Users *create_users(char *line){
    }
 
    users->flights_total = 0;
-   users->reservations_total = 0;
-   users->spent_total = 0;
+   //users->reservations_total = 0;
+   //users->spent_total = 0;
 
    return users;
 }
 
 void insert_users(CAT_USERS *cat_users, Users *users){
     g_hash_table_insert(cat_users->users_hashtable, users->id, users);
+
 }
 
 CAT_USERS *create_cat_users(char *entry_files){
@@ -128,7 +234,7 @@ CAT_USERS *create_cat_users(char *entry_files){
         perror("Error opening users.csv");
         return NULL;
     }
-    
+
     CAT_USERS *cat_users = malloc(sizeof(struct cat_users));
     cat_users->users_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_users);
 
@@ -149,6 +255,7 @@ CAT_USERS *create_cat_users(char *entry_files){
             continue;
         }
         line[strcspn(line, "\n")] = 0;
+
         Users *u = create_users(line);
         if (u != NULL){
             insert_users(cat_users, u);
@@ -161,7 +268,6 @@ CAT_USERS *create_cat_users(char *entry_files){
     printf("Time to parse users.csv: %f\n", cpu_time_used);
 
     printf("Number of users: %d\n", g_hash_table_size(cat_users->users_hashtable));
-
     free(line);
     fclose(fp);
 
@@ -173,31 +279,17 @@ void delete_cat_users(CAT_USERS *cat_users){
     free(cat_users);
 }
 
-void update_users(CAT_USERS *cat_users, char *id, int flights, int reservations, int spent){
-    Users *users = g_hash_table_lookup(cat_users->users_hashtable, id);
+void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
+    GHashTableIter iter;
+    gpointer key, value;
 
-    users->flights_total += flights;
-    users->reservations_total += reservations;
-    users->spent_total += spent;
+    g_hash_table_iter_init (&iter, cat_users->users_hashtable);
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        Users *user = (Users *) value;
+        set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
+    }
 }
 
-char *users_profile(CAT_USERS *cat_users, char *id) {
-    Users *users = g_hash_table_lookup(cat_users->users_hashtable, id);
-
-    if (users == NULL || users->account_status == Inactive) return "";  
-
-    char *name = users->name;
-    char *sex = users->sex;
-    int age = calculate_age(users->birth_date);
-    printf("%d\n", age);
-    char *country_code = users->country_code;
-    int number_of_flights = users->flights_total;
-    int number_of_reservations = users->reservations_total;
-    int total_spent = users->spent_total;
-
-    char *answer = malloc(snprintf(NULL, 0, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent) + 1);
-
-    snprintf(answer, 100, "%s;%s;%d;%s;%d;%d;%d\n", name, sex, age, country_code, number_of_flights, number_of_reservations, total_spent);
-
-    return answer;
+Users *query1_aux(CAT_USERS *users, char *id){
+    return g_hash_table_lookup(users->users_hashtable, id);
 }

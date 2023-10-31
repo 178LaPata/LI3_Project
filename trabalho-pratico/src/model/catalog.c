@@ -1,21 +1,28 @@
 #include "../../includes/model/catalog.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <glib.h>
-
 typedef struct catalog {
     CAT_USERS *cat_users;
     CAT_FLIGHTS *cat_flights;
     CAT_RESERVATIONS *cat_reservations;
+    CAT_PASSENGERS *cat_passengers;
 } catalog;
 
+char* pointer_file (char *path, char *file){
+    char *file_name = malloc(strlen(path) + strlen(file) + 2); // + 2 por causa do \0 e pq n sabes se o path acaba em / ou nao
+    
+    strcat(file_name, path);
+    if (path[strlen(path)] != '/')
+        strcat(file_name,"/");
+    strcat(file_name, file);
+    return file_name; 
+}
+
 catalog *create_catalog(char *entry_files) {
+    char *users = pointer_file(entry_files,"users.csv"), *flights =  pointer_file(entry_files,"flights.csv"), *reservations = pointer_file(entry_files,"reservations.csv"), *passengers = pointer_file(entry_files,"passengers.csv");
     catalog *cat = malloc(sizeof(struct catalog));
-    cat->cat_users = create_cat_users(entry_files);
-    cat->cat_flights = create_cat_flights(entry_files);
-    cat->cat_reservations = create_cat_reservations(entry_files);
+    cat->cat_users = create_cat_users(users);
+    cat->cat_flights = create_cat_flights(flights);
+    cat->cat_reservations = create_cat_reservations(reservations);
+    cat->cat_passengers = create_cat_passengers(passengers);
     return cat;
 }
 
@@ -26,20 +33,24 @@ void delete_catalog(catalog *cat) {
     free(cat);
 }
 
-// queries
-char *q01_users(char *id, catalog *cat) {
-    users_profile(cat->cat_users, id);
-}
 
-//char *q01_reservations(char *id, catalog *cat) {
-//    Reservations *reservations = g_hash_table_lookup(cat->cat_reservations->reservations_hashtable, id);
-//    reservations_profile(cat->cat_reservations, id);
-//}
-//
-//char *q01_flights(int id, catalog *cat) {
-//    Flights *flights = g_hash_table_lookup(cat->cat_flights->flights_hashtable, &id);
-//    flights_profile(cat->cat_flights, id);
-//}
+void query1(catalog *cat, char *id){
+    printf("Utilizador: %s\n\n", id);
+    Users *user = query1_aux(cat->cat_users, id);
+    if (user == NULL){
+        printf("Utilizador não encontrado\n");
+        return;
+    }
+
+    //int idade = calculate_age(user->birth_date);
+    printf("Nome: %s\n", get_name(user));
+    printf("Sexo: %s\n",get_sex(user));
+    //printf("Idade: %d\n", idade);
+    printf("Código do País: %s\n", get_country_code(user));
+    printf("Passaporte: %s\n", get_passport(user));
+    printf("Número de Voos: %d\n", get_flights_total(user));
+
+}
 
 
 
@@ -53,37 +64,43 @@ void parse_queries(char *line, catalog *cat, int output_num){
             char *id = strsep(&line, " ");
             break;
     }
+
 }
 
 
-int runBatch(char **input_file) {
+int run_batch(char **input_file) {
 
     catalog *cat = create_catalog(input_file[1]);
+    update_values_users(cat->cat_users, cat->cat_passengers);
 
-    system("exec rm -rf Resultados/*");
-
-    FILE *fp;
-    fp = fopen(input_file[2], "r");
-    if (!fp) {
-        perror("Error");
-        return -1;
+    FILE *file_query;
+    file_query = fopen(input_file[2], "r");
+    
+    if(file_query == NULL){
+        perror("Erro:");
+        exit(1);
     }
+    char line[100];
+    int buffer_size = 100;
+    int num = 0;
 
-    char *line = NULL;
-    size_t len = 0;
-    int output_number = 1;
-
-    while (getline(&line, &len, fp) != -1) {
-        line[strcspn(line, "\n")] = 0;
-        parse_queries(line, cat, output_number);
-        output_number++;
+    while(fgets(line, buffer_size, file_query)){
+        char *query, *n_query, *query_arg, *arg1, *arg2, *arg3;
+        query = strdup(line);
+        n_query = strsep(&query, " ");
+        query_arg = strsep(&query, "\n");
+        //unsigned i;
+        num++;
+        switch (n_query[0]){
+            case '1':
+                query1(cat, query_arg);
+                break;
+            default:
+                break;
+        }
     }
-
-    free(line);
-    fclose(fp);
 
     delete_catalog(cat);
-
     return 0;
 }
 
