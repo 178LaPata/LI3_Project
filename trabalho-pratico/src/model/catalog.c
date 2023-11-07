@@ -23,6 +23,7 @@ catalog *create_catalog(char *entry_files) {
     cat->cat_flights = create_cat_flights(flights);
     cat->cat_reservations = create_cat_reservations(reservations);
     cat->cat_passengers = create_cat_passengers(passengers);
+    update_values_users(cat->cat_users, cat->cat_passengers);
     return cat;
 }
 
@@ -33,7 +34,7 @@ void delete_catalog(catalog *cat) {
     free(cat);
 }
 
-
+// sq isto pode ser feito nos users 
 void query1(catalog *cat, char *id){
     printf("Utilizador: %s\n\n", id);
     Users *user = query1_aux(cat->cat_users, id);
@@ -42,10 +43,10 @@ void query1(catalog *cat, char *id){
         return;
     }
 
-    //int idade = calculate_age(user->birth_date);
+    int idade = calculate_age(user->birth_date);
     printf("Nome: %s\n", get_name(user));
     printf("Sexo: %s\n",get_sex(user));
-    //printf("Idade: %d\n", idade);
+    printf("Idade: %d\n", idade);
     printf("Código do País: %s\n", get_country_code(user));
     printf("Passaporte: %s\n", get_passport(user));
     printf("Número de Voos: %d\n", get_flights_total(user));
@@ -54,7 +55,7 @@ void query1(catalog *cat, char *id){
 
 
 
-// funcao parse queries
+// funcao que da parse as queries
 void parse_queries(char *line, catalog *cat, int output_num){
 
     int i = (int) strtol(strsep(&line, " "), (char **) NULL, 10);
@@ -71,7 +72,6 @@ void parse_queries(char *line, catalog *cat, int output_num){
 int run_batch(char **input_file) {
 
     catalog *cat = create_catalog(input_file[1]);
-    update_values_users(cat->cat_users, cat->cat_passengers);
 
     FILE *file_query;
     file_query = fopen(input_file[2], "r");

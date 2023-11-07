@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
+// estrutura dos users
 struct users {
     char *id;
     char *name;
@@ -25,10 +26,12 @@ struct users {
     //int spent_total;
 };
 
+// estrutura da hashtable dos users
 struct cat_users {
     GHashTable *users_hashtable;
 };
 
+// da free a um user e as variaveis 
 void delete_users(void *data){
     Users *users = (Users *) data;
     free(users->id);
@@ -42,7 +45,6 @@ void delete_users(void *data){
 }
 
 // gets e sets
-
 char *get_id(Users *users){
     return users->id;
 }
@@ -148,6 +150,7 @@ void set_flights_total(Users *users, int flights_total){
     users->flights_total = flights_total;
 }
 
+// cria um user a partir de uma linha do ficheiro e verifica se os dados sao validos
 Users *create_users(char *line){
     Users *users = malloc(sizeof(Users));
     char *buffer;
@@ -219,11 +222,13 @@ Users *create_users(char *line){
    return users;
 }
 
+// insere um user na hashtable
 void insert_users(CAT_USERS *cat_users, Users *users){
     g_hash_table_insert(cat_users->users_hashtable, users->id, users);
 
 }
 
+// cria e preenche a hashtable dos users
 CAT_USERS *create_cat_users(char *entry_files){
 
     FILE *fp;
@@ -274,11 +279,13 @@ CAT_USERS *create_cat_users(char *entry_files){
     return cat_users;
 }
     
+// da free a hashtable dos users
 void delete_cat_users(CAT_USERS *cat_users){
     g_hash_table_destroy(cat_users->users_hashtable);
     free(cat_users);
 }
 
+// da update as variaveis dos users (variaveis que nao estao no ficheiro)
 void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
     GHashTableIter iter;
     gpointer key, value;
@@ -286,10 +293,12 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
     g_hash_table_iter_init (&iter, cat_users->users_hashtable);
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Users *user = (Users *) value;
+        int tFlights = calculate_total_flights(cat_passengers, user->id);
         set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
     }
 }
 
+// procura um user na hashtable pelo id 
 Users *query1_aux(CAT_USERS *users, char *id){
     return g_hash_table_lookup(users->users_hashtable, id);
 }

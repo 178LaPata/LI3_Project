@@ -74,6 +74,7 @@ struct datetime* valid_date_time(char *datetime_str) {
     return NULL;
 }
 
+// calcula a idade de um user 
 int calculate_age(date birth_date){
     struct tm data_hora_atual;
     sscanf(DATETIME, "%d/%d/%d %d:%d:%d",

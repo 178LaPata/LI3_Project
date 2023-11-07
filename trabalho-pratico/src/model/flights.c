@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// estrutura dos flights
 struct flights {
     int id;
     char *airline;
@@ -23,10 +24,12 @@ struct flights {
     char *notes;
 };
 
+// estrutura da hashtable dos flights
 struct cat_flights {
     GHashTable *flights_hashtable;
 };
 
+// da free a um flights e as variaveis
 void delete_flights(void *data){
     Flights *flights = (Flights *) data;
     free(flights->airline);
@@ -39,6 +42,7 @@ void delete_flights(void *data){
     free(flights);
 }
 
+// cria um flights a partir de uma linha do ficheiro e verifica se os dados sao validos
 Flights *create_flights(char *line){
     Flights *flights = malloc(sizeof(Flights));
     char *buffer;
@@ -103,10 +107,12 @@ Flights *create_flights(char *line){
     return flights;
 }
 
+// insere um flights na hashtable
 void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights){
     g_hash_table_insert(cat_flights->flights_hashtable, &flights->id, flights);
 }
 
+// cria a hashtable dos flights
 CAT_FLIGHTS *create_cat_flights(char *entry_files){
 
     FILE *fp;
@@ -153,6 +159,7 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
     return cat_flights;
 }
 
+// da free a uma hashtable dos flights
 void delete_cat_flights(CAT_FLIGHTS *cat_flights){
     g_hash_table_destroy(cat_flights->flights_hashtable);
     free(cat_flights);

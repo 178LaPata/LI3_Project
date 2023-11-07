@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// estrutura das reservations
 struct reservations {
     char *id;
     char *user_id;
@@ -24,10 +25,12 @@ struct reservations {
     char *comments;
 };
 
+// estrutura da hashtable das reservations
 struct cat_reservations {
     GHashTable *reservations_hashtable;
 };
 
+// da free a uma reservations e as variaveis
 void delete_reservations(void *data){
     Reservations *reservations = (Reservations *) data;
     free(reservations->id);
@@ -35,13 +38,14 @@ void delete_reservations(void *data){
     free(reservations->hotel_id);
     free(reservations->hotel_name);
     free(reservations->adress);
-    //free(reservations->includes_breakfast); // PERGUNTAR CHAKALL
+    free(reservations->includes_breakfast);
     free(reservations->room_details);
     free(reservations->rating);
     free(reservations->comments);
     free(reservations);
 }
 
+// cria uma reservations a partir de uma linha do ficheiro e verifica se os dados sao validos
 Reservations *create_reservations(char *line){
     Reservations *reservations = malloc(sizeof(Reservations));
     char *buffer;
@@ -116,10 +120,12 @@ Reservations *create_reservations(char *line){
     return reservations;
 }
 
+// insere uma reservations na hashtable
 void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reservations){
     g_hash_table_insert(cat_reservations->reservations_hashtable, reservations->id, reservations);
 }
 
+// cria a hashtable das reservations
 CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
     
     FILE *fp;
@@ -166,6 +172,7 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
     return cat_reservations;
 }
 
+// da free a uma hashtable das reservations
 void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations){
     g_hash_table_destroy(cat_reservations->reservations_hashtable);
     free(cat_reservations);
