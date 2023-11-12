@@ -1,3 +1,13 @@
+#pragma once
+
+#include "../../includes/model/date.h"
+#include "../../includes/model/valid.h"
+
+#include <glib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef struct flights Flights; 
 
 typedef struct cat_flights CAT_FLIGHTS;

@@ -1,4 +1,4 @@
-#include "../../includes/model/catalog.h"
+#include "../includes/controller/queries.h"
 
 #include <stdlib.h>
 #include <stdio.h>

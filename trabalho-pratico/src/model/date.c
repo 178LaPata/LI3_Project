@@ -1,13 +1,5 @@
 #include "../../includes/model/date.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <time.h>
-
-#define DATE "2023/10/01"
-#define DATETIME "2023/10/01 00:00:00"
-
 struct date{
     char *year, *month, *day;
 };
@@ -16,7 +8,7 @@ struct datetime{
     char *year, *month, *day, *hour, *minute, *second;
 };
 
-struct date* valid_date (char *date_str){
+date valid_date (char *date_str){
 
     if (strlen(date_str) != 10 || date_str[4] != '/' || date_str[7] != '/') return NULL;
     for (int i=0 ; date_str[i] ; i++){
@@ -24,11 +16,12 @@ struct date* valid_date (char *date_str){
         if (date_str[i]<'0' || date_str[i]>'9') return NULL;
     }
 
-    struct date* date = malloc(sizeof(struct date));
+    date date = malloc(sizeof(struct date));
 
     date->year  = strsep(&date_str, "/");
     date->month = strsep(&date_str, "/");
     date->day = strsep(&date_str, " ");
+
 
     if(atoi(date->year) >= 1900 && atoi(date->year) <= 9999){
         if(atoi(date->month) >= 1 && atoi(date->month) <= 12){
@@ -41,7 +34,7 @@ struct date* valid_date (char *date_str){
     return NULL;
 }
 
-struct datetime* valid_date_time(char *datetime_str) {
+datetime valid_date_time(char *datetime_str) {
     if (strlen(datetime_str) != 19 || datetime_str[4] != '/' || datetime_str[7] != '/' || datetime_str[10] != ' ' || datetime_str[13] != ':' || datetime_str[16] != ':') return NULL;
 
     for (int i = 0; datetime_str[i]; i++) {
@@ -85,9 +78,12 @@ int calculate_age(date birth_date){
            &data_hora_atual.tm_min,
            &data_hora_atual.tm_sec);
 
-    data_hora_atual.tm_year -= 1900;
+    //printDate(birth_date);
+
+    data_hora_atual.tm_year = 1900;
     data_hora_atual.tm_mon -= 1;
 
+    
     int idade = (data_hora_atual.tm_year) - atoi(birth_date->year);
     if (data_hora_atual.tm_mon+1 < atoi(birth_date->month)){
         idade--;
@@ -98,4 +94,8 @@ int calculate_age(date birth_date){
     }
 
     return idade;
+}
+
+void printDate(date date){
+    printf("%s/%s/%s\n", date->year, date->month, date->day);
 }

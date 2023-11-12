@@ -1,5 +1,10 @@
-#ifndef VALID_H
-#define VALID_H
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 enum pay_method{
     debit_card,
@@ -24,5 +29,3 @@ int verify_maior_que_zero(char *number);
 char *verify_includes_breakfast(char *includes_breakfast);
 char *verify_rating(char *rating);
 
-
-#endif // VALID_H

@@ -1,11 +1,5 @@
 #include "../../includes/model/valid.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <ctype.h>
-
 enum pay_method verify_payMethod(char *token){
     if (strcasecmp(token,"debit_card") == 0) return debit_card;
     else if (strcasecmp(token,"credit_card") == 0) return credit_card;

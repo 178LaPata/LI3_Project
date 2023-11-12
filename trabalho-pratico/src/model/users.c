@@ -1,11 +1,5 @@
 #include "../../includes/model/users.h"
 
-#include <glib.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-
 // estrutura dos users
 struct users {
     char *id;
@@ -178,6 +172,7 @@ Users *create_users(char *line){
             case 4:
                 if(strlen(buffer) == 0) val = 0;
                 users->birth_date = valid_date(buffer); 
+                //printDate(users->birth_date);  
                 break;
             case 5:
                 if (strlen(buffer) == 0) val = 0;
@@ -225,7 +220,6 @@ Users *create_users(char *line){
 // insere um user na hashtable
 void insert_users(CAT_USERS *cat_users, Users *users){
     g_hash_table_insert(cat_users->users_hashtable, users->id, users);
-
 }
 
 // cria e preenche a hashtable dos users
@@ -262,6 +256,7 @@ CAT_USERS *create_cat_users(char *entry_files){
         line[strcspn(line, "\n")] = 0;
 
         Users *u = create_users(line);
+        //printDate(u->birth_date);
         if (u != NULL){
             insert_users(cat_users, u);
         } 
@@ -293,7 +288,6 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
     g_hash_table_iter_init (&iter, cat_users->users_hashtable);
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Users *user = (Users *) value;
-        int tFlights = calculate_total_flights(cat_passengers, user->id);
         set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
     }
 }

@@ -1,10 +1,5 @@
 #include "../../includes/model/passengers.h"
 
-#include <glib.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 // estrutura dos passengers
 struct passengers {
     int flight_id;
@@ -28,13 +23,6 @@ void delete_passengers(void *data){
     free(passengers);
 }
 
-void delete_passenger_list(void *data){
-    List_Passengers *list_passengers = (List_Passengers *) data;
-    for (int i=0 ; i<list_passengers->n ; i++)
-        free(list_passengers->passengers_list[i]);
-    free(list_passengers);
-}
-
 List_Passengers *create_passenger_list(Passengers* passengers){
     List_Passengers *list_passengers = malloc(sizeof(List_Passengers));
     list_passengers->passengers_list = malloc(2 * sizeof(char *));
@@ -50,6 +38,13 @@ void insert_passenger_list(List_Passengers *list_passengers, Passengers *passeng
         list_passengers->passengers_list = realloc(list_passengers->passengers_list, list_passengers->size * sizeof(char *));
     }
     list_passengers->passengers_list[list_passengers->n++] = passengers->user_id;
+}
+
+void delete_passenger_list(void *data){
+    List_Passengers *list_passengers = (List_Passengers *) data;
+    for (int i=0 ; i<list_passengers->n ; i++)
+        free(list_passengers->passengers_list[i]);
+    free(list_passengers);
 }
 
 // cria um passengers a partir de uma linha do ficheiro e verifica se os dados sao validos

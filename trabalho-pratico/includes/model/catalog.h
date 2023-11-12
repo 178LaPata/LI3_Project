@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../includes/model/users.h"
 #include "../../includes/model/flights.h"
 #include "../../includes/model/reservations.h"
@@ -14,5 +16,3 @@ typedef struct catalog catalog;
 
 catalog *create_catalog(char *entry_files);
 void delete_catalog(catalog *cat);
-
-// queries

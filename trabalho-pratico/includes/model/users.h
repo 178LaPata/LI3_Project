@@ -1,6 +1,14 @@
+#pragma once
+
 #include "../../includes/model/date.h"
 #include "../../includes/model/valid.h"
 #include "../../includes/model/passengers.h"
+
+#include <glib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
 
 typedef struct users Users;
 

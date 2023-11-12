@@ -1,5 +1,10 @@
 #pragma once
 
+#include <glib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef struct passengers Passengers;
 
 typedef struct cat_passengers CAT_PASSENGERS;
