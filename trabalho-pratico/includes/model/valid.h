@@ -28,4 +28,4 @@ int verify_stars(char *stars);
 int verify_maior_que_zero(char *number);
 char *verify_includes_breakfast(char *includes_breakfast);
 char *verify_rating(char *rating);
-
+int str_is_num (char* str);

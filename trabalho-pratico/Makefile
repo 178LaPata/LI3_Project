@@ -30,5 +30,6 @@ programa-principal: $(OBJ)
 .PHONY: clean
 
 clean:
-	rm -rf $(ODIR)/* programa-principal
-	rm -rf Resultados/*
+	rm -f programa-principal
+	rm -r $(ODIR)
+	rm -r Resultados

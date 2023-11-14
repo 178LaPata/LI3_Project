@@ -347,46 +347,46 @@ double calculate_total_spent(CAT_RESERVATIONS *cat_reservations, char *user){
     return total_gasto;
 }
 
-Reservations *query1_reservations_aux(CAT_RESERVATIONS *reservations, char *id){
-    return g_hash_table_lookup(reservations->reservations_hashtable, id);
+Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
+    return g_hash_table_lookup(cat_reservations->reservations_hashtable, id);
 }
 
 
 // funcao que calcula a classificação média de um hotel, a partir do id do hotel
-double query3_aux(CAT_RESERVATIONS *reservations, char *id){
-    double total = 0.0;
-    int n = 0;
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Reservations *reservations = (Reservations *) value;
-        if (strcmp(reservations->hotel_id, id) == 0) {
-            if (strcmp(reservations->rating, " ") != 0) {
-                total += atof(reservations->rating);
-                n++;
-            }
-        }
-    }
-    if (n == 0) return 0.0;
-    return total / n;
-}
-
-double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
-    double total = 0.0;
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Reservations *reservations = (Reservations *) value;
-        if (strcmp(reservations->hotel_id, hotel_id) == 0) {
-            int nights = get_nights(reservations);
-            printf("noites: %d\n", nights);
-            if (compare_dates(reservations->begin_date, begin) >= 0 && compare_dates(reservations->end_date, end) <= 0) {
-                total += (double) reservations->price_per_night * (double) nights;
-                printf("total: %.3f/n", total);
-            }
-        }
-    }
-    return total;
-}
+//double query3_aux(CAT_RESERVATIONS *reservations, char *id){
+//    double total = 0.0;
+//    int n = 0;
+//    GHashTableIter iter;
+//    gpointer key, value;
+//    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
+//    while (g_hash_table_iter_next(&iter, &key, &value)) {
+//        Reservations *reservations = (Reservations *) value;
+//        if (strcmp(reservations->hotel_id, id) == 0) {
+//            if (strcmp(reservations->rating, " ") != 0) {
+//                total += atof(reservations->rating);
+//                n++;
+//            }
+//        }
+//    }
+//    if (n == 0) return 0.0;
+//    return total / n;
+//}
+//
+//double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
+//    double total = 0.0;
+//    GHashTableIter iter;
+//    gpointer key, value;
+//    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
+//    while (g_hash_table_iter_next(&iter, &key, &value)) {
+//        Reservations *reservations = (Reservations *) value;
+//        if (strcmp(reservations->hotel_id, hotel_id) == 0) {
+//            int nights = get_nights(reservations);
+//            printf("noites: %d\n", nights);
+//            if (compare_dates(reservations->begin_date, begin) >= 0 && compare_dates(reservations->end_date, end) <= 0) {
+//                total += (double) reservations->price_per_night * (double) nights;
+//                printf("total: %.3f/n", total);
+//            }
+//        }
+//    }
+//    return total;
+//}

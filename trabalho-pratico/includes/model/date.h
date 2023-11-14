@@ -19,5 +19,5 @@ int calculate_days(date begin_date, date end_date);
 int calculate_seconds(datetime begin, datetime end);
 int compare_dates(date date1, date date2);
 
-void printDate(date date);
-void printDateTime(datetime datetime);
+char *date_to_string(date date);
+char *datetime_to_string(datetime datetime);

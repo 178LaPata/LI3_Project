@@ -299,7 +299,7 @@ void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passeng
     }
 }
 
-Flights *query1_flights_aux (CAT_FLIGHTS *flights, int id){
+Flights *get_flights (CAT_FLIGHTS *flights, int id){
     return g_hash_table_lookup(flights->flights_hashtable, &id);
 }
 

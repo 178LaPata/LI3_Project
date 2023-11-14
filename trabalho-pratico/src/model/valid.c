@@ -108,3 +108,15 @@ char *verify_rating(char *rating){
     if (atoi(rating) < 0 || atoi(rating) > 5) return NULL;
     return strdup(rating);
 }
+
+int str_is_num (char* str){
+    unsigned i;
+    int p=0;
+    for(i=0; i<strlen(str); i++){
+        if (str[i]<'0' || str[i]>'9'){
+            p=1;
+            return p;
+        }
+    }
+    return p;
+}

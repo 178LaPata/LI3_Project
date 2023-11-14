@@ -310,7 +310,9 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, C
     }
 }
 
-// procura um user na hashtable pelo id 
-Users *query1_users_aux(CAT_USERS *users, char *id){
-    return g_hash_table_lookup(users->users_hashtable, id);
+// retorna um user a partir do id
+Users *get_users(CAT_USERS *cat_users, char *id){
+    Users *user = g_hash_table_lookup(cat_users->users_hashtable, id);
+    //if(!user) return NULL;
+    return user;
 }

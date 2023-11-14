@@ -52,4 +52,4 @@ void insert_users(CAT_USERS *cat_users, Users *users);
 CAT_USERS *create_cat_users(char *entry_files);
 void delete_cat_users(CAT_USERS *cat_users);
 void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, CAT_RESERVATIONS *cat_reservations);
-Users *query1_users_aux(CAT_USERS *users, char *id);
+Users *get_users(CAT_USERS *cat_users, char *id);

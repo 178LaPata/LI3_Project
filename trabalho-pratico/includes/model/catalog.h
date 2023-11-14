@@ -16,3 +16,6 @@ typedef struct catalog catalog;
 char* pointer_file (char *path, char *file);
 catalog *create_catalog(char *entry_files);
 void delete_catalog(catalog *cat);
+Users *query1_users_aux(catalog *cat, char *id);
+Reservations *query1_reservations_aux(catalog *cat, char *id);
+Flights *query1_flights_aux(catalog *cat, char *id);

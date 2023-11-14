@@ -170,10 +170,15 @@ int compare_dates(date date1, date date2){
     return 0;
 }
 
-void printDate(date date){
-    printf("%s/%s/%s\n", date->year, date->month, date->day);
+
+char *date_to_string(date date){
+    char *date_str = malloc(sizeof(char) * 11);
+    sprintf(date_str, "%s/%s/%s", date->year, date->month, date->day);
+    return date_str;
 }
 
-void printDateTime(datetime datetime){
-    printf("%s/%s/%s %s:%s:%s\n", datetime->year, datetime->month, datetime->day, datetime->hour, datetime->minute, datetime->second);
+char *datetime_to_string(datetime datetime){
+    char *datetime_str = malloc(sizeof(char) * 20);
+    sprintf(datetime_str, "%s/%s/%s %s:%s:%s", datetime->year, datetime->month, datetime->day, datetime->hour, datetime->minute, datetime->second);
+    return datetime_str;
 }

@@ -17,5 +17,6 @@ a.out
 *reservations*.csv
 *passengers*.csv
 Resultados/
-
+obj/
+dataset/
 .vscode

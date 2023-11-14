@@ -36,3 +36,15 @@ void delete_catalog(catalog *cat) {
     delete_cat_reservations(cat->cat_reservations);
     free(cat);
 }
+
+Users *query1_users_aux(catalog *cat, char *id){
+    return get_users(cat->cat_users, id);
+}
+
+Reservations *query1_reservations_aux(catalog *cat, char *id){
+    return get_reservations(cat->cat_reservations, id);
+}
+
+Flights *query1_flights_aux(catalog *cat, char *id){
+    return get_flights(cat->cat_flights, atoi(id));
+}
