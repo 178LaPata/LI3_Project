@@ -1,6 +1,5 @@
 #include "../../includes/model/reservations.h"
 
-
 // estrutura das reservations
 struct reservations {
     char *id;
@@ -17,6 +16,9 @@ struct reservations {
     char *room_details;
     char *rating;
     char *comments;
+
+    int nights;
+    double total_price;
 };
 
 // estrutura da hashtable das reservations
@@ -24,19 +26,132 @@ struct cat_reservations {
     GHashTable *reservations_hashtable;
 };
 
-// da free a uma reservations e as variaveis
-void delete_reservations(void *data){
-    Reservations *reservations = (Reservations *) data;
-    free(reservations->id);
-    free(reservations->user_id);
-    free(reservations->hotel_id);
-    free(reservations->hotel_name);
-    free(reservations->adress);
-    free(reservations->includes_breakfast);
-    free(reservations->room_details);
-    free(reservations->rating);
-    free(reservations->comments);
-    free(reservations);
+char *get_id_reservations(Reservations *reservations){
+    return reservations->id;
+}
+
+char *get_user_id(Reservations *reservations){
+    return reservations->user_id;
+}
+
+char *get_hotel_id(Reservations *reservations){
+    return reservations->hotel_id;
+}
+
+char *get_hotel_name(Reservations *reservations){
+    return reservations->hotel_name;
+}
+
+int get_hotel_stars(Reservations *reservations){
+    return reservations->hotel_stars;
+}
+
+int get_city_tax(Reservations *reservations){
+    return reservations->city_tax;
+}
+
+char *get_adress_reservations(Reservations *reservations){
+    return reservations->adress;
+}
+
+date get_begin_date(Reservations *reservations){
+    return reservations->begin_date;
+}
+
+date get_end_date(Reservations *reservations){
+    return reservations->end_date;
+}
+
+int get_price_per_night(Reservations *reservations){
+    return reservations->price_per_night;
+}
+
+char *get_includes_breakfast(Reservations *reservations){
+    return reservations->includes_breakfast;
+}
+
+char *get_room_details(Reservations *reservations){
+    return reservations->room_details;
+}
+
+char *get_rating(Reservations *reservations){
+    return reservations->rating;
+}
+
+char *get_comments(Reservations *reservations){
+    return reservations->comments;
+}
+
+int get_nights(Reservations *reservations){
+    return reservations->nights;
+}
+
+double get_total_price(Reservations *reservations){
+    return reservations->total_price;
+}
+
+void set_id_reservations(Reservations *reservations, char *id){
+    reservations->id = strdup(id);
+}
+
+void set_user_id(Reservations *reservations, char *user_id){
+    reservations->user_id = strdup(user_id);
+}
+
+void set_hotel_id(Reservations *reservations, char *hotel_id){
+    reservations->hotel_id = strdup(hotel_id);
+}
+
+void set_hotel_name(Reservations *reservations, char *hotel_name){
+    reservations->hotel_name = strdup(hotel_name);
+}
+
+void set_hotel_stars(Reservations *reservations, int hotel_stars){
+    reservations->hotel_stars = hotel_stars;
+}
+
+void set_city_tax(Reservations *reservations, int city_tax){
+    reservations->city_tax = city_tax;
+}
+
+void set_adress_reservations(Reservations *reservations, char *adress){
+    reservations->adress = strdup(adress);
+}
+
+void set_begin_date(Reservations *reservations, date begin_date){
+    reservations->begin_date = begin_date;
+}
+
+void set_end_date(Reservations *reservations, date end_date){
+    reservations->end_date = end_date;
+}
+
+void set_price_per_night(Reservations *reservations, int price_per_night){
+    reservations->price_per_night = price_per_night;
+}
+
+void set_includes_breakfast(Reservations *reservations, char *includes_breakfast){
+    reservations->includes_breakfast = strdup(includes_breakfast);
+}
+
+void set_room_details(Reservations *reservations, char *room_details){
+    reservations->room_details = strdup(room_details);
+}
+
+void set_rating(Reservations *reservations, char *rating){
+    reservations->rating = strdup(rating);
+}
+
+void set_comments(Reservations *reservations, char *comments){
+    reservations->comments = strdup(comments);
+}
+
+void set_nights(Reservations *reservations, int nights){
+    reservations->nights = nights;
+}
+
+void set_total_price(Reservations *reservations, double total_price){
+    reservations->total_price = total_price;
 }
 
 // cria uma reservations a partir de uma linha do ficheiro e verifica se os dados sao validos
@@ -95,13 +210,13 @@ Reservations *create_reservations(char *line){
                 reservations->room_details = strdup(buffer);
                 break;
             case 12:
-                if(strlen(buffer) == 0) reservations->rating = "no rating";
+                if(strlen(buffer) == 0) reservations->rating = " ";
                 reservations->rating = verify_rating(buffer);
                 if(reservations->rating == NULL) val = 0;
                 reservations->rating = strdup(buffer);
                 break;
             case 13:
-                if(strlen(buffer) == 0) reservations->comments = "no comments";
+                if(strlen(buffer) == 0) reservations->comments = " ";
                 reservations->comments = strdup(buffer);
                 break;
         }
@@ -112,6 +227,21 @@ Reservations *create_reservations(char *line){
         return NULL;
     }
     return reservations;
+}
+
+// da free a uma reservations e as variaveis
+void delete_reservations(void *data){
+    Reservations *reservations = (Reservations *) data;
+    free(reservations->id);
+    free(reservations->user_id);
+    free(reservations->hotel_id);
+    free(reservations->hotel_name);
+    free(reservations->adress);
+    free(reservations->includes_breakfast);
+    free(reservations->room_details);
+    free(reservations->rating);
+    free(reservations->comments);
+    free(reservations);
 }
 
 // insere uma reservations na hashtable
@@ -170,4 +300,93 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
 void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations){
     g_hash_table_destroy(cat_reservations->reservations_hashtable);
     free(cat_reservations);
+}
+
+void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        set_nights(reservations, calculate_days(reservations->begin_date, reservations->end_date));
+        set_total_price(reservations, calculate_total_price(reservations));
+    }
+}
+
+int calculate_total_reservations(CAT_RESERVATIONS *cat_reservations, char *user){
+    int total_reservations = 0;
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        if (strcmp(reservations->user_id, user) == 0) total_reservations++;
+    }
+    return total_reservations;
+}
+
+double calculate_total_price(Reservations *reservations){
+    int dias = get_nights(reservations);
+    double custo_por_estadia = (double) reservations->price_per_night * (double) dias;
+    double imposto = (custo_por_estadia/100) * (double) reservations->city_tax;
+    return custo_por_estadia + imposto;
+}
+
+double calculate_total_spent(CAT_RESERVATIONS *cat_reservations, char *user){
+    double total_gasto = 0.0;
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        if (strcmp(reservations->user_id, user) == 0) {
+            total_gasto += get_total_price(reservations);
+        }
+    }
+    return total_gasto;
+}
+
+Reservations *query1_reservations_aux(CAT_RESERVATIONS *reservations, char *id){
+    return g_hash_table_lookup(reservations->reservations_hashtable, id);
+}
+
+
+// funcao que calcula a classificação média de um hotel, a partir do id do hotel
+double query3_aux(CAT_RESERVATIONS *reservations, char *id){
+    double total = 0.0;
+    int n = 0;
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        if (strcmp(reservations->hotel_id, id) == 0) {
+            if (strcmp(reservations->rating, " ") != 0) {
+                total += atof(reservations->rating);
+                n++;
+            }
+        }
+    }
+    if (n == 0) return 0.0;
+    return total / n;
+}
+
+double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
+    double total = 0.0;
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        if (strcmp(reservations->hotel_id, hotel_id) == 0) {
+            int nights = get_nights(reservations);
+            printf("noites: %d\n", nights);
+            if (compare_dates(reservations->begin_date, begin) >= 0 && compare_dates(reservations->end_date, end) <= 0) {
+                total += (double) reservations->price_per_night * (double) nights;
+                printf("total: %.3f/n", total);
+            }
+        }
+    }
+    return total;
 }

@@ -1,4 +1,5 @@
 #include "../../includes/model/catalog.h"
+
 typedef struct catalog {
     CAT_USERS *cat_users;
     CAT_FLIGHTS *cat_flights;
@@ -23,7 +24,9 @@ catalog *create_catalog(char *entry_files) {
     cat->cat_flights = create_cat_flights(flights);
     cat->cat_reservations = create_cat_reservations(reservations);
     cat->cat_passengers = create_cat_passengers(passengers);
-    update_values_users(cat->cat_users, cat->cat_passengers);
+    update_values_users(cat->cat_users, cat->cat_passengers, cat->cat_reservations);
+    update_values_flights(cat->cat_flights, cat->cat_passengers);
+    update_values_reservations(cat->cat_reservations);
     return cat;
 }
 

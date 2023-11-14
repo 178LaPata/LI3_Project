@@ -16,8 +16,8 @@ struct users {
     enum account_status account_status;
 
     int flights_total;
-    //int reservations_total;
-    //int spent_total;
+    int reservations_total;
+    double spent_total;
 };
 
 // estrutura da hashtable dos users
@@ -25,20 +25,6 @@ struct cat_users {
     GHashTable *users_hashtable;
 };
 
-// da free a um user e as variaveis 
-void delete_users(void *data){
-    Users *users = (Users *) data;
-    free(users->id);
-    free(users->name);
-    free(users->email);
-    free(users->sex);
-    free(users->passport);
-    free(users->country_code);
-    free(users->adress);
-    free(users);
-}
-
-// gets e sets
 char *get_id(Users *users){
     return users->id;
 }
@@ -89,6 +75,14 @@ enum account_status get_account_status(Users *users){
 
 int get_flights_total(Users *users){
     return users->flights_total;
+}
+
+int get_reservations_total(Users *users){
+    return users->reservations_total;
+}
+
+double get_spent_total(Users *users){
+    return users->spent_total;
 }
 
 
@@ -144,13 +138,20 @@ void set_flights_total(Users *users, int flights_total){
     users->flights_total = flights_total;
 }
 
+void set_reservations_total(Users *users, int reservations_total){
+    users->reservations_total = reservations_total;
+}
+
+void set_spent_total(Users *users, double spent_total){
+    users->spent_total = spent_total;
+}
+
 // cria um user a partir de uma linha do ficheiro e verifica se os dados sao validos
 Users *create_users(char *line){
     Users *users = malloc(sizeof(Users));
     char *buffer;
     int i = 0;
     int val = 1;
-
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -172,7 +173,6 @@ Users *create_users(char *line){
             case 4:
                 if(strlen(buffer) == 0) val = 0;
                 users->birth_date = valid_date(buffer); 
-                //printDate(users->birth_date);  
                 break;
             case 5:
                 if (strlen(buffer) == 0) val = 0;
@@ -211,10 +211,25 @@ Users *create_users(char *line){
    }
 
    users->flights_total = 0;
-   //users->reservations_total = 0;
-   //users->spent_total = 0;
+   users->reservations_total = 0;
+   users->spent_total = 0.0;
 
    return users;
+}
+
+// da free a um user e as variaveis 
+void delete_users(void *data){
+    Users *users = (Users *) data;
+    free(users->id);
+    free(users->name);
+    free(users->email);
+    free(users->birth_date);
+    free(users->sex);
+    free(users->passport);
+    free(users->country_code);
+    free(users->adress);
+    free(users->account_creation);
+    free(users);
 }
 
 // insere um user na hashtable
@@ -256,7 +271,6 @@ CAT_USERS *create_cat_users(char *entry_files){
         line[strcspn(line, "\n")] = 0;
 
         Users *u = create_users(line);
-        //printDate(u->birth_date);
         if (u != NULL){
             insert_users(cat_users, u);
         } 
@@ -265,6 +279,7 @@ CAT_USERS *create_cat_users(char *entry_files){
     end = clock();
 
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
     printf("Time to parse users.csv: %f\n", cpu_time_used);
 
     printf("Number of users: %d\n", g_hash_table_size(cat_users->users_hashtable));
@@ -281,7 +296,8 @@ void delete_cat_users(CAT_USERS *cat_users){
 }
 
 // da update as variaveis dos users (variaveis que nao estao no ficheiro)
-void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
+// é aqui que esta a dar merda a guardar
+void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, CAT_RESERVATIONS *cat_reservations){
     GHashTableIter iter;
     gpointer key, value;
 
@@ -289,10 +305,12 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers){
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Users *user = (Users *) value;
         set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
+        set_reservations_total(user, calculate_total_reservations(cat_reservations, user->id));
+        set_spent_total(user, calculate_total_spent(cat_reservations, user->id));
     }
 }
 
 // procura um user na hashtable pelo id 
-Users *query1_aux(CAT_USERS *users, char *id){
+Users *query1_users_aux(CAT_USERS *users, char *id){
     return g_hash_table_lookup(users->users_hashtable, id);
 }

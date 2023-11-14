@@ -16,13 +16,6 @@ struct list_passengers {
     int size, n;
 };
 
-// da free a um passengers e as variaveis
-void delete_passengers(void *data){
-    Passengers *passengers = (Passengers *) data;
-    free(passengers->user_id);
-    free(passengers);
-}
-
 List_Passengers *create_passenger_list(Passengers* passengers){
     List_Passengers *list_passengers = malloc(sizeof(List_Passengers));
     list_passengers->passengers_list = malloc(2 * sizeof(char *));
@@ -32,19 +25,19 @@ List_Passengers *create_passenger_list(Passengers* passengers){
     return list_passengers;
 }
 
+void delete_passenger_list(void *data){
+    List_Passengers *list_passengers = (List_Passengers *) data;
+    for (int i=0 ; i<list_passengers->n ; i++)
+        free(list_passengers->passengers_list[i]);
+    free(list_passengers);
+}
+
 void insert_passenger_list(List_Passengers *list_passengers, Passengers *passengers){
     if (list_passengers->n == list_passengers->size){
         list_passengers->size *= 2;
         list_passengers->passengers_list = realloc(list_passengers->passengers_list, list_passengers->size * sizeof(char *));
     }
     list_passengers->passengers_list[list_passengers->n++] = passengers->user_id;
-}
-
-void delete_passenger_list(void *data){
-    List_Passengers *list_passengers = (List_Passengers *) data;
-    for (int i=0 ; i<list_passengers->n ; i++)
-        free(list_passengers->passengers_list[i]);
-    free(list_passengers);
 }
 
 // cria um passengers a partir de uma linha do ficheiro e verifica se os dados sao validos
@@ -70,6 +63,13 @@ Passengers *create_passengers(char *line){
         return NULL;
     }
     return passengers;
+}
+
+// da free a um passengers e as variaveis
+void delete_passengers(void *data){
+    Passengers *passengers = (Passengers *) data;
+    free(passengers->user_id);
+    free(passengers);
 }
 
 // insere um passengers na hashtable
@@ -151,4 +151,9 @@ int calculate_total_flights(CAT_PASSENGERS *cat_passengers, char *id){
         total_flights += calculate_total_flights_list(list_passengers, id);
     }
     return total_flights;
+}
+
+int get_num_passengers_list(CAT_PASSENGERS *cat_passengers, int id){
+    List_Passengers *list_passengers = g_hash_table_lookup(cat_passengers->passengers_hashtable, &id);
+    return list_passengers->n;
 }

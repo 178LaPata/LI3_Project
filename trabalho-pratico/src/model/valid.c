@@ -90,10 +90,10 @@ char *verify_includes_breakfast(char *includes_breakfast) {
     }
     if (strcmp(includes_breakfast, "f") == 0 || strcmp(includes_breakfast, "false") == 0 || 
         strcmp(includes_breakfast, "0") == 0) {
-        return strdup("false");
+        return strdup("False");
     } else if (strcmp(includes_breakfast, "t") == 0 || strcmp(includes_breakfast, "true") == 0 || 
                strcmp(includes_breakfast, "1") == 0) {
-        return strdup("true");
+        return strdup("True");
     } else {
         return NULL; 
     }
