@@ -226,6 +226,11 @@ Reservations *create_reservations(char *line){
         delete_reservations(reservations);
         return NULL;
     }
+
+    reservations->nights = 0;
+    reservations->total_price = 0.0; 
+    
+
     return reservations;
 }
 
@@ -329,7 +334,8 @@ double calculate_total_price(Reservations *reservations){
     int dias = get_nights(reservations);
     double custo_por_estadia = (double) reservations->price_per_night * (double) dias;
     double imposto = (custo_por_estadia/100) * (double) reservations->city_tax;
-    return custo_por_estadia + imposto;
+    double total = custo_por_estadia + imposto;
+    return total;
 }
 
 double calculate_total_spent(CAT_RESERVATIONS *cat_reservations, char *user){
@@ -351,27 +357,24 @@ Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
     return g_hash_table_lookup(cat_reservations->reservations_hashtable, id);
 }
 
+double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_id){
+    int rating = 0;
+    int count = 0;
+    double total = 0.0;
+    GHashTableIter iter;
+    gpointer key, value;
+    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
+    while(g_hash_table_iter_next(&iter, &key, &value)){
+        Reservations *reservations = (Reservations *) value;
+        if(strcmp(reservations->hotel_id, hotel_id) == 0){
+            rating += reservations->hotel_stars;
+            count++;
+        }
+    }
+    total = (double) rating/(double) count;
+    return total;
+}
 
-// funcao que calcula a classificação média de um hotel, a partir do id do hotel
-//double query3_aux(CAT_RESERVATIONS *reservations, char *id){
-//    double total = 0.0;
-//    int n = 0;
-//    GHashTableIter iter;
-//    gpointer key, value;
-//    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
-//    while (g_hash_table_iter_next(&iter, &key, &value)) {
-//        Reservations *reservations = (Reservations *) value;
-//        if (strcmp(reservations->hotel_id, id) == 0) {
-//            if (strcmp(reservations->rating, " ") != 0) {
-//                total += atof(reservations->rating);
-//                n++;
-//            }
-//        }
-//    }
-//    if (n == 0) return 0.0;
-//    return total / n;
-//}
-//
 //double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
 //    double total = 0.0;
 //    GHashTableIter iter;

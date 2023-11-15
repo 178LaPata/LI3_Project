@@ -109,6 +109,7 @@ char *verify_rating(char *rating){
     return strdup(rating);
 }
 
+
 int str_is_num (char* str){
     unsigned i;
     int p=0;

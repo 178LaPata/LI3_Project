@@ -24,9 +24,9 @@ catalog *create_catalog(char *entry_files) {
     cat->cat_flights = create_cat_flights(flights);
     cat->cat_reservations = create_cat_reservations(reservations);
     cat->cat_passengers = create_cat_passengers(passengers);
+    update_values_reservations(cat->cat_reservations);
     update_values_users(cat->cat_users, cat->cat_passengers, cat->cat_reservations);
     update_values_flights(cat->cat_flights, cat->cat_passengers);
-    update_values_reservations(cat->cat_reservations);
     return cat;
 }
 
@@ -47,4 +47,9 @@ Reservations *query1_reservations_aux(catalog *cat, char *id){
 
 Flights *query1_flights_aux(catalog *cat, char *id){
     return get_flights(cat->cat_flights, atoi(id));
+}
+
+// funcao que calcula a classificação média de um hotel, a partir do id do hotel
+double query3_aux(catalog *cat, char *id){
+    return calculate_average_rating(cat->cat_reservations, id);
 }

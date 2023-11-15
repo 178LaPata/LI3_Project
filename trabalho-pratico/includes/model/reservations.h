@@ -54,5 +54,5 @@ int calculate_total_reservations(CAT_RESERVATIONS *cat_reservations, char *user)
 double calculate_total_price(Reservations *reservations);
 double calculate_total_spent(CAT_RESERVATIONS *cat_reservations, char *user);
 Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id);
-//double query3_aux(CAT_RESERVATIONS *reservations, char *id);
+double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_id);
 //double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end);

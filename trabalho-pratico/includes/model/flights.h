@@ -49,4 +49,4 @@ void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights);
 CAT_FLIGHTS *create_cat_flights(char *entry_files);
 void delete_cat_flights(CAT_FLIGHTS *cat_flights);
 void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passengers);
-Flights *get_flights (CAT_FLIGHTS *flights, int id){
+Flights *get_flights (CAT_FLIGHTS *flights, int id);

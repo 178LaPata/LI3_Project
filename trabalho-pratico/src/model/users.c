@@ -296,7 +296,6 @@ void delete_cat_users(CAT_USERS *cat_users){
 }
 
 // da update as variaveis dos users (variaveis que nao estao no ficheiro)
-// é aqui que esta a dar merda a guardar
 void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, CAT_RESERVATIONS *cat_reservations){
     GHashTableIter iter;
     gpointer key, value;
@@ -312,7 +311,5 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, C
 
 // retorna um user a partir do id
 Users *get_users(CAT_USERS *cat_users, char *id){
-    Users *user = g_hash_table_lookup(cat_users->users_hashtable, id);
-    //if(!user) return NULL;
-    return user;
+    return g_hash_table_lookup(cat_users->users_hashtable, id);
 }

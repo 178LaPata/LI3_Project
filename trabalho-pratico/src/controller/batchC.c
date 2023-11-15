@@ -44,7 +44,7 @@ int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
             //query2(cat, queries_path);
             break;
         case '3':
-            //query3(cat, queries_path);
+            query3(cat, queries_path, fp_output);
             break;
         case '4':
             break;
@@ -73,11 +73,21 @@ void query1(catalog *cat, char *query, FILE *fp) {
         if(strncmp(arg_query, "Book", 4)==0){
             Reservations *r = query1_reservations_aux(cat, arg_query);
             if (r) batch_print_query1_reservations(r, fp);
-        else {
+        } else {
             Users *user = query1_users_aux(cat, arg_query);
-            if (user) batch_print_query1_user(user, fp);
-        }
+            if (user){
+                batch_print_query1_user(user, fp);
+            }
         }
     }
 }
 
+
+void query3(catalog *cat, char *query, FILE *fp) {
+    char *nr_query = strsep(&query, " ");
+    char *arg_query = strsep(&query, "\n");
+    
+    double total = 0.0;
+    total = query3_aux(cat, arg_query);
+    batch_print_query3(total, fp);
+}
