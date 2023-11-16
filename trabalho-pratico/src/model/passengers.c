@@ -2,7 +2,7 @@
 
 // estrutura dos passengers
 struct passengers {
-    int flight_id;
+    char *flight_id;
     char *user_id;
 };
 
@@ -50,7 +50,7 @@ Passengers *create_passengers(char *line){
         switch(i++){
             case 0:
                 if (strlen(buffer) == 0) val = 0;
-                passengers->flight_id = (int) strtol(buffer, (char **) NULL, 10);
+                passengers->flight_id = strdup(buffer);
                 break;
             case 1:
                 if (strlen(buffer) == 0) val = 0;
@@ -68,16 +68,17 @@ Passengers *create_passengers(char *line){
 // da free a um passengers e as variaveis
 void delete_passengers(void *data){
     Passengers *passengers = (Passengers *) data;
+    free(passengers->flight_id);
     free(passengers->user_id);
     free(passengers);
 }
 
 // insere um passengers na hashtable
 void insert_passengers(CAT_PASSENGERS *cat_passengers, Passengers *passengers){
-    if (!g_hash_table_contains(cat_passengers->passengers_hashtable, &passengers->flight_id))
-        g_hash_table_insert(cat_passengers->passengers_hashtable, &passengers->flight_id, create_passenger_list(passengers));
+    if (!g_hash_table_contains(cat_passengers->passengers_hashtable, passengers->flight_id))
+        g_hash_table_insert(cat_passengers->passengers_hashtable, passengers->flight_id, create_passenger_list(passengers));
     else
-        insert_passenger_list(g_hash_table_lookup(cat_passengers->passengers_hashtable, &passengers->flight_id), passengers);
+        insert_passenger_list(g_hash_table_lookup(cat_passengers->passengers_hashtable, passengers->flight_id), passengers);
 }
 
 // cria a hashtable dos passengers
@@ -93,7 +94,7 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     }
 
     CAT_PASSENGERS *cat_passengers = malloc(sizeof(CAT_PASSENGERS));
-    cat_passengers->passengers_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, delete_passenger_list);
+    cat_passengers->passengers_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_passenger_list);
 
     char *line = NULL;
     size_t len = 0;
@@ -153,7 +154,7 @@ int calculate_total_flights(CAT_PASSENGERS *cat_passengers, char *id){
     return total_flights;
 }
 
-int get_num_passengers_list(CAT_PASSENGERS *cat_passengers, int id){
-    List_Passengers *list_passengers = g_hash_table_lookup(cat_passengers->passengers_hashtable, &id);
+int get_num_passengers_list(CAT_PASSENGERS *cat_passengers, char *id){
+    List_Passengers *list_passengers = g_hash_table_lookup(cat_passengers->passengers_hashtable, id);
     return list_passengers->n;
 }

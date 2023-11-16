@@ -40,7 +40,11 @@ void batch_print_query4(Reservations *r, FILE *fp){
 
 void batch_print_query5(Flights *fli, FILE *fp){
     if(fli != NULL){
-        fprintf(fp, "%d;%s;%s;%s;%s", get_id_flights(fli), datetime_to_string(get_schedule_departure_date(fli)), 
+        fprintf(fp, "%s;%s;%s;%s;%s\n", get_id_flights(fli), datetime_to_string(get_schedule_departure_date(fli)), 
                 get_destination(fli), get_company(fli), get_plane(fli));
     }  
+}
+
+void batch_print_query8(int total, FILE *fp){
+    fprintf(fp, "%d\n", total);
 }

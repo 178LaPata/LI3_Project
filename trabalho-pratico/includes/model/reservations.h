@@ -58,4 +58,4 @@ double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_
 GList* list_reservations_hotelID(CAT_RESERVATIONS *cat_reservations, char* hotel_id);
 gint data_mais_recente(gconstpointer a, gconstpointer b);
 GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id);
-//double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end);
+int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, date begin, date end);

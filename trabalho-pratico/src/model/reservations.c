@@ -396,19 +396,17 @@ GList* list_reservations_hotelID(CAT_RESERVATIONS *cat_reservations, char* hotel
     g_hash_table_iter_init (&iter,cat_reservations->reservations_hashtable);
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Reservations *r = (Reservations *) value;
-        if(strcmp(get_hotel_id(r),hotel_id)==0){
+        if(strcmp(get_hotel_id(r), hotel_id)==0){
             list = g_list_append(list,r);
         }
     }
     return list;
 }
 
-
 // funcao auxiliar para ordenar as reservas por data de início da mais recente para a mais antiga
 gint data_mais_recente(gconstpointer a, gconstpointer b){
     Reservations *reservations_a = (Reservations *) a;
     Reservations *reservations_b = (Reservations *) b;
-    //se as datas forem iguais dar sort pelo id da reserva
     if (equal_dates(reservations_a->begin_date, reservations_b->begin_date) == 1) {
         return strcmp(reservations_a->id_res, reservations_b->id_res);
     }
@@ -425,23 +423,37 @@ GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id
 }
 
 
-
-
-//double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
-//    double total = 0.0;
-//    GHashTableIter iter;
-//    gpointer key, value;
-//    g_hash_table_iter_init(&iter, reservations->reservations_hashtable);
-//    while (g_hash_table_iter_next(&iter, &key, &value)) {
-//        Reservations *reservations = (Reservations *) value;
-//        if (strcmp(reservations->hotel_id, hotel_id) == 0) {
-//            int nights = get_nights(reservations);
-//            printf("noites: %d\n", nights);
-//            if (compare_dates(reservations->begin_date, begin) >= 0 && compare_dates(reservations->end_date, end) <= 0) {
-//                total += (double) reservations->price_per_night * (double) nights;
-//                printf("total: %.3f/n", total);
-//            }
-//        }
-//    }
-//    return total;
-//}
+// esta a calcular mal, prov nao e assim que se faz
+int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, date begin, date end){
+    GHashTableIter iter;
+    gpointer key, value;
+    int totalReceita = 0;
+    int total = 0;
+    int custo_por_estadia = 0;
+    int imposto = 0;
+    int nights = 0;
+    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        if(strcmp(hotel_id, reservations->hotel_id) == 0){
+            if (between_date(reservations->begin_date, begin, end) == 1) {
+                nights = calculate_days(reservations->begin_date, end);
+                custo_por_estadia = reservations->price_per_night * nights;
+                imposto = (custo_por_estadia/100) * reservations->city_tax;
+                total += custo_por_estadia + imposto;
+            } else if (between_date(reservations->end_date, begin, end) == 1 ){
+                nights = calculate_days(begin, reservations->end_date);
+                custo_por_estadia = reservations->price_per_night * nights;
+                imposto = (custo_por_estadia/100) * reservations->city_tax;
+                total += custo_por_estadia + imposto;
+            } else if (between_date(reservations->begin_date, begin, end) == 1 && between_date(reservations->end_date, begin, end) == 1) {
+                nights = calculate_days(begin, end);
+                custo_por_estadia = reservations->price_per_night * nights;
+                imposto = (custo_por_estadia/100) * reservations->city_tax;
+                total += custo_por_estadia + imposto;
+            }
+        }
+        totalReceita += total;
+    }
+    return totalReceita;
+}

@@ -2,7 +2,7 @@
 
 // estrutura dos flights
 struct flights {
-    int id;
+    char *id_flights;
     char *airline;
     char *plane_model;
     int total_seats;
@@ -25,8 +25,8 @@ struct cat_flights {
     GHashTable *flights_hashtable;
 };
 
-int get_id_flights(Flights *flights){
-    return flights->id;
+char *get_id_flights(Flights *flights){
+    return flights->id_flights;
 }
 
 char *get_company(Flights *flights){
@@ -85,8 +85,8 @@ int get_delay(Flights *flights){
     return flights->delay;
 }
 
-void set_id_flights(Flights *flights, int id){
-    flights->id = id;
+void set_id_flights(Flights *flights, char *id_flights){
+    flights->id_flights = strdup(id_flights);
 }
 
 void set_company(Flights *flights, char *company){
@@ -155,7 +155,7 @@ Flights *create_flights(char *line){
         switch(i++){
             case 0:
                 if (strlen(buffer) == 0) val = 0;
-                flights->id = (int) strtol(buffer, (char **) NULL, 10);
+                flights->id_flights = strdup(buffer);
                 break;
             case 1:
                 if (strlen(buffer) == 0) val = 0;
@@ -218,6 +218,7 @@ Flights *create_flights(char *line){
 // da free a um flights e as variaveis
 void delete_flights(void *data){
     Flights *flights = (Flights *) data;
+    free(flights->id_flights);
     free(flights->airline);
     free(flights->plane_model);
     free(flights->origin);
@@ -230,7 +231,7 @@ void delete_flights(void *data){
 
 // insere um flights na hashtable
 void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights){
-    g_hash_table_insert(cat_flights->flights_hashtable, &flights->id, flights);
+    g_hash_table_insert(cat_flights->flights_hashtable, flights->id_flights, flights);
 }
 
 // cria a hashtable dos flights
@@ -246,7 +247,7 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
     }    
 
     CAT_FLIGHTS *cat_flights = malloc(sizeof(CAT_FLIGHTS));
-    cat_flights->flights_hashtable = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, delete_flights);
+    cat_flights->flights_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_flights);
 
     char *line = NULL;
     size_t len = 0;
@@ -299,11 +300,11 @@ void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passeng
     }
 }
 
-Flights *get_flights (CAT_FLIGHTS *flights, int id){
-    return g_hash_table_lookup(flights->flights_hashtable, &id);
+Flights *get_flights (CAT_FLIGHTS *flights, char *id_flights){
+    return g_hash_table_lookup(flights->flights_hashtable, id_flights);
 }
 
-GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD){
+GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, datetime beginD, datetime endD){
     GList *list = NULL;
     GHashTableIter iter;
     gpointer key, value;
@@ -311,8 +312,10 @@ GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, char *beginD,
     g_hash_table_iter_init (&iter, cat_flights->flights_hashtable);
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Flights *flights = (Flights *) value;
-        if (strcmp(get_origin(flights), origin) == 0 && between_dates(flights->schedule_departure_date, beginD, endD)) {
-            list = g_list_append(list, flights);
+        if (strcmp(get_origin(flights), origin) == 0){
+            if(between_datetime(flights->schedule_departure_date, beginD, endD) == 1) {
+                list = g_list_append(list, flights);
+            }
         }
     }
     return list;
@@ -322,14 +325,14 @@ gint data_mais_recenteF(gconstpointer a, gconstpointer b){
     Flights *flights1 = (Flights *) a;
     Flights *flights2 = (Flights *) b;
     
-    if(equal_dates(flights1->schedule_departure_date, flights2->schedule_departure_date)){
-        if(flights1->id < flights2->id) return -1;
+    if(equal_datetime(flights1->schedule_departure_date, flights2->schedule_departure_date)){
+        if(flights1->id_flights < flights2->id_flights) return -1;
         else return 1;
     }
-    return most_recent_date(flights1->schedule_departure_date, flights2->schedule_departure_date);
+    return most_recent_datetime(flights2->schedule_departure_date, flights1->schedule_departure_date);
 }
 
-GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD){
+GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, datetime beginD, datetime endD){
     GList *values = list_flights_origin(cat_flights, origin, beginD, endD);
     return g_list_sort(values, data_mais_recenteF);
 }

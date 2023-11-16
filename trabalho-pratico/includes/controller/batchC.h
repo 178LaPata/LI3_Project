@@ -21,3 +21,4 @@ void query1(catalog *cat, char *query, FILE *fp);
 void query3(catalog *cat, char *query, FILE *fp);
 void query4(catalog *cat, char *query, FILE *fp);
 void query5(catalog *cat, char *query, FILE *fp);
+void query8(catalog *cat, char *query, FILE *fp);

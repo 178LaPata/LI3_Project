@@ -21,6 +21,8 @@ int calculate_seconds(datetime begin, datetime end);
 char *date_to_string(date date);
 char *datetime_to_string(datetime datetime);
 int most_recent_date(date date1, date date2);
+int most_recent_datetime(datetime datetime1, datetime datetime2);
 int equal_dates(date date1, date date2);
-int between_dates(date date1, date date2, date date3);
-
+int equal_datetime(datetime date1, datetime date2);
+int between_date(date date1, date date2, date date3);
+int between_datetime(datetime date1, datetime beginD, datetime endD);

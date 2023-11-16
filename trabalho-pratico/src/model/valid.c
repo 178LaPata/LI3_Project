@@ -109,15 +109,12 @@ char *verify_rating(char *rating){
     return strdup(rating);
 }
 
-
-int str_is_num (char* str){
-    unsigned i;
-    int p=0;
-    for(i=0; i<strlen(str); i++){
-        if (str[i]<'0' || str[i]>'9'){
-            p=1;
-            return p;
-        }
+// verifica se a string apenas contem numeros
+int verify_only_numbers(char *str){
+    int i;
+    int len = strlen(str);
+    for (i = 0; i < len; i++){
+        if (!isdigit(str[i])) return 0;
     }
-    return p;
+    return 1;
 }

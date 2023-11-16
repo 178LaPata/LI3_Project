@@ -46,7 +46,7 @@ Reservations *query1_reservations_aux(catalog *cat, char *id){
 }
 
 Flights *query1_flights_aux(catalog *cat, char *id){
-    return get_flights(cat->cat_flights, atoi(id));
+    return get_flights(cat->cat_flights, id);
 }
 
 // funcao que calcula a classificação média de um hotel, a partir do id do hotel
@@ -58,6 +58,10 @@ GList *query4_aux(catalog *cat, char *hotel_id){
     return sort_reservations_data(cat->cat_reservations, hotel_id);
 }
 
-GList *query5_aux(catalog *cat, char *origin, char *beginD, char *endD){
+GList *query5_aux(catalog *cat, char *origin, datetime beginD, datetime endD){
     return sort_flights_data(cat->cat_flights, origin, beginD, endD);
+}
+
+int query8_aux(catalog *cat, char *hotel_id, date begin, date end){
+    return calcular_receita_total(cat->cat_reservations, hotel_id, begin, end);
 }

@@ -57,7 +57,7 @@ int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
         case '7':
             break;
         case '8':
-            //query8(cat, queries_path, fp_output);
+            query8(cat, queries_path, fp_output);
             break;            
         default:
             break;
@@ -68,7 +68,7 @@ int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
 void query1(catalog *cat, char *query, FILE *fp) {
     char *nr_query = strsep(&query, " ");
     char *arg_query = strsep(&query, "\n");
-    if(str_is_num(arg_query)==0){
+    if(verify_only_numbers(arg_query)==0){
         Flights *fli = query1_flights_aux(cat, arg_query);
         if (fli) batch_print_query1_flights(fli, fp);
     } else {
@@ -94,7 +94,6 @@ void query3(catalog *cat, char *query, FILE *fp) {
     batch_print_query3(total, fp);
 }
 
-// . Caso duas reservas tenham a mesma data, deve ser usado o identificador da reserva como critério de desempate (de forma crescente).
 void query4(catalog *cat, char *query, FILE *fp){
     char *nr_query = strsep(&query, " ");
     char *arg_query = strsep(&query, "\n");
@@ -111,13 +110,16 @@ void query4(catalog *cat, char *query, FILE *fp){
 
 void query5(catalog *cat, char *query, FILE *fp){
     char *nr_query = strsep(&query, " ");
-    char *arg_query = strsep(&query, "\n");
     char *origem = strsep(&query, " ");
-    char *beginDate = strsep(&query, " ");
-    char *endDate = strsep(&query, "\n");
+    query++;
+    char *beginDate = strsep(&query, "\"");
+    query += 2;
+    char *endDate = strsep(&query, "\"");
 
+    datetime beginD = valid_date_time(beginDate);
+    datetime endD = valid_date_time(endDate);
 
-    GList *list = query5_aux(cat, origem, beginDate, endDate);
+    GList *list = query5_aux(cat, origem, beginD, endD);
     GList *aux = list;
     while(aux){
         Flights *fli = (Flights *) aux->data;
@@ -125,4 +127,19 @@ void query5(catalog *cat, char *query, FILE *fp){
         aux = aux->next;
     }
     g_list_free(list);
+}
+
+void query8(catalog *cat, char *query, FILE *fp){
+    char *nr_query = strsep(&query, " ");
+    char *id_arg = strsep(&query, " ");
+    char *beginDate = strsep(&query, " ");
+    char *endDate = strsep(&query, "\n");
+
+    date beginD = valid_date(beginDate);
+    date endD = valid_date(endDate);
+
+    int total = query8_aux(cat, id_arg, beginD, endD);
+    batch_print_query8(total, fp);
+
+
 }
