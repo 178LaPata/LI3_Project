@@ -303,3 +303,33 @@ Flights *get_flights (CAT_FLIGHTS *flights, int id){
     return g_hash_table_lookup(flights->flights_hashtable, &id);
 }
 
+GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD){
+    GList *list = NULL;
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init (&iter, cat_flights->flights_hashtable);
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        Flights *flights = (Flights *) value;
+        if (strcmp(get_origin(flights), origin) == 0 && between_dates(flights->schedule_departure_date, beginD, endD)) {
+            list = g_list_append(list, flights);
+        }
+    }
+    return list;
+}
+
+gint data_mais_recenteF(gconstpointer a, gconstpointer b){
+    Flights *flights1 = (Flights *) a;
+    Flights *flights2 = (Flights *) b;
+    
+    if(equal_dates(flights1->schedule_departure_date, flights2->schedule_departure_date)){
+        if(flights1->id < flights2->id) return -1;
+        else return 1;
+    }
+    return most_recent_date(flights1->schedule_departure_date, flights2->schedule_departure_date);
+}
+
+GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD){
+    GList *values = list_flights_origin(cat_flights, origin, beginD, endD);
+    return g_list_sort(values, data_mais_recenteF);
+}

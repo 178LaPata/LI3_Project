@@ -2,7 +2,7 @@
 
 // estrutura das reservations
 struct reservations {
-    char *id;
+    char *id_res;
     char *user_id;
     char *hotel_id;
     char *hotel_name;
@@ -27,7 +27,7 @@ struct cat_reservations {
 };
 
 char *get_id_reservations(Reservations *reservations){
-    return reservations->id;
+    return reservations->id_res;
 }
 
 char *get_user_id(Reservations *reservations){
@@ -90,8 +90,8 @@ double get_total_price(Reservations *reservations){
     return reservations->total_price;
 }
 
-void set_id_reservations(Reservations *reservations, char *id){
-    reservations->id = strdup(id);
+void set_id_reservations(Reservations *reservations, char *id_res){
+    reservations->id_res = strdup(id_res);
 }
 
 void set_user_id(Reservations *reservations, char *user_id){
@@ -164,7 +164,7 @@ Reservations *create_reservations(char *line){
         switch(i++){
             case 0:
                 if (strlen(buffer) == 0) val = 0;
-                reservations->id = strdup(buffer);
+                reservations->id_res = strdup(buffer);
                 break;
             case 1:
                 if (strlen(buffer) == 0) val = 0;
@@ -210,13 +210,13 @@ Reservations *create_reservations(char *line){
                 reservations->room_details = strdup(buffer);
                 break;
             case 12:
-                if(strlen(buffer) == 0) reservations->rating = " ";
+                if(strlen(buffer) == 0) reservations->rating = "";
                 reservations->rating = verify_rating(buffer);
                 if(reservations->rating == NULL) val = 0;
                 reservations->rating = strdup(buffer);
                 break;
             case 13:
-                if(strlen(buffer) == 0) reservations->comments = " ";
+                if(strlen(buffer) == 0) reservations->comments = "";
                 reservations->comments = strdup(buffer);
                 break;
         }
@@ -237,7 +237,7 @@ Reservations *create_reservations(char *line){
 // da free a uma reservations e as variaveis
 void delete_reservations(void *data){
     Reservations *reservations = (Reservations *) data;
-    free(reservations->id);
+    free(reservations->id_res);
     free(reservations->user_id);
     free(reservations->hotel_id);
     free(reservations->hotel_name);
@@ -251,7 +251,7 @@ void delete_reservations(void *data){
 
 // insere uma reservations na hashtable
 void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reservations){
-    g_hash_table_insert(cat_reservations->reservations_hashtable, reservations->id, reservations);
+    g_hash_table_insert(cat_reservations->reservations_hashtable, reservations->id_res, reservations);
 }
 
 // cria a hashtable das reservations
@@ -357,23 +357,75 @@ Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
     return g_hash_table_lookup(cat_reservations->reservations_hashtable, id);
 }
 
+// esta a dar mal
 double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_id){
-    int rating = 0;
+    int ratingT = 0;
     int count = 0;
-    double total = 0.0;
+    double totalR = 0.0, total = 0.0;
+    int r = 0;
     GHashTableIter iter;
     gpointer key, value;
     g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
     while(g_hash_table_iter_next(&iter, &key, &value)){
         Reservations *reservations = (Reservations *) value;
         if(strcmp(reservations->hotel_id, hotel_id) == 0){
-            rating += reservations->hotel_stars;
+            //printf("hotel_id: %s\n", reservations->hotel_id);
+            //printf("reservation_id: %s\n", reservations->id_res);
+            //printf("id recebido: %s\n", hotel_id);
+            r = atoi(reservations->rating);
+            ratingT += r;
             count++;
         }
+
     }
-    total = (double) rating/(double) count;
+    //printf("count: %d\n", count);
+    //printf("ratingT: %d\n", ratingT);
+    totalR = (double) ratingT;
+    total = totalR / (double) count;
+    //printf("total: %.3f\n", total);
     return total;
 }
+
+// funcao que retorna uma lista com as reservas de um hotel
+GList* list_reservations_hotelID(CAT_RESERVATIONS *cat_reservations, char* hotel_id){
+    GHashTableIter iter;
+    gpointer key, value;
+  
+    GList* list = NULL;
+
+    g_hash_table_iter_init (&iter,cat_reservations->reservations_hashtable);
+    while (g_hash_table_iter_next (&iter, &key, &value)){
+        Reservations *r = (Reservations *) value;
+        if(strcmp(get_hotel_id(r),hotel_id)==0){
+            list = g_list_append(list,r);
+        }
+    }
+    return list;
+}
+
+
+// funcao auxiliar para ordenar as reservas por data de início da mais recente para a mais antiga
+gint data_mais_recente(gconstpointer a, gconstpointer b){
+    Reservations *reservations_a = (Reservations *) a;
+    Reservations *reservations_b = (Reservations *) b;
+    //se as datas forem iguais dar sort pelo id da reserva
+    if (equal_dates(reservations_a->begin_date, reservations_b->begin_date) == 1) {
+        return strcmp(reservations_a->id_res, reservations_b->id_res);
+    }
+    return most_recent_date(reservations_b->begin_date, reservations_a->begin_date);
+}
+
+// funcao que ordena as reservas por data de início (da mais recente para a mais antiga)
+GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id){
+    GList *values = list_reservations_hotelID(cat_reservations, hotel_id);
+    if (values == NULL) {
+        printf("erro");
+    }
+    return g_list_sort(values, data_mais_recente);
+}
+
+
+
 
 //double query8_aux(CAT_RESERVATIONS *reservations, char *hotel_id, date begin, date end){
 //    double total = 0.0;

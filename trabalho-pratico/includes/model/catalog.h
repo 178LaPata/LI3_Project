@@ -20,3 +20,5 @@ Users *query1_users_aux(catalog *cat, char *id);
 Reservations *query1_reservations_aux(catalog *cat, char *id);
 Flights *query1_flights_aux(catalog *cat, char *id);
 double query3_aux(catalog *cat, char *id);
+GList *query4_aux(catalog *cat, char *hotel_id);
+GList *query5_aux(catalog *cat, char *origin, char *beginD, char *endD);

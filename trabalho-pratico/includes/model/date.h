@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <glib.h>
 
 #define DATE "2023/10/01"
 #define DATETIME "2023/10/01 00:00:00"
@@ -17,7 +18,9 @@ datetime valid_date_time(char *datetime_str);
 int calculate_age(date birth_date);
 int calculate_days(date begin_date, date end_date);
 int calculate_seconds(datetime begin, datetime end);
-int compare_dates(date date1, date date2);
-
 char *date_to_string(date date);
 char *datetime_to_string(datetime datetime);
+int most_recent_date(date date1, date date2);
+int equal_dates(date date1, date date2);
+int between_dates(date date1, date date2, date date3);
+

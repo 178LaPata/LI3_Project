@@ -273,6 +273,7 @@ CAT_USERS *create_cat_users(char *entry_files){
         Users *u = create_users(line);
         if (u != NULL){
             insert_users(cat_users, u);
+            //set_flights_total(u, calculate_total_flights(cat_passengers, u->id));
         } 
     }
 

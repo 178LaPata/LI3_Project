@@ -30,3 +30,17 @@ void batch_print_query1_reservations(Reservations *r, FILE *fp){
 void batch_print_query3(double total, FILE *fp){
     fprintf(fp, "%.3f\n", total);
 }
+
+void batch_print_query4(Reservations *r, FILE *fp){
+    if(r != NULL){
+        fprintf(fp, "%s;%s;%s;%s;%s;%.3f\n", get_id_reservations(r), date_to_string(get_begin_date(r)), date_to_string(get_end_date(r)), 
+                get_user_id(r), get_rating(r), get_total_price(r));
+    }
+}
+
+void batch_print_query5(Flights *fli, FILE *fp){
+    if(fli != NULL){
+        fprintf(fp, "%d;%s;%s;%s;%s", get_id_flights(fli), datetime_to_string(get_schedule_departure_date(fli)), 
+                get_destination(fli), get_company(fli), get_plane(fli));
+    }  
+}

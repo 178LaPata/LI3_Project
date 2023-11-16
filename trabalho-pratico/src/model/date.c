@@ -152,25 +152,6 @@ int calculate_seconds(datetime begin, datetime end){
     return (int) segundos;
 }
 
-int compare_dates(date date1, date date2){
-    int ano1 = atoi(date1->year);
-    int mes1 = atoi(date1->month);
-    int dia1 = atoi(date1->day);
-
-    int ano2 = atoi(date2->year);
-    int mes2 = atoi(date2->month);
-    int dia2 = atoi(date2->day);
-
-    if (ano1 > ano2) return 1;
-    if (ano1 < ano2) return -1;
-    if (mes1 > mes2) return 1;
-    if (mes1 < mes2) return -1;
-    if (dia1 > dia2) return 1;
-    if (dia1 < dia2) return -1;
-    return 0;
-}
-
-
 char *date_to_string(date date){
     char *date_str = malloc(sizeof(char) * 11);
     sprintf(date_str, "%s/%s/%s", date->year, date->month, date->day);
@@ -181,4 +162,37 @@ char *datetime_to_string(datetime datetime){
     char *datetime_str = malloc(sizeof(char) * 20);
     sprintf(datetime_str, "%s/%s/%s %s:%s:%s", datetime->year, datetime->month, datetime->day, datetime->hour, datetime->minute, datetime->second);
     return datetime_str;
+}
+
+// funcao que verifica a funcao mais recente, retorna 1 se data1 for mais recente que data2 e 0 caso contrario
+int most_recent_date(date date1, date date2){
+    if(date1 == NULL && date2 == NULL) return 1;
+    else if(date1 == NULL || date2 == NULL) return 0;
+    
+    if(atoi(date1->year) > atoi(date2->year)) return 1;
+    else if(atoi(date1->year) < atoi(date2->year)) return 0;
+    else{
+        if(atoi(date1->month) > atoi(date2->month)) return 1;
+        else if(atoi(date1->month) < atoi(date2->month)) return 0;
+        else{
+            if(atoi(date1->day) > atoi(date2->day)) return 1;
+            else if(atoi(date1->day) < atoi(date2->day)) return 0;
+            else return 1;
+        }
+    }
+}  
+
+// funcao que verifica se duas datas sao iguais, retornando 1 se forem iguais e 0 caso contrario
+int equal_dates(date date1, date date2){
+    if(date1 == NULL && date2 == NULL) return 1;
+    else if(date1 == NULL || date2 == NULL) return 0;
+    
+    if(strcmp(date1->year, date2->year) == 0 && strcmp(date1->month, date2->month) == 0 && strcmp(date1->day, date2->day) == 0) return 1;
+    else return 0;
+}
+
+// funcao que verifica se a data1 esta entre a data2 e a data3, retornando 1 se estiver e 0 caso contrario
+int between_dates(date date1, date date2, date date3){
+    if(most_recent_date(date1, date2) == 1 && most_recent_date(date3, date1) == 1) return 1;
+    else return 0;
 }

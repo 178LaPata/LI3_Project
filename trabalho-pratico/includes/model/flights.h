@@ -50,3 +50,6 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files);
 void delete_cat_flights(CAT_FLIGHTS *cat_flights);
 void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passengers);
 Flights *get_flights (CAT_FLIGHTS *flights, int id);
+GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD);
+gint data_mais_recenteF(gconstpointer a, gconstpointer b);
+GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, char *beginD, char *endD);

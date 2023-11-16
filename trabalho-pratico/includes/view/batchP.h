@@ -10,3 +10,5 @@ void batch_print_query1_flights(Flights *fli, FILE *fp);
 void batch_print_query1_reservations(Reservations *r, FILE *fp);
 
 void batch_print_query3(double total, FILE *fp);
+void batch_print_query4(Reservations *r, FILE *fp);
+void batch_print_query5(Flights *fli, FILE *fp);

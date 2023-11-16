@@ -47,8 +47,10 @@ int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
             query3(cat, queries_path, fp_output);
             break;
         case '4':
+            query4(cat, queries_path, fp_output);
             break;
         case '5':
+            query5(cat, queries_path, fp_output);
             break;
         case '6':
             break;
@@ -90,4 +92,37 @@ void query3(catalog *cat, char *query, FILE *fp) {
     double total = 0.0;
     total = query3_aux(cat, arg_query);
     batch_print_query3(total, fp);
+}
+
+// . Caso duas reservas tenham a mesma data, deve ser usado o identificador da reserva como critério de desempate (de forma crescente).
+void query4(catalog *cat, char *query, FILE *fp){
+    char *nr_query = strsep(&query, " ");
+    char *arg_query = strsep(&query, "\n");
+    
+    GList *list = query4_aux(cat, arg_query);
+    GList *aux = list;
+    while(aux){
+        Reservations *r = (Reservations *) aux->data;
+        batch_print_query4(r, fp);
+        aux = aux->next;
+    }
+    g_list_free(list);
+}
+
+void query5(catalog *cat, char *query, FILE *fp){
+    char *nr_query = strsep(&query, " ");
+    char *arg_query = strsep(&query, "\n");
+    char *origem = strsep(&query, " ");
+    char *beginDate = strsep(&query, " ");
+    char *endDate = strsep(&query, "\n");
+
+
+    GList *list = query5_aux(cat, origem, beginDate, endDate);
+    GList *aux = list;
+    while(aux){
+        Flights *fli = (Flights *) aux->data;
+        batch_print_query5(fli, fp);
+        aux = aux->next;
+    }
+    g_list_free(list);
 }
