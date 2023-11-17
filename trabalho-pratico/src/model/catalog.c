@@ -27,6 +27,7 @@ catalog *create_catalog(char *entry_files) {
     update_values_reservations(cat->cat_reservations);
     update_values_users(cat->cat_users, cat->cat_passengers, cat->cat_reservations);
     update_values_flights(cat->cat_flights, cat->cat_passengers);
+    mudar_valores(cat->cat_reservations, cat->cat_users);
     return cat;
 }
 
@@ -38,6 +39,7 @@ void delete_catalog(catalog *cat) {
 }
 
 Users *query1_users_aux(catalog *cat, char *id){
+    printf("ID: %s\n", id);
     return get_users(cat->cat_users, id);
 }
 
@@ -64,4 +66,19 @@ GList *query5_aux(catalog *cat, char *origin, datetime beginD, datetime endD){
 
 int query8_aux(catalog *cat, char *hotel_id, date begin, date end){
     return calcular_receita_total(cat->cat_reservations, hotel_id, begin, end);
+}
+
+void mudar_valores(CAT_RESERVATIONS *r, CAT_USERS *u){
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init(&iter, get_reservations_hashtable(r));
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Reservations *reservations = (Reservations *) value;
+        char *userID = get_user_id(reservations);
+        Users *user = get_users(u, userID);
+        if(!user) continue;
+        add_reservations_total(user, 1);
+        add_spent_total(user, get_total_price(reservations));
+    }
 }

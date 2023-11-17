@@ -2,12 +2,23 @@
 
 void batch_print_query1_user(Users *u, FILE *fp){
     int ac = get_account_status(u);
+    printf("ac: %d\n", ac);
     if(u != NULL){
         if(ac != 2){
             int idade = calculate_age(get_birth_date(u));
             fprintf(fp, "%s;%s;%d;%s;%s;%d;%d;%.3f\n", get_name(u), get_sex(u), idade, 
                     get_country_code(u),get_passport(u),get_flights_total(u),
                     get_reservations_total(u), get_spent_total(u));
+        }
+    }
+}
+
+void batch_print_query1F_user(Users *u, FILE *fp){
+    int ac = get_account_status(u);
+    if(u != NULL){
+        if(ac != 2){
+            int idade = calculate_age(get_birth_date(u));
+            fprintf(fp, "Name: %s\n", get_name(u));
         }
     }
 }

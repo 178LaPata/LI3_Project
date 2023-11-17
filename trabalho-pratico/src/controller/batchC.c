@@ -68,8 +68,10 @@ int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
 void query1(catalog *cat, char *query, FILE *fp) {
     char *nr_query = strsep(&query, " ");
     char *arg_query = strsep(&query, "\n");
-    if(verify_only_numbers(arg_query)==0){
+
+    if(verify_only_numbers(arg_query)==1){
         Flights *fli = query1_flights_aux(cat, arg_query);
+        printf("Fli: %p\n", fli);
         if (fli) batch_print_query1_flights(fli, fp);
     } else {
         if(strncmp(arg_query, "Book", 4)==0){
