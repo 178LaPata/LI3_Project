@@ -285,7 +285,10 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
         }
         line[strcspn(line, "\n")] = 0;
         Reservations *r = create_reservations(line);
-        if (r != NULL) insert_reservations(cat_reservations, r);
+        if (r != NULL){
+            insert_reservations(cat_reservations, r);
+        }
+
     }
 
     end = clock();
@@ -307,6 +310,11 @@ void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations){
     free(cat_reservations);
 }
 
+GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations){
+    return cat_reservations->reservations_hashtable;
+}
+
+
 void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
     GHashTableIter iter;
     gpointer key, value;
@@ -318,39 +326,12 @@ void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
     }
 }
 
-int calculate_total_reservations(CAT_RESERVATIONS *cat_reservations, char *user){
-    int total_reservations = 0;
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Reservations *reservations = (Reservations *) value;
-        if (strcmp(reservations->user_id, user) == 0) total_reservations++;
-    }
-    return total_reservations;
-}
-
 double calculate_total_price(Reservations *reservations){
     int dias = get_nights(reservations);
     double custo_por_estadia = (double) reservations->price_per_night * (double) dias;
     double imposto = (custo_por_estadia/100) * (double) reservations->city_tax;
     double total = custo_por_estadia + imposto;
     return total;
-}
-
-double calculate_total_spent(CAT_RESERVATIONS *cat_reservations, char *user){
-    double total_gasto = 0.0;
-    GHashTableIter iter;
-    gpointer key, value;
-
-    g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Reservations *reservations = (Reservations *) value;
-        if (strcmp(reservations->user_id, user) == 0) {
-            total_gasto += get_total_price(reservations);
-        }
-    }
-    return total_gasto;
 }
 
 Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
@@ -369,20 +350,20 @@ double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_
     while(g_hash_table_iter_next(&iter, &key, &value)){
         Reservations *reservations = (Reservations *) value;
         if(strcmp(reservations->hotel_id, hotel_id) == 0){
-            //printf("hotel_id: %s\n", reservations->hotel_id);
-            //printf("reservation_id: %s\n", reservations->id_res);
-            //printf("id recebido: %s\n", hotel_id);
+            printf("hotel_id: %s\n", reservations->hotel_id);
+            printf("reservation_id: %s\n", reservations->id_res);
+            printf("id recebido: %s\n", hotel_id);
             r = atoi(reservations->rating);
             ratingT += r;
             count++;
         }
 
     }
-    //printf("count: %d\n", count);
-    //printf("ratingT: %d\n", ratingT);
+    printf("count: %d\n", count);
+    printf("ratingT: %d\n", ratingT);
     totalR = (double) ratingT;
     total = totalR / (double) count;
-    //printf("total: %.3f\n", total);
+    printf("total: %.3f\n", total);
     return total;
 }
 
@@ -421,7 +402,6 @@ GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id
     }
     return g_list_sort(values, data_mais_recente);
 }
-
 
 // esta a calcular mal, prov nao e assim que se faz
 int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, date begin, date end){

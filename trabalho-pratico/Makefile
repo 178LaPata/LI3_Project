@@ -1,6 +1,6 @@
 IDIR = includes
 CC = gcc
-CFLAGS = -Wall -I$(IDIR) -g `pkg-config --cflags glib-2.0`
+CFLAGS = -Wall -I$(IDIR) -g -O2 `pkg-config --cflags glib-2.0`
 LDFLAGS = `pkg-config --libs glib-2.0` -lm
 
 SDIR = src

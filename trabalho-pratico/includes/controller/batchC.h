@@ -1,3 +1,4 @@
+# pragma once
 #include "../../includes/model/catalog.h"
 #include "../../includes/model/users.h"
 #include "../../includes/model/flights.h"

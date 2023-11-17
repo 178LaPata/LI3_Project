@@ -273,7 +273,6 @@ CAT_USERS *create_cat_users(char *entry_files){
         Users *u = create_users(line);
         if (u != NULL){
             insert_users(cat_users, u);
-            //set_flights_total(u, calculate_total_flights(cat_passengers, u->id));
         } 
     }
 
@@ -305,8 +304,6 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, C
     while (g_hash_table_iter_next (&iter, &key, &value)){
         Users *user = (Users *) value;
         set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
-        set_reservations_total(user, calculate_total_reservations(cat_reservations, user->id));
-        set_spent_total(user, calculate_total_spent(cat_reservations, user->id));
     }
 }
 
@@ -314,3 +311,13 @@ void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, C
 Users *get_users(CAT_USERS *cat_users, char *id){
     return g_hash_table_lookup(cat_users->users_hashtable, id);
 }
+
+// fucnao que adiciona um valor ao total de reservas de um user
+void add_reservations_total(Users *users, int value){
+    users->reservations_total += value;
+}
+
+void add_spent_total(Users *users, double value){
+    users->spent_total += value;
+}
+
