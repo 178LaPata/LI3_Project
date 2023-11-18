@@ -116,3 +116,7 @@ void batch_print_query5F(Flights *fli, FILE *fp){
 void batch_print_query8(int total, FILE *fp){
     fprintf(fp, "%d\n", total);
 }
+
+void batch_print_query8F(int total, FILE *fp){
+    fprintf(fp, "Total Revenue: %d\n", total);
+}
