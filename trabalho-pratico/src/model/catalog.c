@@ -65,7 +65,6 @@ Flights *query1_flights_aux(catalog *cat, char *id){
     return get_flights(cat->cat_flights, id);
 }
 
-// funcao que calcula a classificação média de um hotel, a partir do id do hotel
 double query3_aux(catalog *cat, char *id){
     return calculate_average_rating(cat->cat_reservations, id);
 }

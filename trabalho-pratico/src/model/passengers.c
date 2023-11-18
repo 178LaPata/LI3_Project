@@ -47,7 +47,6 @@ Passengers *create_passengers(char *line){
     int i = 0;
     int val = 1;
     char *copy_line = strdup(line);
-    
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -110,7 +109,7 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
     int first_line = 1;
 
     start = clock();
-
+    int count = 0;
     while (getline(&line, &len, fp) > 0) {
         if (first_line) {
             first_line = 0;
@@ -118,12 +117,12 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
         }
         line[strcspn(line, "\n")] = 0;
         Passengers *passengers = create_passengers(line);
+        count++;
         if(passengers != NULL){
             insert_passengers(cat_passengers, passengers);
         }
     }
     end = clock();
-
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse passengers.csv: %f\n", cpu_time_used);
 

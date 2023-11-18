@@ -3,7 +3,6 @@
 #include "../../includes/model/date.h"
 #include "../../includes/model/valid.h"
 
-
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -44,11 +43,12 @@ void set_rating(Reservations *reservations, char *rating);
 void set_comments(Reservations *reservations, char *comments);
 void set_nights(Reservations *reservations, int nights);
 void set_total_price(Reservations *reservations, double total_price);
-GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations);
+
 Reservations *create_reservations(char *line);
 void delete_reservations(void *data);
 void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reservations);
 CAT_RESERVATIONS *create_cat_reservations(char *entry_files);
+GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations);
 void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations);
 void update_values_reservations(CAT_RESERVATIONS *cat_reservations);
 double calculate_total_price(Reservations *reservations);
