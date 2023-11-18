@@ -160,6 +160,8 @@ Reservations *create_reservations(char *line){
     char *buffer;
     int i = 0;
     int val = 1;
+    char *copy_line =strdup(line);
+
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -183,7 +185,7 @@ Reservations *create_reservations(char *line){
                 if (reservations->hotel_stars == 0) val = 0;
                 break;
             case 5:
-                reservations->city_tax = verify_maior_que_zero(buffer);
+                reservations->city_tax = verify_maior_igual_que_zero(buffer);
                 if (reservations->city_tax == 0) val = 0;
                 break;
             case 6:
@@ -197,6 +199,7 @@ Reservations *create_reservations(char *line){
             case 8:
                 reservations->end_date = valid_date(buffer);
                 if (reservations->end_date == NULL) val = 0;
+                if(most_recent_date(reservations->begin_date, reservations->end_date) == 1) val = 0;
                 break;
             case 9:
                 reservations->price_per_night = verify_maior_que_zero(buffer);
@@ -210,7 +213,6 @@ Reservations *create_reservations(char *line){
                 reservations->room_details = strdup(buffer);
                 break;
             case 12:
-                if(strlen(buffer) == 0) reservations->rating = "";
                 reservations->rating = verify_rating(buffer);
                 if(reservations->rating == NULL) val = 0;
                 reservations->rating = strdup(buffer);
@@ -223,14 +225,16 @@ Reservations *create_reservations(char *line){
     }
     
     if(val == 0){
+        validate_csv_error(copy_line, "reservations");
         delete_reservations(reservations);
+        free(copy_line);
         return NULL;
     }
 
     reservations->nights = 0;
     reservations->total_price = 0.0; 
     
-
+    free(copy_line);
     return reservations;
 }
 
@@ -350,20 +354,14 @@ double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_
     while(g_hash_table_iter_next(&iter, &key, &value)){
         Reservations *reservations = (Reservations *) value;
         if(strcmp(reservations->hotel_id, hotel_id) == 0){
-            printf("hotel_id: %s\n", reservations->hotel_id);
-            printf("reservation_id: %s\n", reservations->id_res);
-            printf("id recebido: %s\n", hotel_id);
             r = atoi(reservations->rating);
             ratingT += r;
             count++;
         }
 
     }
-    printf("count: %d\n", count);
-    printf("ratingT: %d\n", ratingT);
     totalR = (double) ratingT;
     total = totalR / (double) count;
-    printf("total: %.3f\n", total);
     return total;
 }
 

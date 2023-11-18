@@ -38,26 +38,26 @@ int run_queries(catalog *cat, char *queries_path) {
 int run_query(catalog *cat, char *queries_path, FILE *fp_output) {
     switch (queries_path[0]){
         case '1':
-            query1(cat, queries_path, fp_output);
+            //query1(cat, queries_path, fp_output);
             break;
         case '2':
             //query2(cat, queries_path);
             break;
         case '3':
-            query3(cat, queries_path, fp_output);
+            //query3(cat, queries_path, fp_output);
             break;
         case '4':
-            query4(cat, queries_path, fp_output);
+            //query4(cat, queries_path, fp_output);
             break;
         case '5':
-            query5(cat, queries_path, fp_output);
+            //query5(cat, queries_path, fp_output);
             break;
         case '6':
             break;
         case '7':
             break;
         case '8':
-            query8(cat, queries_path, fp_output);
+            //query8(cat, queries_path, fp_output);
             break;            
         default:
             break;
@@ -71,7 +71,6 @@ void query1(catalog *cat, char *query, FILE *fp) {
 
     if(verify_only_numbers(arg_query)==1){
         Flights *fli = query1_flights_aux(cat, arg_query);
-        printf("Fli: %p\n", fli);
         if (fli) batch_print_query1_flights(fli, fp);
     } else {
         if(strncmp(arg_query, "Book", 4)==0){
@@ -79,13 +78,10 @@ void query1(catalog *cat, char *query, FILE *fp) {
             if (r) batch_print_query1_reservations(r, fp);
         } else {
             Users *user = query1_users_aux(cat, arg_query);
-            if (user){
-                batch_print_query1_user(user, fp);
-            }
+            if (user) batch_print_query1_user(user, fp);
         }
     }
 }
-
 
 void query3(catalog *cat, char *query, FILE *fp) {
     char *nr_query = strsep(&query, " ");

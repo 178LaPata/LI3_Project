@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../../includes/model/date.h"
+#include "../../includes/model/valid.h"
+
 #include <glib.h>
 #include <string.h>
 #include <stdlib.h>

@@ -1,5 +1,7 @@
 #pragma once
 
+#define BUFFER 64
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +28,8 @@ char *verify_passport(char *passport);
 char *verify_phone_number(char *phone_number);
 int verify_stars(char *stars);
 int verify_maior_que_zero(char *number);
+int verify_maior_igual_que_zero(char *number);
 char *verify_includes_breakfast(char *includes_breakfast);
 char *verify_rating(char *rating);
 int verify_only_numbers(char *str);
+void validate_csv_error(char *line, char *file_name);

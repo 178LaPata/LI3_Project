@@ -60,16 +60,16 @@ char *verify_phone_number(char *phone_number){
         if (!isdigit(phone_number[i])) return NULL;
     }
     return strdup(phone_number);
-
 }
 
 int verify_stars(char *stars){
     int i;
     int len = strlen(stars);
+    int k = atoi(stars);
     for (i = 0; i < len; i++){
         if (!isdigit(stars[i])) return 0;
     }
-    if (atoi(stars) < 0 || atoi(stars) > 5) return 0;
+    if (k < 0 || k > 5) return 0;
     return atoi(stars);
 
 }
@@ -84,12 +84,22 @@ int verify_maior_que_zero(char *number){
     return atoi(number);
 }
 
+int verify_maior_igual_que_zero(char *number){
+    int i;
+    int len = strlen(number);
+    for (i = 0; i < len; i++){
+        if (!isdigit(number[i])) return 0;
+    }
+    if (atoi(number) <= 0) return 0;
+    return atoi(number);
+}
+
 char *verify_includes_breakfast(char *includes_breakfast) {
     for(int i = 0; includes_breakfast[i]; i++){
         includes_breakfast[i] = tolower(includes_breakfast[i]);
     }
     if (strcmp(includes_breakfast, "f") == 0 || strcmp(includes_breakfast, "false") == 0 || 
-        strcmp(includes_breakfast, "0") == 0) {
+        strcmp(includes_breakfast, "0") == 0 || strcmp(includes_breakfast, "") == 0) {
         return strdup("False");
     } else if (strcmp(includes_breakfast, "t") == 0 || strcmp(includes_breakfast, "true") == 0 || 
                strcmp(includes_breakfast, "1") == 0) {
@@ -102,6 +112,7 @@ char *verify_includes_breakfast(char *includes_breakfast) {
 char *verify_rating(char *rating){
     int i;
     int len = strlen(rating);
+    if(strlen(rating) == 0) rating = "";
     for (i = 0; i < len; i++){
         if (!isdigit(rating[i])) return NULL;
     }
@@ -117,4 +128,17 @@ int verify_only_numbers(char *str){
         if (!isdigit(str[i])) return 0;
     }
     return 1;
+}
+
+// funcao que escreve para o ficheiro as entradas invalidas do csv 
+void validate_csv_error(char *line, char *file_name){
+    char file[BUFFER];
+    sprintf(file, "./Resultados/%s_errors.csv", file_name);
+    FILE *fp_errors = fopen(file, "a");
+    if(fp_errors != NULL) {
+        fprintf(fp_errors, "%s\n", line);
+        fclose(fp_errors);
+    } else {
+        printf("Error opening file %s\n", file);
+    }
 }

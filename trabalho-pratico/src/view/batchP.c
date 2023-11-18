@@ -2,7 +2,6 @@
 
 void batch_print_query1_user(Users *u, FILE *fp){
     int ac = get_account_status(u);
-    printf("ac: %d\n", ac);
     if(u != NULL){
         if(ac != 2){
             int idade = calculate_age(get_birth_date(u));
@@ -13,15 +12,7 @@ void batch_print_query1_user(Users *u, FILE *fp){
     }
 }
 
-void batch_print_query1F_user(Users *u, FILE *fp){
-    int ac = get_account_status(u);
-    if(u != NULL){
-        if(ac != 2){
-            int idade = calculate_age(get_birth_date(u));
-            fprintf(fp, "Name: %s\n", get_name(u));
-        }
-    }
-}
+//void batch_print_query1F_user(Users *u, FILE *fp){}
 
 void batch_print_query1_flights(Flights *fli, FILE *fp){
     if(fli != NULL)

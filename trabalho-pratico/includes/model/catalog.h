@@ -16,6 +16,8 @@ typedef struct catalog catalog;
 char* pointer_file (char *path, char *file);
 catalog *create_catalog(char *entry_files);
 void delete_catalog(catalog *cat);
+void update_hash_user(CAT_RESERVATIONS *r, CAT_USERS *u);
+
 Users *query1_users_aux(catalog *cat, char *id);
 Reservations *query1_reservations_aux(catalog *cat, char *id);
 Flights *query1_flights_aux(catalog *cat, char *id);
@@ -23,4 +25,3 @@ double query3_aux(catalog *cat, char *id);
 GList *query4_aux(catalog *cat, char *hotel_id);
 GList *query5_aux(catalog *cat, char *origin, datetime beginD, datetime endD);
 int query8_aux(catalog *cat, char *hotel_id, date begin, date end);
-void mudar_valores(CAT_RESERVATIONS *r, CAT_USERS *u);

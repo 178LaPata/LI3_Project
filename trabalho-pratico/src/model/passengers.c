@@ -46,6 +46,8 @@ Passengers *create_passengers(char *line){
     char *buffer;
     int i = 0;
     int val = 1;
+    char *copy_line = strdup(line);
+    
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -59,9 +61,13 @@ Passengers *create_passengers(char *line){
         }
     }
     if (val == 0){
-        free(passengers);
+        validate_csv_error(copy_line, "passengers");
+        delete_passengers(passengers);
+        free(copy_line);
         return NULL;
     }
+    
+    free(copy_line);
     return passengers;
 }
 

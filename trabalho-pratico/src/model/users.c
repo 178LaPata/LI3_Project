@@ -152,6 +152,7 @@ Users *create_users(char *line){
     char *buffer;
     int i = 0;
     int val = 1;
+    char *copy_line = strdup(line);
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -163,8 +164,9 @@ Users *create_users(char *line){
                 users->name = strdup(buffer);
                 break;
             case 2:
-                users->email = verify_email(buffer);
                 if (strlen(buffer) == 0) val = 0;
+                users->email = verify_email(buffer);
+                if(users->email == NULL) val = 0;
                 break;
             case 3:
                 if (strlen(buffer) == 0) val = 0;
@@ -173,6 +175,7 @@ Users *create_users(char *line){
             case 4:
                 if(strlen(buffer) == 0) val = 0;
                 users->birth_date = valid_date(buffer); 
+                if(users->birth_date == NULL) val = 0;
                 break;
             case 5:
                 if (strlen(buffer) == 0) val = 0;
@@ -192,7 +195,9 @@ Users *create_users(char *line){
                 users->adress = strdup(buffer);
                 break;
             case 9:
-                users->account_creation = valid_date_time(buffer);
+                users->account_creation = valid_date_time(buffer);  
+                if(users->account_creation == NULL) val = 0;
+                if(most_recent(users->account_creation, users->birth_date) == 0) val = 0;
                 break;
             case 10:
                 users->pay_method = verify_payMethod(buffer); 
@@ -206,15 +211,18 @@ Users *create_users(char *line){
     }
 
     if(val == 0){
+        validate_csv_error(copy_line, "users");
         delete_users(users);
+        free(copy_line);
         return NULL;
-   }
+    }
 
-   users->flights_total = 0;
-   users->reservations_total = 0;
-   users->spent_total = 0.0;
+    users->flights_total = 0;
+    users->reservations_total = 0;
+    users->spent_total = 0.0;
 
-   return users;
+    free(copy_line);
+    return users;
 }
 
 // da free a um user e as variaveis 
@@ -271,9 +279,7 @@ CAT_USERS *create_cat_users(char *entry_files){
         line[strcspn(line, "\n")] = 0;
 
         Users *u = create_users(line);
-        if (u != NULL){
-            insert_users(cat_users, u);
-        } 
+        if (u != NULL) insert_users(cat_users, u);
     }
 
     end = clock();
@@ -312,7 +318,7 @@ Users *get_users(CAT_USERS *cat_users, char *id){
     return g_hash_table_lookup(cat_users->users_hashtable, id);
 }
 
-// fucnao que adiciona um valor ao total de reservas de um user
+// funcao que adiciona um valor ao total de reservas de um user
 void add_reservations_total(Users *users, int value){
     users->reservations_total += value;
 }
@@ -320,4 +326,3 @@ void add_reservations_total(Users *users, int value){
 void add_spent_total(Users *users, double value){
     users->spent_total += value;
 }
-

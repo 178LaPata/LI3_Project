@@ -151,6 +151,8 @@ Flights *create_flights(char *line){
     char *buffer;
     int i = 0;
     int val = 1;
+    char *copy_line = strdup(line);
+
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -166,12 +168,15 @@ Flights *create_flights(char *line){
                 flights->plane_model = strdup(buffer);
                 break; 
             case 3: 
+                if(!verify_only_numbers(buffer)) val = 0;
                 flights->total_seats = atoi(buffer);
                 break;
             case 4:
+                if (strlen(buffer) != 3) val = 0;
                 flights->origin = strdup(buffer);
                 break;
             case 5:
+                if (strlen(buffer) != 3) val = 0;
                 flights->destination = strdup(buffer);
                 break;
             case 6:
@@ -181,6 +186,7 @@ Flights *create_flights(char *line){
             case 7:
                 flights->schedule_arrival_date = valid_date_time(buffer);
                 if (flights->schedule_arrival_date == NULL) val = 0;
+                if(most_recent_datetime(flights->schedule_departure_date, flights->schedule_arrival_date) == 1) val = 0;
                 break;
             case 8:
                 flights->real_departure_date = valid_date_time(buffer);
@@ -189,6 +195,7 @@ Flights *create_flights(char *line){
             case 9:
                 flights->real_arrival_date = valid_date_time(buffer);
                 if (flights->real_arrival_date == NULL) val = 0;
+                if(most_recent_datetime(flights->real_departure_date, flights->real_arrival_date) == 1) val = 0;
                 break;
             case 10:
                 if (strlen(buffer) == 0) val = 0;
@@ -202,16 +209,19 @@ Flights *create_flights(char *line){
                 flights->notes = strdup(buffer);
                 break;
         } 
-    }
 
-    if(val == 0){
-        delete_flights(flights);
-        return NULL;
+        if (val == 0){
+            validate_csv_error(copy_line, "flights");
+            delete_flights(flights);
+            free(copy_line);
+            return NULL;
+        }
     }
 
     flights->num_passengers = 0;
     flights->delay = 0;
 
+    free(copy_line);
     return flights;
 }
 
@@ -297,6 +307,10 @@ void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passeng
         Flights *flights = (Flights *) value;
         set_num_passengers(flights, get_num_passengers_list(cat_passengers, get_id_flights(flights)));
         set_delay(flights, calculate_seconds(flights->schedule_departure_date, flights->real_departure_date));
+        if(get_num_passengers(flights) > get_seats(flights)){
+            // nao tenho a certeza se e suposto fazer assim, fica assim pra ja
+            //validate_csv_error(get_id_flights(flights), "flights");
+        }
     }
 }
 

@@ -20,7 +20,7 @@ struct date* valid_date (char *date_str){
 
     date->year  = strdup(strsep(&date_str, "/"));
     date->month = strdup(strsep(&date_str, "/"));
-    date->day = strdup(strsep(&date_str, " "));
+    date->day = strdup(date_str);
 
     if(atoi(date->year) >= 1900 && atoi(date->year) <= 9999){
         if(atoi(date->month) >= 1 && atoi(date->month) <= 12){
@@ -48,7 +48,7 @@ struct datetime* valid_date_time(char *datetime_str) {
     datetime->day = strdup(strsep(&datetime_str, " "));
     datetime->hour = strdup(strsep(&datetime_str, ":"));
     datetime->minute = strdup(strsep(&datetime_str, ":"));
-    datetime->second = strdup(strsep(&datetime_str, "\0"));
+    datetime->second = strdup(strsep(&datetime_str, "\n"));
 
     if (atoi(datetime->year) >= 1900 && atoi(datetime->year) <= 9999) {
         if (atoi(datetime->month) >= 1 && atoi(datetime->month) <= 12) {
@@ -212,6 +212,24 @@ int most_recent_datetime(datetime date1, datetime date2){
     }
 }
 
+// retorna 1 se date1 for mais recente que date2 e 0 caso contrario
+int most_recent(datetime date1, date date2){
+    if(date1 == NULL && date2 == NULL) return 1;
+    else if(date1 == NULL || date2 == NULL) return 0;
+    
+    if(atoi(date1->year) > atoi(date2->year)) return 1;
+    else if(atoi(date1->year) < atoi(date2->year)) return 0;
+    else{
+        if(atoi(date1->month) > atoi(date2->month)) return 1;
+        else if(atoi(date1->month) < atoi(date2->month)) return 0;
+        else{
+            if(atoi(date1->day) > atoi(date2->day)) return 1;
+            else if(atoi(date1->day) < atoi(date2->day)) return 0;
+            else return 1;
+        }
+    }
+}
+
 // funcao que verifica se duas datas sao iguais, retornando 1 se forem iguais e 0 caso contrario
 int equal_dates(date date1, date date2){
     if(date1 == NULL && date2 == NULL) return 1;
@@ -242,3 +260,4 @@ int between_datetime(datetime date1, datetime beginD, datetime endD){
     if(most_recent_datetime(date1, beginD) == 1 && most_recent_datetime(endD, date1) == 1) return 1;
     else return 0;
 }
+
