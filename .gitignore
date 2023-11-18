@@ -19,4 +19,6 @@ a.out
 Resultados/
 obj/
 dataset/
+datasetCLEAN/
+datasetERROS/
 .vscode
