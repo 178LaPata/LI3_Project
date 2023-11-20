@@ -272,6 +272,9 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
 
     CAT_RESERVATIONS *cat_reservations = malloc(sizeof(CAT_RESERVATIONS));
     cat_reservations->reservations_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_reservations);
+    
+    char *linha = "id;user_id;hotel_id;hotel_name;hotel_stars;city_tax;address;begin_date;end_date;price_per_night;includes_breakfast;room_details;rating;comment";
+    validate_csv_error(linha, "reservations");
 
     char *line = NULL;
     size_t len = 0;
@@ -318,6 +321,16 @@ GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations){
     return cat_reservations->reservations_hashtable;
 }
 
+char *reservations_to_line(Reservations *reservations){
+    char *line = malloc(sizeof(char) * 1000);
+    sprintf(line, "%s;%s;%s;%s;%d;%d;%s;%s;%s;%d;%s;%s;%s;%s", get_id_reservations(reservations), 
+            get_user_id(reservations), get_hotel_id(reservations), get_hotel_name(reservations), 
+            get_hotel_stars(reservations), get_city_tax(reservations), get_adress_reservations(reservations), 
+            date_to_string(get_begin_date(reservations)), date_to_string(get_end_date(reservations)), 
+            get_price_per_night(reservations), get_includes_breakfast(reservations), 
+            get_room_details(reservations), get_rating(reservations), get_comments(reservations));
+    return line;
+}
 
 void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
     GHashTableIter iter;
@@ -434,4 +447,10 @@ int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, d
         totalReceita += total;
     }
     return totalReceita;
+}
+
+
+// funcao que conta as entradas todas da hashtable das reservas
+int count_reservations(CAT_RESERVATIONS *cat_reservations){
+    return g_hash_table_size(cat_reservations->reservations_hashtable);
 }

@@ -153,6 +153,8 @@ Users *create_users(char *line){
     int i = 0;
     int val = 1;
     char *copy_line = strdup(line);
+
+
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -257,9 +259,12 @@ CAT_USERS *create_cat_users(char *entry_files){
         return NULL;
     }
 
+
     CAT_USERS *cat_users = malloc(sizeof(struct cat_users));
     cat_users->users_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_users);
 
+    char *linha = "id;name;email;phone_number;birth_date;sex;passport;country_code;address;account_creation;pay_method;account_status";
+    validate_csv_error(linha, "users");
 
     char *line = NULL;
     size_t len = 0;

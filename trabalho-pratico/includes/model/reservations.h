@@ -50,6 +50,7 @@ void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reser
 CAT_RESERVATIONS *create_cat_reservations(char *entry_files);
 GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations);
 void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations);
+char *reservations_to_line(Reservations *reservations);
 void update_values_reservations(CAT_RESERVATIONS *cat_reservations);
 double calculate_total_price(Reservations *reservations);
 Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id);
@@ -58,3 +59,5 @@ GList* list_reservations_hotelID(CAT_RESERVATIONS *cat_reservations, char* hotel
 gint data_mais_recente(gconstpointer a, gconstpointer b);
 GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id);
 int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, date begin, date end);
+
+int count_reservations(CAT_RESERVATIONS *cat_reservations);

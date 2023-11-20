@@ -47,6 +47,7 @@ Passengers *create_passengers(char *line){
     int i = 0;
     int val = 1;
     char *copy_line = strdup(line);
+    
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
@@ -100,6 +101,9 @@ CAT_PASSENGERS *create_cat_passengers(char *entry_files){
 
     CAT_PASSENGERS *cat_passengers = malloc(sizeof(CAT_PASSENGERS));
     cat_passengers->passengers_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_passenger_list);
+    
+    char *linha = "flight_id;user_id";
+    validate_csv_error(linha, "passengers");
 
     char *line = NULL;
     size_t len = 0;

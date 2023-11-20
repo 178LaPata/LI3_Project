@@ -42,15 +42,29 @@ void update_hash_user(CAT_RESERVATIONS *r, CAT_USERS *u){
     GHashTableIter iter;
     gpointer key, value;
 
+    GList *keys_to_remove = NULL;
+    char *line = NULL;
+
     g_hash_table_iter_init(&iter, get_reservations_hashtable(r));
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         Reservations *reservations = (Reservations *) value;
         char *userID = get_user_id(reservations);
         Users *user = get_users(u, userID);
-        if(!user) continue;
-        add_reservations_total(user, 1);
-        add_spent_total(user, get_total_price(reservations));
+        if (user == NULL) {
+            keys_to_remove = g_list_prepend(keys_to_remove, g_strdup(key));
+            line = reservations_to_line(reservations);
+            validate_csv_error(line, "reservations");
+        } else {
+            add_reservations_total(user, 1);
+            add_spent_total(user, get_total_price(reservations));
+        }
     }
+
+    for (GList *l = keys_to_remove; l != NULL; l = l->next) {
+        g_hash_table_remove(get_reservations_hashtable(r), l->data);
+        g_free(l->data);
+    }
+    g_list_free(keys_to_remove);
 }
 
 Users *query1_users_aux(catalog *cat, char *id){

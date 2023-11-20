@@ -258,6 +258,9 @@ CAT_FLIGHTS *create_cat_flights(char *entry_files){
 
     CAT_FLIGHTS *cat_flights = malloc(sizeof(CAT_FLIGHTS));
     cat_flights->flights_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_flights);
+    
+    char *linha = "id;airline;plane_model;total_seats;origin;destination;schedule_departure_date;schedule_arrival_date;real_departure_date;real_arrival_date;pilot;copilot;notes";
+    validate_csv_error(linha, "flights");
 
     char *line = NULL;
     size_t len = 0;
