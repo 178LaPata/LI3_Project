@@ -9,21 +9,24 @@
 #define DATE "2023/10/01"
 #define DATETIME "2023/10/01 00:00:00"
 
-typedef struct date *date;
+typedef struct date *Date;
 
-typedef struct datetime *datetime;
+typedef struct datetime *Datetime;
 
-date valid_date (char *date_str);
-datetime valid_date_time(char *datetime_str);
-int calculate_age(date birth_date);
-int calculate_days(date begin_date, date end_date);
-int calculate_seconds(datetime begin, datetime end);
-char *date_to_string(date date);
-char *datetime_to_string(datetime datetime);
-int most_recent_date(date date1, date date2);
-int most_recent_datetime(datetime datetime1, datetime datetime2);
-int most_recent(datetime date1, date date2);
-int equal_dates(date date1, date date2);
-int equal_datetime(datetime date1, datetime date2);
-int between_date(date date1, date date2, date date3);
-int between_datetime(datetime date1, datetime beginD, datetime endD);
+char *get_datetime_year(Datetime date);
+Date valid_date (char *date_str);
+Datetime valid_date_time(char *datetime_str);
+void free_date(Date date);
+void free_datetime(Datetime datetime);
+int calculate_age(Date birth_date);
+int calculate_days(Date begin_date, Date end_date);
+int calculate_seconds(Datetime begin, Datetime end);
+char *date_to_string(Date date);
+char *datetime_to_string(Datetime datetime);
+int most_recent_date(Date date1, Date date2);
+int most_recent_datetime(Datetime datetime1, Datetime datetime2);
+int most_recent(Datetime date1, Date date2);
+int equal_dates(Date date1, Date date2);
+int equal_datetime(Datetime date1, Datetime date2);
+int between_date(Date date1, Date date2, Date date3);
+int between_datetime(Datetime date1, Datetime beginD, Datetime endD);

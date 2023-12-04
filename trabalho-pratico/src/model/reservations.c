@@ -9,8 +9,8 @@ struct reservations {
     int hotel_stars;
     int city_tax;
     char *adress;
-    date begin_date;
-    date end_date;
+    Date begin_date;
+    Date end_date;
     int price_per_night;
     char *includes_breakfast;
     char *room_details;
@@ -54,11 +54,11 @@ char *get_adress_reservations(Reservations *reservations){
     return reservations->adress;
 }
 
-date get_begin_date(Reservations *reservations){
+Date get_begin_date(Reservations *reservations){
     return reservations->begin_date;
 }
 
-date get_end_date(Reservations *reservations){
+Date get_end_date(Reservations *reservations){
     return reservations->end_date;
 }
 
@@ -118,11 +118,11 @@ void set_adress_reservations(Reservations *reservations, char *adress){
     reservations->adress = strdup(adress);
 }
 
-void set_begin_date(Reservations *reservations, date begin_date){
+void set_begin_date(Reservations *reservations, Date begin_date){
     reservations->begin_date = begin_date;
 }
 
-void set_end_date(Reservations *reservations, date end_date){
+void set_end_date(Reservations *reservations, Date end_date){
     reservations->end_date = end_date;
 }
 
@@ -155,12 +155,29 @@ void set_total_price(Reservations *reservations, double total_price){
 }
 
 // cria uma reservations a partir de uma linha do ficheiro e verifica se os dados sao validos
-Reservations *create_reservations(char *line){
+Reservations *create_reservations(char *line, CAT_USERS *cat_users){
     Reservations *reservations = malloc(sizeof(Reservations));
     char *buffer;
     int i = 0;
     int val = 1;
     char *copy_line =strdup(line);
+
+    reservations->id_res = NULL;
+    reservations->user_id = NULL;
+    reservations->hotel_id = NULL;
+    reservations->hotel_name = NULL;
+    reservations->hotel_stars = 0;
+    reservations->city_tax = 0;
+    reservations->adress = NULL;
+    reservations->begin_date = NULL;
+    reservations->end_date = NULL;
+    reservations->price_per_night = 0;
+    reservations->includes_breakfast = NULL;
+    reservations->room_details = NULL;
+    reservations->rating = NULL;
+    reservations->comments = NULL;
+    reservations->nights = 0;
+    reservations->total_price = 0.0;
 
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
@@ -171,6 +188,7 @@ Reservations *create_reservations(char *line){
             case 1:
                 if (strlen(buffer) == 0) val = 0;
                 reservations->user_id = strdup(buffer);
+                if(get_users(cat_users, reservations->user_id) == NULL) val = 0;
                 break;
             case 2:
                 if (strlen(buffer) == 0) val = 0;
@@ -193,11 +211,13 @@ Reservations *create_reservations(char *line){
                 reservations->adress = strdup(buffer);
                 break;
             case 7:
-                reservations->begin_date = valid_date(buffer);
+                Date begin = valid_date(buffer);
+                reservations->begin_date = begin;
                 if (reservations->begin_date == NULL) val = 0;
                 break;
             case 8:
-                reservations->end_date = valid_date(buffer);
+                Date end = valid_date(buffer);
+                reservations->end_date = end;
                 if (reservations->end_date == NULL) val = 0;
                 if(most_recent_date(reservations->begin_date, reservations->end_date) == 1) val = 0;
                 break;
@@ -213,7 +233,9 @@ Reservations *create_reservations(char *line){
                 reservations->room_details = strdup(buffer);
                 break;
             case 12:
-                reservations->rating = verify_rating(buffer);
+                char *r = verify_rating(buffer);
+                reservations->rating = r;
+                free(r);
                 if(reservations->rating == NULL) val = 0;
                 reservations->rating = strdup(buffer);
                 break;
@@ -250,6 +272,8 @@ void delete_reservations(void *data){
     free(reservations->room_details);
     free(reservations->rating);
     free(reservations->comments);
+    free_date(reservations->begin_date);
+    free_date(reservations->end_date);
     free(reservations);
 }
 
@@ -259,7 +283,7 @@ void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reser
 }
 
 // cria a hashtable das reservations
-CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
+CAT_RESERVATIONS *create_cat_reservations(char *entry_files, CAT_USERS *cat_users){
     
     FILE *fp;
     char open[50];
@@ -291,7 +315,7 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
             continue;
         }
         line[strcspn(line, "\n")] = 0;
-        Reservations *r = create_reservations(line);
+        Reservations *r = create_reservations(line, cat_users);
         if (r != NULL){
             insert_reservations(cat_reservations, r);
         }
@@ -302,8 +326,6 @@ CAT_RESERVATIONS *create_cat_reservations(char *entry_files){
 
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse reservations.csv: %f\n", cpu_time_used);
-
-    printf("Number of reservations: %d\n", g_hash_table_size(cat_reservations->reservations_hashtable));
 
     free(line);
     fclose(fp);
@@ -321,6 +343,7 @@ GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations){
     return cat_reservations->reservations_hashtable;
 }
 
+// funcao que converte uma reservations para uma linha
 char *reservations_to_line(Reservations *reservations){
     char *line = malloc(sizeof(char) * 1000);
     sprintf(line, "%s;%s;%s;%s;%d;%d;%s;%s;%s;%d;%s;%s;%s;%s", get_id_reservations(reservations), 
@@ -343,6 +366,7 @@ void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
     }
 }
 
+// funcao que calcula o preco total de uma reserva
 double calculate_total_price(Reservations *reservations){
     int dias = get_nights(reservations);
     double custo_por_estadia = (double) reservations->price_per_night * (double) dias;
@@ -355,7 +379,8 @@ Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
     return g_hash_table_lookup(cat_reservations->reservations_hashtable, id);
 }
 
-// esta a dar mal
+
+// funcao que calcula a media de rating de um hotel
 double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_id){
     int ratingT = 0;
     int count = 0;
@@ -414,43 +439,35 @@ GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id
     return g_list_sort(values, data_mais_recente);
 }
 
-// esta a calcular mal, prov nao e assim que se faz
-int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, date begin, date end){
+// funcao que calcula o preco total de uma reserva entre duas datas
+int calculate_total_price_between_dates(Reservations *reservations, Date begin, Date end){
+    int nights = 0, total = 0;
+    if (between_date(reservations->begin_date, begin, end) == 1 && between_date(reservations->end_date, begin, end) == 1) {
+        nights += calculate_days(reservations->begin_date, reservations->end_date);
+        total = reservations->price_per_night * nights;
+    } else if(between_date(reservations->begin_date, begin, end) == 1){
+        nights += calculate_days(reservations->begin_date, end) + 1;
+        total = reservations->price_per_night * nights;
+    } else if (between_date(reservations->end_date, begin, end) == 1){
+        nights += calculate_days(begin, reservations->end_date);
+        total = reservations->price_per_night * nights;
+    }
+    return total;
+}
+
+// funcao que calcula a receita total de um hotel entre duas datas
+int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, Date begin, Date end){
     GHashTableIter iter;
     gpointer key, value;
     int totalReceita = 0;
-    int total = 0;
-    int custo_por_estadia = 0;
-    int imposto = 0;
-    int nights = 0;
+
     g_hash_table_iter_init(&iter, cat_reservations->reservations_hashtable);
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         Reservations *reservations = (Reservations *) value;
         if(strcmp(hotel_id, reservations->hotel_id) == 0){
-            if (between_date(reservations->begin_date, begin, end) == 1) {
-                nights = calculate_days(reservations->begin_date, end);
-                custo_por_estadia = reservations->price_per_night * nights;
-                imposto = (custo_por_estadia/100) * reservations->city_tax;
-                total += custo_por_estadia + imposto;
-            } else if (between_date(reservations->end_date, begin, end) == 1 ){
-                nights = calculate_days(begin, reservations->end_date);
-                custo_por_estadia = reservations->price_per_night * nights;
-                imposto = (custo_por_estadia/100) * reservations->city_tax;
-                total += custo_por_estadia + imposto;
-            } else if (between_date(reservations->begin_date, begin, end) == 1 && between_date(reservations->end_date, begin, end) == 1) {
-                nights = calculate_days(begin, end);
-                custo_por_estadia = reservations->price_per_night * nights;
-                imposto = (custo_por_estadia/100) * reservations->city_tax;
-                total += custo_por_estadia + imposto;
-            }
+            int total = calculate_total_price_between_dates(reservations, begin, end);
+            totalReceita += total;
         }
-        totalReceita += total;
     }
     return totalReceita;
-}
-
-
-// funcao que conta as entradas todas da hashtable das reservas
-int count_reservations(CAT_RESERVATIONS *cat_reservations){
-    return g_hash_table_size(cat_reservations->reservations_hashtable);
 }

@@ -6,12 +6,12 @@ struct users {
     char *name;
     char *email;
     char *phone_number;
-    date birth_date;
+    Date birth_date;
     char *sex; 
     char *passport;
     char *country_code;
     char *adress;
-    datetime account_creation;
+    Datetime account_creation;
     enum pay_method pay_method;
     enum account_status account_status;
 
@@ -41,7 +41,7 @@ char *get_phone_number(Users *users){
     return users->phone_number;
 }
 
-date get_birth_date(Users *users){
+Date get_birth_date(Users *users){
     return users->birth_date;
 }
 
@@ -61,7 +61,7 @@ char *get_adress(Users *users){
     return users->adress;
 }
 
-datetime get_account_creation(Users *users){
+Datetime get_account_creation(Users *users){
     return users->account_creation;
 }
 
@@ -102,7 +102,7 @@ void set_phone_number(Users *users, char *phone_number){
     users->phone_number = strdup(phone_number);
 }
 
-void set_birth_date(Users *users, date birth_date){
+void set_birth_date(Users *users, Date birth_date){
     users->birth_date = birth_date;
 }
 
@@ -122,7 +122,7 @@ void set_adress(Users *users, char *adress){
     users->adress = strdup(adress);
 }
 
-void set_account_creation(Users *users, datetime account_creation){
+void set_account_creation(Users *users, Datetime account_creation){
     users->account_creation = account_creation;
 }
 
@@ -154,6 +154,22 @@ Users *create_users(char *line){
     int val = 1;
     char *copy_line = strdup(line);
 
+    users->id = NULL;
+    users->name = NULL;
+    users->email = NULL;
+    users->phone_number = NULL;
+    users->birth_date = NULL;
+    users->sex = NULL;
+    users->passport = NULL;
+    users->country_code = NULL;
+    users->adress = NULL;
+    users->account_creation = NULL;
+    users->pay_method = noPayMethod;
+    users->account_status = NoStatus;
+    users->flights_total = 0;
+    users->reservations_total = 0;
+    users->spent_total = 0.0;
+
 
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
@@ -172,11 +188,14 @@ Users *create_users(char *line){
                 break;
             case 3:
                 if (strlen(buffer) == 0) val = 0;
-                users->phone_number = verify_phone_number(buffer);
+                char *ph= verify_phone_number(buffer);
+                users->phone_number = ph;
+                free(ph);
                 break;
             case 4:
                 if(strlen(buffer) == 0) val = 0;
-                users->birth_date = valid_date(buffer); 
+                Date bd = valid_date(buffer);
+                users->birth_date = bd; 
                 if(users->birth_date == NULL) val = 0;
                 break;
             case 5:
@@ -197,7 +216,8 @@ Users *create_users(char *line){
                 users->adress = strdup(buffer);
                 break;
             case 9:
-                users->account_creation = valid_date_time(buffer);  
+                Datetime ac = valid_date_time(buffer);
+                users->account_creation = ac;  
                 if(users->account_creation == NULL) val = 0;
                 if(most_recent(users->account_creation, users->birth_date) == 0) val = 0;
                 break;
@@ -233,12 +253,12 @@ void delete_users(void *data){
     free(users->id);
     free(users->name);
     free(users->email);
-    free(users->birth_date);
+    free_date(users->birth_date);
     free(users->sex);
     free(users->passport);
     free(users->country_code);
     free(users->adress);
-    free(users->account_creation);
+    free_datetime(users->account_creation);
     free(users);
 }
 
@@ -293,7 +313,6 @@ CAT_USERS *create_cat_users(char *entry_files){
 
     printf("Time to parse users.csv: %f\n", cpu_time_used);
 
-    printf("Number of users: %d\n", g_hash_table_size(cat_users->users_hashtable));
     free(line);
     fclose(fp);
 
@@ -306,21 +325,13 @@ void delete_cat_users(CAT_USERS *cat_users){
     free(cat_users);
 }
 
-// da update as variaveis dos users (variaveis que nao estao no ficheiro)
-void update_values_users(CAT_USERS *cat_users, CAT_PASSENGERS *cat_passengers, CAT_RESERVATIONS *cat_reservations){
-    GHashTableIter iter;
-    gpointer key, value;
-
-    g_hash_table_iter_init (&iter, cat_users->users_hashtable);
-    while (g_hash_table_iter_next (&iter, &key, &value)){
-        Users *user = (Users *) value;
-        set_flights_total(user, calculate_total_flights(cat_passengers, user->id));
-    }
-}
-
 // retorna um user a partir do id
 Users *get_users(CAT_USERS *cat_users, char *id){
     return g_hash_table_lookup(cat_users->users_hashtable, id);
+}
+
+void add_flights_total(Users *users, int value){
+    users->flights_total += value;
 }
 
 // funcao que adiciona um valor ao total de reservas de um user
@@ -330,4 +341,36 @@ void add_reservations_total(Users *users, int value){
 
 void add_spent_total(Users *users, double value){
     users->spent_total += value;
+}
+
+// funcao que cria uma lista com os users em que o prefixo passado corresponde ao prefixo do id e a conta nao esta inativa
+GList *list_users_prefixo(CAT_USERS *cat_users, char *prefix){
+    GHashTableIter iter;
+    gpointer key, value;
+    GList *list = NULL;
+
+    g_hash_table_iter_init(&iter, cat_users->users_hashtable);
+    while (g_hash_table_iter_next(&iter, &key, &value)) {
+        Users *users = (Users *) value;
+        if(strncmp(get_name(users), prefix, strlen(prefix)) == 0 && get_account_status(users) != 2)
+            list = g_list_prepend(list, users);
+    }
+    return list;
+}
+
+// funcao que compara dois users por nome e id
+gint ordena_id(gconstpointer a, gconstpointer b){
+    Users *u1 = (Users *) a;
+    Users *u2 = (Users *) b;
+    if(strcoll(get_name(u1), get_name(u2)) == 0)
+        return strcoll(get_id(u1), get_id(u2));
+    else
+        return strcoll(get_name(u1), get_name(u2));
+}
+
+// funcao que cria uma lista com os users ordenados por id
+GList *sort_users_id(CAT_USERS *cat_users, char *prefix){
+    GList *list = list_users_prefixo(cat_users, prefix);
+    list = g_list_sort(list, ordena_id);
+    return list;
 }

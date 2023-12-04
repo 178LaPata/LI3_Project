@@ -8,7 +8,30 @@ struct datetime{
     char *year, *month, *day, *hour, *minute, *second;
 };
 
-struct date* valid_date (char *date_str){
+char *get_datetime_year(Datetime date){
+    return date->year;
+}
+
+void free_date(Date date){
+    if(date == NULL) return;
+    free(date->year);
+    free(date->month);
+    free(date->day);
+    free(date);
+}
+
+void free_datetime(Datetime datetime){
+    if(datetime == NULL) return;
+    free(datetime->year);
+    free(datetime->month);
+    free(datetime->day);
+    free(datetime->hour);
+    free(datetime->minute);
+    free(datetime->second);
+    free(datetime);
+}
+
+Date valid_date (char *date_str){
 
     if (strlen(date_str) != 10 || date_str[4] != '/' || date_str[7] != '/') return NULL;
     for (int i=0 ; date_str[i] ; i++){
@@ -16,11 +39,19 @@ struct date* valid_date (char *date_str){
         if (date_str[i]<'0' || date_str[i]>'9') return NULL;
     }
 
-    struct date* date = malloc(sizeof(struct date));
+    Date date = malloc(sizeof(struct date));
 
-    date->year  = strdup(strsep(&date_str, "/"));
-    date->month = strdup(strsep(&date_str, "/"));
-    date->day = strdup(date_str);
+    char *year = strdup(strsep(&date_str, "/"));
+    char *month = strdup(strsep(&date_str, "/"));
+    char *day = strdup(date_str);
+
+    date->year  = strdup(year);
+    date->month = strdup(month);
+    date->day = strdup(day);
+
+    free(year);
+    free(month);
+    free(day);
 
     if(atoi(date->year) >= 1900 && atoi(date->year) <= 9999){
         if(atoi(date->month) >= 1 && atoi(date->month) <= 12){
@@ -33,7 +64,7 @@ struct date* valid_date (char *date_str){
     return NULL;
 }
 
-struct datetime* valid_date_time(char *datetime_str) {
+Datetime valid_date_time(char *datetime_str) {
     if (strlen(datetime_str) != 19 || datetime_str[4] != '/' || datetime_str[7] != '/' || datetime_str[10] != ' ' || datetime_str[13] != ':' || datetime_str[16] != ':') return NULL;
 
     for (int i = 0; datetime_str[i]; i++) {
@@ -41,14 +72,28 @@ struct datetime* valid_date_time(char *datetime_str) {
         if (datetime_str[i]<'0' || datetime_str[i]>'9') return NULL;
     }
 
-    struct datetime* datetime = malloc(sizeof(struct datetime));
+    Datetime datetime = malloc(sizeof(struct datetime));
 
-    datetime->year = strdup(strsep(&datetime_str, "/"));
-    datetime->month = strdup(strsep(&datetime_str, "/"));
-    datetime->day = strdup(strsep(&datetime_str, " "));
-    datetime->hour = strdup(strsep(&datetime_str, ":"));
-    datetime->minute = strdup(strsep(&datetime_str, ":"));
-    datetime->second = strdup(strsep(&datetime_str, "\n"));
+    char *year = strdup(strsep(&datetime_str, "/"));
+    char *month = strdup(strsep(&datetime_str, "/"));
+    char *day = strdup(strsep(&datetime_str, " "));
+    char *hour = strdup(strsep(&datetime_str, ":"));
+    char *minute = strdup(strsep(&datetime_str, ":"));
+    char *second = strdup(datetime_str);
+
+    datetime->year = strdup(year);
+    datetime->month = strdup(month);
+    datetime->day = strdup(day);
+    datetime->hour = strdup(hour);
+    datetime->minute = strdup(minute);
+    datetime->second = strdup(second);
+
+    free(year);
+    free(month);
+    free(day);
+    free(hour);
+    free(minute);
+    free(second);
 
     if (atoi(datetime->year) >= 1900 && atoi(datetime->year) <= 9999) {
         if (atoi(datetime->month) >= 1 && atoi(datetime->month) <= 12) {
@@ -67,7 +112,7 @@ struct datetime* valid_date_time(char *datetime_str) {
 }
 
 // calcula a idade de um user 
-int calculate_age(date birth_date) {
+int calculate_age(Date birth_date) {
     int ano_atual, mes_atual, dia_atual;
     sscanf(DATE, "%d/%d/%d", &ano_atual, &mes_atual, &dia_atual);
 
@@ -84,7 +129,8 @@ int calculate_age(date birth_date) {
     return idade;
 }
 
-int calculate_days(date begin_date, date end_date){
+// calcula os dias entre duas datas
+int calculate_days(Date begin_date, Date end_date){
     int ano_inicio = atoi(begin_date->year);
     int mes_inicio = atoi(begin_date->month);
     int dia_inicio = atoi(begin_date->day);
@@ -93,26 +139,11 @@ int calculate_days(date begin_date, date end_date){
     int mes_fim = atoi(end_date->month);
     int dia_fim = atoi(end_date->day);
 
-    struct tm inicio = {0};
-    struct tm fim = {0};
-
-    inicio.tm_year = ano_inicio - 1900;
-    inicio.tm_mon = mes_inicio - 1;
-    inicio.tm_mday = dia_inicio;
-
-    fim.tm_year = ano_fim - 1900;
-    fim.tm_mon = mes_fim - 1;
-    fim.tm_mday = dia_fim;
-
-    time_t inicio_t = mktime(&inicio);
-    time_t fim_t = mktime(&fim);
-
-    double dias = difftime(fim_t, inicio_t) / (60 * 60 * 24);
-
-    return (int) dias;
+    return (ano_fim - ano_inicio) * 365 + (mes_fim - mes_inicio) * 30 + (dia_fim - dia_inicio);
 }
 
-int calculate_seconds(datetime begin, datetime end){
+// calcula os segundos entre duas datetimes
+int calculate_seconds(Datetime begin, Datetime end){
     int ano_inicio = atoi(begin->year);
     int mes_inicio = atoi(begin->month);
     int dia_inicio = atoi(begin->day);
@@ -152,20 +183,22 @@ int calculate_seconds(datetime begin, datetime end){
     return (int) segundos;
 }
 
-char *date_to_string(date date){
+// funcao que converte uma data para string
+char *date_to_string(Date date){
     char *date_str = malloc(sizeof(char) * 11);
     sprintf(date_str, "%s/%s/%s", date->year, date->month, date->day);
     return date_str;
 }
 
-char *datetime_to_string(datetime datetime){
+// funcao que converte uma datetime para string
+char *datetime_to_string(Datetime datetime){
     char *datetime_str = malloc(sizeof(char) * 20);
     sprintf(datetime_str, "%s/%s/%s %s:%s:%s", datetime->year, datetime->month, datetime->day, datetime->hour, datetime->minute, datetime->second);
     return datetime_str;
 }
 
 // funcao que verifica a funcao mais recente, retorna 1 se data1 for mais recente que data2 e 0 caso contrario
-int most_recent_date(date date1, date date2){
+int most_recent_date(Date date1, Date date2){
     if(date1 == NULL && date2 == NULL) return 1;
     else if(date1 == NULL || date2 == NULL) return 0;
     
@@ -183,7 +216,7 @@ int most_recent_date(date date1, date date2){
 }  
 
 // funcao que verifica a funcao mais recente, retorna 1 se data1 for mais recente que data2 e 0 caso contrario
-int most_recent_datetime(datetime date1, datetime date2){
+int most_recent_datetime(Datetime date1, Datetime date2){
     if(date1 == NULL && date2 == NULL) return 1;
     else if(date1 == NULL || date2 == NULL) return 0;
     
@@ -213,7 +246,7 @@ int most_recent_datetime(datetime date1, datetime date2){
 }
 
 // retorna 1 se date1 for mais recente que date2 e 0 caso contrario
-int most_recent(datetime date1, date date2){
+int most_recent(Datetime date1, Date date2){
     if(date1 == NULL && date2 == NULL) return 1;
     else if(date1 == NULL || date2 == NULL) return 0;
     
@@ -231,7 +264,7 @@ int most_recent(datetime date1, date date2){
 }
 
 // funcao que verifica se duas datas sao iguais, retornando 1 se forem iguais e 0 caso contrario
-int equal_dates(date date1, date date2){
+int equal_dates(Date date1, Date date2){
     if(date1 == NULL && date2 == NULL) return 1;
     else if(date1 == NULL || date2 == NULL) return 0;
     
@@ -239,7 +272,8 @@ int equal_dates(date date1, date date2){
     else return 0;
 }
 
-int equal_datetime(datetime date1, datetime date2){
+// funcao que verifica se duas datetimes sao iguais, retornando 1 se forem iguais e 0 caso contrario
+int equal_datetime(Datetime date1, Datetime date2){
     if(date1 == NULL && date2 == NULL) return 1;
     else if(date1 == NULL || date2 == NULL) return 0;
     
@@ -247,17 +281,16 @@ int equal_datetime(datetime date1, datetime date2){
        strcmp(date1->day, date2->day) == 0 && strcmp(date1->hour, date2->hour) == 0 && 
        strcmp(date1->minute, date2->minute) == 0 && strcmp(date1->second, date2->second) == 0) return 1;
     else return 0;
-
 }
 
 // funcao que verifica se a data1 esta entre a data2 e a data3, retornando 1 se estiver e 0 caso contrario
-int between_date(date date1, date date2, date date3){
+int between_date(Date date1, Date date2, Date date3){
     if(most_recent_date(date1, date2) == 1 && most_recent_date(date3, date1) == 1) return 1;
     else return 0;
 }
 
-int between_datetime(datetime date1, datetime beginD, datetime endD){
+// funcao que verifica se a datetime1 esta entre a datetime2 e a datetime3, retornando 1 se estiver e 0 caso contrario
+int between_datetime(Datetime date1, Datetime beginD, Datetime endD){
     if(most_recent_datetime(date1, beginD) == 1 && most_recent_datetime(endD, date1) == 1) return 1;
     else return 0;
 }
-
