@@ -12,6 +12,7 @@ a.out
 *.o
 *.exe
 *.txt
+melhorar.md
 *users*.csv
 *flights*.csv
 *reservations*.csv
