@@ -57,12 +57,12 @@ void update_hash_userRes(CAT_RESERVATIONS *r, CAT_USERS *u){
 
     g_hash_table_iter_init(&iter, get_reservations_hashtable(r));
     while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Reservation *reservation = (Reservation *) value;
-        char *userID = get_user_id(reservation);
-        User *user = get_users(u, userID);
+        Reservations *reservations = (Reservations *) value;
+        char *userID = get_user_id(reservations);
+        Users *user = get_users(u, userID);
         if(!user) continue;
         add_reservations_total(user, 1);
-        add_spent_total(user, get_total_price(reservation));
+        add_spent_total(user, get_total_price(reservations));
     }
 }
 
@@ -75,21 +75,21 @@ void update_hash_userPas(CAT_PASSENGERS *p, CAT_USERS *u){
     while (g_hash_table_iter_next(&iter, &key, &value)) {
         for (int i = 0; i < get_num_passengers_list(p, key); i++) {
             char *userID = get_user_from_list(p, key, i);
-            User *user = get_users(u, userID);
+            Users *user = get_users(u, userID);
             add_flights_total(user, 1);
         }
     }
 }
 
-User *query1_users_aux(catalog *cat, char *id){
+Users *query1_users_aux(catalog *cat, char *id){
     return get_users(cat->cat_users, id);
 }
 
-Reservation *query1_reservations_aux(catalog *cat, char *id){
+Reservations *query1_reservations_aux(catalog *cat, char *id){
     return get_reservations(cat->cat_reservations, id);
 }
 
-Flight *query1_flights_aux(catalog *cat, char *id){
+Flights *query1_flights_aux(catalog *cat, char *id){
     return get_flights(cat->cat_flights, id);
 }
 

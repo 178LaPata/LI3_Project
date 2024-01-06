@@ -5,7 +5,7 @@
 #include "../../includes/model/reservations.h"
 #include "../../includes/model/passengers.h"
 #include "../../includes/model/date.h"
-#include "../../includes/view/output.h"
+#include "../../includes/view/batchP.h"
 
 #define BUFFER 64
 

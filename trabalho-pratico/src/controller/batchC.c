@@ -1,4 +1,4 @@
-#include "../../includes/controller/queries.h"
+#include "../../includes/controller/batchC.h"
 
 int run_batch(char* inputs_path, char* queries_path) {
     catalog *cat = create_catalog(inputs_path);
@@ -94,14 +94,14 @@ void query1(catalog *cat, char *query, FILE *fp) {
     char *arg_query = strsep(&query, "\n");
 
     if(verify_only_numbers(arg_query)==1){
-        Flight *fli = query1_flights_aux(cat, arg_query);
+        Flights *fli = query1_flights_aux(cat, arg_query);
         if (fli) batch_print_query1_flights(fli, fp);
     } else {
         if(strncmp(arg_query, "Book", 4)==0){
-            Reservation *r = query1_reservations_aux(cat, arg_query);
+            Reservations *r = query1_reservations_aux(cat, arg_query);
             if (r) batch_print_query1_reservations(r, fp);
         } else {
-            User *user = query1_users_aux(cat, arg_query);
+            Users *user = query1_users_aux(cat, arg_query);
             if (user) batch_print_query1_user(user, fp);
         }
     }
@@ -113,20 +113,20 @@ void query1F(catalog *cat, char *query, FILE *fp) {
     int i = 0;
 
     if(verify_only_numbers(arg_query)==1){
-        Flight *fli = query1_flights_aux(cat, arg_query);
+        Flights *fli = query1_flights_aux(cat, arg_query);
         if (fli){
             i++;
             batch_print_query1F_flights(fli, fp, i);
         }
     } else {
         if(strncmp(arg_query, "Book", 4)==0){
-            Reservation *r = query1_reservations_aux(cat, arg_query);
+            Reservations *r = query1_reservations_aux(cat, arg_query);
             if (r){
                 i++;
                 batch_print_query1F_reservations(r, fp, i);
             }
         } else {
-            User *user = query1_users_aux(cat, arg_query);
+            Users *user = query1_users_aux(cat, arg_query);
             if (user){
                 i++;
                 batch_print_query1F_user(user, fp, i);
@@ -160,7 +160,7 @@ void query4(catalog *cat, char *query, FILE *fp){
     GList *list = query4_aux(cat, arg_query);
     GList *aux = list;
     while(aux){
-        Reservation *r = (Reservation *) aux->data;
+        Reservations *r = (Reservations *) aux->data;
         batch_print_query4(r, fp);
         aux = aux->next;
     }
@@ -176,7 +176,7 @@ void query4F(catalog *cat, char *query, FILE *fp){
     GList *list = query4_aux(cat, arg_query);
     GList *aux = list;
     while(aux){
-        Reservation *r = (Reservation *) aux->data;
+        Reservations *r = (Reservations *) aux->data;
         i++;
         batch_print_query4F(r, fp, i);
         aux = aux->next;
@@ -201,7 +201,7 @@ void query5(catalog *cat, char *query, FILE *fp){
     GList *list = query5_aux(cat, origem, beginD, endD);
     GList *aux = list;
     while(aux){
-        Flight *fli = (Flight *) aux->data;
+        Flights *fli = (Flights *) aux->data;
         batch_print_query5(fli, fp);
         aux = aux->next;
     }
@@ -225,7 +225,7 @@ void query5F(catalog *cat, char *query, FILE *fp){
     GList *list = query5_aux(cat, origem, beginD, endD);
     GList *aux = list;
     while(aux){
-        Flight *fli = (Flight *) aux->data;
+        Flights *fli = (Flights *) aux->data;
         i++;
         batch_print_query5F(fli, fp, i);
         aux = aux->next;
@@ -322,7 +322,7 @@ void query9(catalog *cat, char *query, FILE *fp){
     GList *aux = list;
 
     while(aux){
-        User *user = (User *) aux->data;
+        Users *user = (Users *) aux->data;
         batch_print_query9(user, fp);
         aux = aux->next;
     }
@@ -342,7 +342,7 @@ void query9F(catalog *cat, char *query, FILE *fp){
     GList *aux = list;
 
     while(aux){
-        User *user = (User *) aux->data;
+        Users *user = (Users *) aux->data;
         i++;
         batch_print_query9F(user, fp, i);
         aux = aux->next;

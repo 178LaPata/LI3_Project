@@ -1,6 +1,6 @@
-#include "../../includes/view/output.h"
+#include "../../includes/view/batchP.h"
 
-void batch_print_query1_user(User *u, FILE *fp){
+void batch_print_query1_user(Users *u, FILE *fp){
     int ac = get_account_status(u);
     if(u != NULL){
         if(ac != 2){
@@ -12,7 +12,7 @@ void batch_print_query1_user(User *u, FILE *fp){
     }
 }
 
-void batch_print_query1F_user(User *u, FILE *fp, int i){
+void batch_print_query1F_user(Users *u, FILE *fp, int i){
     int ac = get_account_status(u);
     if(u != NULL){
         if(ac != 2){
@@ -29,7 +29,7 @@ void batch_print_query1F_user(User *u, FILE *fp, int i){
     }
 }
 
-void batch_print_query1_flights(Flight *fli, FILE *fp){
+void batch_print_query1_flights(Flights *fli, FILE *fp){
     if(fli != NULL){
         char *departure = datetime_to_string(get_schedule_departure_date(fli));
         char *arrival = datetime_to_string(get_schedule_arrival_date(fli));
@@ -41,7 +41,7 @@ void batch_print_query1_flights(Flight *fli, FILE *fp){
     }
 }
 
-void batch_print_query1F_flights(Flight *fli, FILE *fp, int i){
+void batch_print_query1F_flights(Flights *fli, FILE *fp, int i){
     if(fli != NULL){
         char *departure = datetime_to_string(get_schedule_departure_date(fli));
         char *arrival = datetime_to_string(get_schedule_arrival_date(fli));
@@ -59,7 +59,7 @@ void batch_print_query1F_flights(Flight *fli, FILE *fp, int i){
     }
 }
 
-void batch_print_query1_reservations(Reservation *r, FILE *fp){
+void batch_print_query1_reservations(Reservations *r, FILE *fp){
     if(r != NULL){
         char *begindate = date_to_string(get_begin_date(r));
         char *enddate = date_to_string(get_end_date(r));
@@ -71,7 +71,7 @@ void batch_print_query1_reservations(Reservation *r, FILE *fp){
     }
 }
 
-void batch_print_query1F_reservations(Reservation *r, FILE *fp, int i){
+void batch_print_query1F_reservations(Reservations *r, FILE *fp, int i){
     if(r != NULL){
         char *begindate = date_to_string(get_begin_date(r));
         char *enddate = date_to_string(get_end_date(r));
@@ -99,7 +99,7 @@ void batch_print_query3F(double total, FILE *fp, int i){
 }
 
 
-void batch_print_query4(Reservation *r, FILE *fp){
+void batch_print_query4(Reservations *r, FILE *fp){
     if(r != NULL){
         char *begindate = date_to_string(get_begin_date(r));
         char *enddate = date_to_string(get_end_date(r));
@@ -110,7 +110,7 @@ void batch_print_query4(Reservation *r, FILE *fp){
     }
 }
 
-void batch_print_query4F(Reservation *r, FILE *fp, int i){
+void batch_print_query4F(Reservations *r, FILE *fp, int i){
     if(r != NULL){
         char *begindate = date_to_string(get_begin_date(r));
         char *enddate = date_to_string(get_end_date(r));
@@ -126,7 +126,7 @@ void batch_print_query4F(Reservation *r, FILE *fp, int i){
     }
 }
 
-void batch_print_query5(Flight *fli, FILE *fp){
+void batch_print_query5(Flights *fli, FILE *fp){
     if(fli != NULL){
         char *begindate = datetime_to_string(get_schedule_departure_date(fli));
         fprintf(fp, "%s;%s;%s;%s;%s\n", get_id_flights(fli), begindate, 
@@ -135,7 +135,7 @@ void batch_print_query5(Flight *fli, FILE *fp){
     }  
 }
 
-void batch_print_query5F(Flight *fli, FILE *fp, int i){
+void batch_print_query5F(Flights *fli, FILE *fp, int i){
     if(fli != NULL){
         char *begindate = datetime_to_string(get_schedule_departure_date(fli));
         fprintf(fp, "--- %d ---\n", i);
@@ -169,7 +169,7 @@ void batch_print_query8F(int total, FILE *fp, int i){
     fprintf(fp, "revenue: %d\n", total);
 }
 
-void batch_print_query9(User *u, FILE *fp){
+void batch_print_query9(Users *u, FILE *fp){
     int ac = get_account_status(u);
     if(u != NULL){
         if(ac != 2){
@@ -178,11 +178,10 @@ void batch_print_query9(User *u, FILE *fp){
     }
 }
 
-void batch_print_query9F(User *u, FILE *fp, int i){
+void batch_print_query9F(Users *u, FILE *fp, int i){
     if(u != NULL){
         fprintf(fp, "--- %d ---\n", i);
         fprintf(fp, "id: %s\n", get_id(u));
         fprintf(fp, "name: %s\n", get_name(u));
     }
 }
-
