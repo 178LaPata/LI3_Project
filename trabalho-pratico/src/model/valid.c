@@ -142,3 +142,15 @@ void validate_csv_error(char *line, char *file_name){
         printf("Error opening file %s\n", file);
     }
 }
+
+void writeToFile(char *line, char *file_name){
+    char file[BUFFER];
+    sprintf(file, "./Entradas/%sOK.csv", file_name);
+    FILE *fp_guardar = fopen(file, "a");
+    if(fp_guardar != NULL) {
+        fprintf(fp_guardar, "%s\n", line);
+        fclose(fp_guardar);
+    } else {
+        printf("Error opening file %s\n", file);
+    }
+}

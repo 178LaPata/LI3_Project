@@ -33,3 +33,4 @@ char *verify_includes_breakfast(char *includes_breakfast);
 char *verify_rating(char *rating);
 int verify_only_numbers(char *str);
 void validate_csv_error(char *line, char *file_name);
+void writeToFile(char *line, char *file_name);

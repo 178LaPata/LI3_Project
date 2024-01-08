@@ -245,6 +245,7 @@ Users *create_users(char *line){
     users->reservations_total = 0;
     users->spent_total = 0.0;
 
+    //writeToFile(copy_line, "users");
     free(copy_line);
     return users;
 }
@@ -307,6 +308,7 @@ CAT_USERS *create_cat_users(char *entry_files){
 
         Users *u = create_users(line);
         if (u != NULL) insert_users(cat_users, u);
+        //delete_users(u);
     }
 
     end = clock();
