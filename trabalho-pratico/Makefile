@@ -6,11 +6,8 @@ LDFLAGS = `pkg-config --libs glib-2.0` -lm
 SDIR = src
 ODIR = obj
 
-# Adicione aqui os subdiretórios do seu projeto
-SUBDIRS = controller model view
-
 # Utilize a função wildcard para encontrar todos os arquivos .c
-SOURCES = $(wildcard $(SDIR)/*.c $(SDIR)/controller/*.c $(SDIR)/model/*.c $(SDIR)/view/*.c)
+SOURCES = $(wildcard $(SDIR)/*.c)
 
 # Substitua os caminhos dos arquivos fonte pelos caminhos dos arquivos objeto
 _OBJ = $(SOURCES:$(SDIR)/%.c=%.o)
@@ -20,7 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: $(SDIR)/%.c
 	mkdir -p $(@D)
 	mkdir -p Resultados
-	mkdir -p Entradas
+	mkdir -p Entrada
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 # Regra para compilar o programa principal
@@ -32,6 +29,6 @@ programa-principal: $(OBJ)
 
 clean:
 	rm -f programa-principal
+	rm -r Entrada
 	rm -r $(ODIR)
 	rm -r Resultados
-	rm -r Entradas

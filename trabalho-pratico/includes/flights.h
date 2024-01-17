@@ -9,9 +9,9 @@ typedef struct flights Flights;
 typedef struct cat_flights CAT_FLIGHTS;
 typedef struct origin_passenger_count ORIGIN_PASSENGER_COUNT;  
 
-#include "../../includes/model/date.h"
-#include "../../includes/model/valid.h"
-#include "../../includes/model/passengers.h"
+#include "../includes/date.h"
+#include "../includes/valid.h"
+#include "../includes/passengers.h"
 
 char *get_origin_opc(ORIGIN_PASSENGER_COUNT *opc);
 int get_total_passengers_opc(ORIGIN_PASSENGER_COUNT *opc);
@@ -52,7 +52,7 @@ void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights);
 CAT_FLIGHTS *create_cat_flights(char *entry_files);
 void delete_cat_flights(CAT_FLIGHTS *cat_flights);
 void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passengers);
-Flights *get_flights (CAT_FLIGHTS *flights, char *id_flights);
+char *display_flights(CAT_FLIGHTS *flights, char *id_flights);
 GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD);
 gint data_mais_recenteF(gconstpointer a, gconstpointer b);
 GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD);

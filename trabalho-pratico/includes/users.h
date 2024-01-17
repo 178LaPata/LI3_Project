@@ -10,11 +10,11 @@
 typedef struct users Users;
 typedef struct cat_users CAT_USERS;
 
-#include "../../includes/model/date.h"
-#include "../../includes/model/valid.h"
-#include "../../includes/model/passengers.h"
-#include "../../includes/model/reservations.h"
-#include "../../includes/model/flights.h"
+#include "../includes/date.h"
+#include "../includes/valid.h"
+#include "../includes/passengers.h"
+#include "../includes/reservations.h"
+#include "../includes/flights.h"
 
 char *get_id(Users *users);
 char *get_name(Users *users);

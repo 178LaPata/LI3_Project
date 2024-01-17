@@ -1,4 +1,4 @@
-#include "../../includes/model/reservations.h"
+#include "../includes/reservations.h"
 
 // estrutura das reservations
 struct reservations {
@@ -345,18 +345,6 @@ GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations){
     return cat_reservations->reservations_hashtable;
 }
 
-// funcao que converte uma reservations para uma linha
-char *reservations_to_line(Reservations *reservations){
-    char *line = malloc(sizeof(char) * 1000);
-    sprintf(line, "%s;%s;%s;%s;%d;%d;%s;%s;%s;%d;%s;%s;%s;%s", get_id_reservations(reservations), 
-            get_user_id(reservations), get_hotel_id(reservations), get_hotel_name(reservations), 
-            get_hotel_stars(reservations), get_city_tax(reservations), get_adress_reservations(reservations), 
-            date_to_string(get_begin_date(reservations)), date_to_string(get_end_date(reservations)), 
-            get_price_per_night(reservations), get_includes_breakfast(reservations), 
-            get_room_details(reservations), get_rating(reservations), get_comments(reservations));
-    return line;
-}
-
 void update_values_reservations(CAT_RESERVATIONS *cat_reservations){
     GHashTableIter iter;
     gpointer key, value;
@@ -377,8 +365,23 @@ double calculate_total_price(Reservations *reservations){
     return total;
 }
 
-Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id){
-    return g_hash_table_lookup(cat_reservations->reservations_hashtable, id);
+
+char *display_reservations(CAT_RESERVATIONS *cat_reservations, char *id_res){
+    Reservations *reservations = g_hash_table_lookup(cat_reservations->reservations_hashtable, id_res);
+    if (reservations == NULL) return NULL;
+
+    char *hotel_id = get_hotel_id(reservations);
+    char *hotel_name = get_hotel_name(reservations);
+    int hotel_stars = get_hotel_stars(reservations);
+    char *begin_date = date_to_string(get_begin_date(reservations));
+    char *end_date = date_to_string(get_end_date(reservations));
+    char *includes_breakfast = get_includes_breakfast(reservations);
+    int nights = get_nights(reservations);
+    double total_price = get_total_price(reservations);
+
+    char *display = malloc(sizeof(snprintf(NULL, 0, "%s;%s;%d;%s;%s;%s;%d;%.3f", hotel_id, hotel_name, hotel_stars, begin_date, end_date, includes_breakfast, nights, total_price)) + 1);
+    snprintf(display, 100, "%s;%s;%d;%s;%s;%s;%d;%.3f", hotel_id, hotel_name, hotel_stars, begin_date, end_date, includes_breakfast, nights, total_price);
+    return display;
 }
 
 

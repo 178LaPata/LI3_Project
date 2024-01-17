@@ -1,4 +1,4 @@
-#include "../../includes/model/valid.h"
+#include "../includes/valid.h"
 
 enum pay_method verify_payMethod(char *token){
     if (strcasecmp(token,"debit_card") == 0) return debit_card;
@@ -143,14 +143,38 @@ void validate_csv_error(char *line, char *file_name){
     }
 }
 
-void writeToFile(char *line, char *file_name){
+void write_valids_to_file(char *line, char *file_name){
     char file[BUFFER];
-    sprintf(file, "./Entradas/%sOK.csv", file_name);
+    sprintf(file, "./Entrada/%s_valid.csv", file_name);
     FILE *fp_guardar = fopen(file, "a");
     if(fp_guardar != NULL) {
         fprintf(fp_guardar, "%s\n", line);
         fclose(fp_guardar);
     } else {
         printf("Error opening file %s\n", file);
+    }
+}
+
+char *payMethod_to_string(enum pay_method pay_method){
+    switch (pay_method){
+        case debit_card:
+            return "debit_card";
+        case credit_card:
+            return "credit_card";
+        case cash:
+            return "cash";
+        default:
+            return "noPayMethod";
+    }
+}
+
+char *accountStatus_to_string(enum account_status account_status){
+    switch (account_status){
+        case Active:
+            return "active";
+        case Inactive:
+            return "inactive";
+        default:
+            return "NoStatus";
     }
 }

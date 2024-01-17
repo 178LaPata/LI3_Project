@@ -1,4 +1,4 @@
-#include "../../includes/model/users.h"
+#include "../includes/users.h"
 
 // estrutura dos users
 struct users {
@@ -146,7 +146,23 @@ void set_spent_total(Users *users, double spent_total){
     users->spent_total = spent_total;
 }
 
-// cria um user a partir de uma linha do ficheiro e verifica se os dados sao validos
+void valid_user_to_file(Users *u, char *filename){
+    char file[BUFFER];
+    sprintf(file, "./Entrada/%s_valid.csv", filename);
+    FILE *fp_guardar = fopen(file, "a");
+    if(fp_guardar != NULL) {
+        fprintf(fp_guardar, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%.3f\n",
+                u->id, u->name, u->email, u->phone_number,
+                date_to_string(u->birth_date), u->sex, u->passport,
+                u->country_code, u->adress, datetime_to_string(u->account_creation),
+                payMethod_to_string(u->pay_method), accountStatus_to_string(u->account_status),
+                u->flights_total, u->reservations_total, u->spent_total);
+        fclose(fp_guardar);
+    } else {
+        printf("Error opening file %s\n", file);
+    }
+}
+
 Users *create_users(char *line){
     Users *users = malloc(sizeof(Users));
     char *buffer;
@@ -245,10 +261,25 @@ Users *create_users(char *line){
     users->reservations_total = 0;
     users->spent_total = 0.0;
 
-    //writeToFile(copy_line, "users");
+    valid_user_to_file(users, "users"); // escreve um user aka escreve tambem as variaveis que acrescentei
+    write_valids_to_file(copy_line, "users"); // este nao, escreve a linha que leu do csv
+    
     free(copy_line);
     return users;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // da free a um user e as variaveis 
 void delete_users(void *data){
@@ -329,10 +360,24 @@ void delete_cat_users(CAT_USERS *cat_users){
     free(cat_users);
 }
 
-// retorna um user a partir do id
-Users *get_users(CAT_USERS *cat_users, char *id){
-    return g_hash_table_lookup(cat_users->users_hashtable, id);
+char *display_user(CAT_USERS *user, char *id_user){
+    Users *u = g_hash_table_lookup(user->users_hashtable, id_user);
+    if(u == NULL || u->account_status == Inactive) return NULL;
+
+    char *name = get_name(u);
+    char *sex = get_sex(u);
+    char *age = get_age(u);
+    char *country_code = get_country_code(u);
+    char *passport = get_passport(u);
+    int flights_total = get_flights_total(u);
+    int reservations_total = get_reservations_total(u);
+    double spent_total = get_spent_total(u);
+
+    char *display = malloc(sizeof(snprintf(NULL, 0, "%s;%s;%d;%s;%s;%d;%d;%.3f\n", name, sex, age, country_code, passport, flights_total, reservations_total, spent_total)) + 1);
+    snprintf(display, 100, "%s;%s;%d;%s;%s;%d;%d;%.3f\n", name, sex, age, country_code, passport, flights_total, reservations_total, spent_total);
+    return display;
 }
+
 
 void add_flights_total(Users *users, int value){
     users->flights_total += value;

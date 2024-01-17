@@ -1,4 +1,4 @@
-#include "../../includes/model/flights.h"
+#include "../includes/flights.h"
 
 // estrutura dos flights
 struct flights {
@@ -361,9 +361,31 @@ void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passeng
     }
 }
 
-Flights *get_flights (CAT_FLIGHTS *flights, char *id_flights){
-    return g_hash_table_lookup(flights->flights_hashtable, id_flights);
+char *display_flights(CAT_FLIGHTS *flights, char *id_flights){
+    Flights *flight = g_hash_table_lookup(flights->flights_hashtable, id_flights);
+    if(flight == NULL) return NULL;
+    char *airline = get_airline(flight);
+    char *plane = get_plane(flight);
+    char *origin = get_origin(flight);
+    char *destination = get_destination(flight);
+    char *schedule_departure_date datetime_to_string(get_schedule_departure_date(flight));
+    char *schedule_arrival_date = datetime_to_string(get_schedule_arrival_date(flight));
+    int num_passengers = get_num_passengers(flight);
+    int delay = get_delay(flight);
+
+    char *display = malloc(snprintf(NULL, 0, "%s;%s;%s;%s;%s;%s;%d;%d", airline, plane, origin, destination, schedule_departure_date, schedule_arrival_date, num_passengers, delay) + 1);
+    snprintf(display, 100,"%s;%s;%s;%s;%s;%s;%d;%d", airline, plane, origin, destination, schedule_departure_date, schedule_arrival_date, num_passengers, delay);
+    return display;
 }
+
+
+
+
+
+
+
+
+
 
 // funcao que cria uma lista com os flights de uma determinada origem e entre duas datas
 GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD){

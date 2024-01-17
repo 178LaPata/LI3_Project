@@ -1,4 +1,4 @@
-#include "../../includes/model/passengers.h"
+#include "../includes/passengers.h"
 
 // estrutura dos passengers
 struct passengers {

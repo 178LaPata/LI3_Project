@@ -1,4 +1,4 @@
-#include "../../includes/model/catalog.h"
+#include "../includes/catalog.h"
 
 typedef struct catalog {
     CAT_USERS *cat_users;
@@ -81,38 +81,75 @@ void update_hash_userPas(CAT_PASSENGERS *p, CAT_USERS *u){
     }
 }
 
-Users *query1_users_aux(catalog *cat, char *id){
-    return get_users(cat->cat_users, id);
+char *query1(char *input, catalog *cat){
+    char *output;
+    if(verify_only_numbers(input)==1){
+        Flights *fli = query1_flights_aux(cat, input);
+        if (fli) output = display_flights(fli, input);
+    } else {
+        if(strncmp(input, "Book", 4)==0){
+            Reservations *r = query1_reservations_aux(cat, input);
+            if (r) output = display_reservations(r, input);
+        } else {
+            Users *user = query1_users_aux(cat, input);
+            if (user) output = display_users(user, input);
+        }
+    }
+    return output;
 }
 
-Reservations *query1_reservations_aux(catalog *cat, char *id){
-    return get_reservations(cat->cat_reservations, id);
+
+void run_queries(char *queries_path, catalog *cat, int query){
+    int i = (int) strtol(strsep(&queries_path, " "), (char **) NULL, 10);
+    switch(i){
+        case 1:
+            if(queries_path[1] == '0') {
+                //if(queries_path[2] == 'F') {
+                //    char *arg_query = strsep(&queries_path, " ");
+                //    write_to_file_mul_line(query10F(arg_query, cat), query);
+                //}
+                //else{
+                //    char *arg_query = strsep(&queries_path, " ");
+                //    write_to_file_one_line(query10(arg_query, cat), query);
+                //}                
+                break;
+            } else if(queries_path[1] == 'F') {
+                char *arg_query = strsep(&queries_path, " ");
+                write_to_file_mul_line(query1F(arg_query, cat), query);
+            }
+            else{
+                char *arg_query = strsep(&queries_path, " ");
+                write_to_file_one_line(query1(arg_query, cat), query);
+            }
+            break;
+        case 2:
+
+    }
 }
 
-Flights *query1_flights_aux(catalog *cat, char *id){
-    return get_flights(cat->cat_flights, id);
-}
+int run_batch(char* inputs_path, char* queries_path) {
+    catalog *cat = create_catalog(inputs_path);
+    system("exec rm -rf Resultados/*");
 
-double query3_aux(catalog *cat, char *id){
-    return calculate_average_rating(cat->cat_reservations, id);
-}
+    FILE *fp;
+    fp = fopen(queries_path, "r");
+    if (!fp) {
+        perror("Error");
+        return -1;
+    }
 
-GList *query4_aux(catalog *cat, char *hotel_id){
-    return sort_reservations_data(cat->cat_reservations, hotel_id);
-}
+    char *line = NULL;
+    size_t len = 0;
+    int op = 1;
 
-GList *query5_aux(catalog *cat, char *origin, Datetime beginD, Datetime endD){
-    return sort_flights_data(cat->cat_flights, origin, beginD, endD);
-}
+    while (getline(&line, &len, fp) != -1) {
+        line[strcspn(line, "\n")] = 0;
+        run_queries(line, cat, op);
+        op++;
+    }
 
-GList *query6_aux(catalog *cat, char *year){
-    return sort_flights_num_passengers(cat->cat_flights, year);    
-}
-
-int query8_aux(catalog *cat, char *hotel_id, Date begin, Date end){
-    return calcular_receita_total(cat->cat_reservations, hotel_id, begin, end);
-}
-
-GList *query9_aux(catalog *cat, char *user_id){
-    return sort_users_id(cat->cat_users, user_id);
+    free(line);
+    fclose(fp);
+    delete_catalog(cat);
+    return 0;
 }

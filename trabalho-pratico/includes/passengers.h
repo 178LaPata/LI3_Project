@@ -9,10 +9,10 @@ typedef struct passengers Passengers;
 typedef struct cat_passengers CAT_PASSENGERS;
 typedef struct list_passengers List_Passengers;
 
-#include "../../includes/model/date.h"
-#include "../../includes/model/valid.h"
-#include "../../includes/model/users.h"
-#include "../../includes/model/flights.h"
+#include "../includes/date.h"
+#include "../includes/valid.h"
+#include "../includes/users.h"
+#include "../includes/flights.h"
 
 List_Passengers *create_passenger_list(Passengers* passengers);
 void delete_passenger_list(void *data);

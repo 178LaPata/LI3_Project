@@ -8,9 +8,9 @@
 typedef struct reservations Reservations;
 typedef struct cat_reservations CAT_RESERVATIONS;
 
-#include "../../includes/model/date.h"
-#include "../../includes/model/valid.h"
-#include "../../includes/model/users.h"
+#include "../includes/date.h"
+#include "../includes/valid.h"
+#include "../includes/users.h"
 
 char *get_id_reservations(Reservations *reservations);
 char *get_user_id(Reservations *reservations);
