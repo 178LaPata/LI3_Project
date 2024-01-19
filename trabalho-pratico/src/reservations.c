@@ -323,22 +323,19 @@ int create_reservations_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-
+    int first_line = 1;
+    
     FILE *fp2 = fopen("entrada/reservations_valid.csv", "w");
     if (!fp2) return -1;
     
     while(fgets(buffer, 1000000, fp)){
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
         buffer2 = strdup(buffer); 
         Reservations *r = create_reservations(buffer2);
-        if(r != NULL) {
-            set_nights(r, calculate_days(r->begin_date, r->end_date));
-            set_total_price(r, calculate_total_price(r));
-            char *buffer3 = reservation_toString(r);
-            fprintf(fp2, "%s\n", buffer3);
-            // sq aqui insiro na cache
-            free(buffer3);
-            delete_reservations(r);
-        }
+        if(r != NULL) fprintf(fp2, "%s\n", buffer2);
     }
 
     end = clock();
@@ -348,6 +345,35 @@ int create_reservations_valid_file(char *file){
     fclose(fp2);
     return 0;
 }
+
+int create_reservations_aux_file(){
+    FILE *fp = fopen("entrada/reservations_valid.csv", "r");
+    if(!fp) return 1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;
+
+    FILE *fp2 = fopen("entrada/reservations_valid2.csv", "w");
+    if (!fp2) return -1;
+
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        Reservations *r = create_reservations(buffer2);
+        if(r != NULL) {
+            set_nights(r, calculate_days(r->begin_date, r->end_date));
+            set_total_price(r, calculate_total_price(r));
+            char *buffer3 = reservation_to_string(r);
+            fprintf(fp2, "%s\n", buffer3);
+            free(buffer3);
+            delete_reservations(r);
+        }
+    }
+    fclose(fp);
+    fclose(fp2);
+    return 0;
+}
+
+
 double calculate_total_price(Reservations *reservations){
     int dias = get_nights(reservations);
     double custo_por_estadia = (double) reservations->price_per_night * (double) dias;
@@ -482,8 +508,8 @@ gint data_mais_recente(gconstpointer a, gconstpointer b){
 
 // query3 
 // nao sei como fazer para meter a procurar primeiro na cache e so depois no ficheiro
-char *calculate_average_rating(char *file, char *hotel_id) {
-    FILE *fp = fopen(file, "r");
+char *calculate_average_rating(char *hotel_id) {\
+    FILE *fp = fopen("entrada/reservations_valid.csv", "r");
     if(!fp) return NULL;
 
     char buffer[1000000];
@@ -534,8 +560,8 @@ int calculate_total_price_between_dates(Reservations *reservations, Date begin, 
     return total;
 }
 
-char *calculate_total_revenue(char *file, char *hotel_id, Date begin, Date end) {
-    FILE *fp = fopen(file, "r");
+char *calculate_total_revenue(char *hotel_id, Date begin, Date end) {
+    FILE *fp = fopen("entrada/reservations_valid.csv", "r"); 
     if (!fp) return NULL;
 
     char buffer[1000];

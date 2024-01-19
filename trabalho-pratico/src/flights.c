@@ -319,24 +319,51 @@ int create_flights_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
+    int first_line = 1;
 
     FILE *fp2 = fopen("entrada/flights_valid.csv", "w");
     if (!fp2) return -1;
     
+    while(fgets(buffer, 1000000, fp)){
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
+        buffer2 = strdup(buffer); 
+        Flights *f = create_flights(buffer2);
+        if(f != NULL) fprintf(fp2, "%s\n", buffer2);
+    }
+
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Time to parse flights.csv: %f\n", cpu_time_used);
+    fclose(fp);
+    fclose(fp2);
+    return 0;
+}
+
+
+int create_flights_aux_file(){
+    FILE *fp = fopen("entrada/flights_valid.csv", "r");
+    if(!fp) return 1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+    
+    FILE *fp2 = fopen("entrada/flights_valid2.csv", "w");
+    if (!fp2) return -1;
+
     while(fgets(buffer, 1000000, fp)){
         buffer2 = strdup(buffer); 
         Flights *f = create_flights(buffer2);
         if(f != NULL) {
             set_num_passengers(f, get_number_passengers(f->id_flights));
             set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
-            char *buffer3 = flights_toString(f);
+            char *buffer3 = flights_to_string(f);
             fprintf(fp2, "%s\n", buffer3);
         }
     }
 
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("Time to parse flights.csv: %f\n", cpu_time_used);
     fclose(fp);
     fclose(fp2);
     return 0;

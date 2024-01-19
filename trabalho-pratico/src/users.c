@@ -197,6 +197,7 @@ Users *cache_users_lookup(CACHE_USERS *cache_users, char *id){
 }
 
 Users *create_users(char *line){
+    printf("%s\n", line);
     Users *users = malloc(sizeof(Users));
     char *buffer;
     int i = 0;
@@ -224,6 +225,7 @@ Users *create_users(char *line){
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
+                printf("%s\n", buffer);
                 if (strlen(buffer) == 0) val = 0;
                 users->id = strdup(buffer);
                 break;
@@ -298,6 +300,7 @@ Users *create_users(char *line){
 }
 
 int create_users_valid_file(char *file){
+
     FILE *fp = fopen(file, "r");
     if(!fp) return 1;
 
@@ -309,24 +312,21 @@ int create_users_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
+    int first_line = 1;
 
     FILE *fp2 = fopen("entrada/users_valid.csv", "w");
     if (!fp2) return -1;
     
     while(fgets(buffer, 1000000, fp)){
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
         buffer2 = strdup(buffer); 
         Users *u = create_users(buffer2);
         if(u != NULL || get_account_status(u) != 2) {
-            int i = verify_user_reservation(u->id);
-            if(i == 1){
-                add_reservations_total(u, 1);
-                add_spent_total(u, calculate_total_price_user(u->id));
-                add_flights_total(u, verify_passenger(u->id));
-            }
-            char *buffer3 = user_to_string(u);
-            fprintf(fp2, "%s\n", buffer3);
-            free(buffer3);
-            delete_users(u);
+            fprintf(fp2, "%s\n", buffer2);
+            free(u);
         }
     }
 
@@ -344,20 +344,27 @@ int create_users_aux_file(){
 
     char buffer[1000000];
     char *buffer2 = NULL;
-    char *id = NULL;  
-    char *name = NULL;
     FILE *fp3 = fopen("entrada/users_name.csv", "w");
+    FILE *fp4 = fopen("entrada/users_valid2.csv", "w");
     if (!fp3) return -1;
 
     while(fgets(buffer, 1000000, fp2)){
         buffer2 = strdup(buffer);
-        id = strsep(&buffer2, ";");
-        name = strsep(&buffer2, ";");
-        fprintf(fp3, "%s;%s\n", id, name);
+        Users *u = create_users(buffer2);
+        fprintf(fp3, "%s;%s\n", u->id, u->name);
+        int i = verify_user_reservation(u->id);
+        if(i == 1){
+            add_reservations_total(u, 1);
+            add_spent_total(u, calculate_total_price_user(u->id));
+            add_flights_total(u, verify_passenger(u->id));
+        }
+        char *buffer3 = user_to_string(u);
+        fprintf(fp4, "%s\n", buffer3);
     }
     
     fclose(fp2);
     fclose(fp3);
+    fclose(fp4);
     sort_users_by_name("entrada/users_name.csv");
     return 0;
 }
