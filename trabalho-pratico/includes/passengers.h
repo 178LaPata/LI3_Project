@@ -23,4 +23,5 @@ Passengers *create_passengers(char *line);
 int create_passengers_valid_file(char *file);
 int compare_id_flights(const void *a, const void *b);
 int get_number_passengers(char *flight_id);
+Passengers *search_passenger(CACHE_PASSENGERS *cache_passengers, char *user_id);
 int verify_passenger(char *user_id);

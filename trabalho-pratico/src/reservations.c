@@ -356,7 +356,7 @@ double calculate_total_price(Reservations *reservations){
     return total;
 }
 
-char *reservation_toString(Reservations *r){
+char *reservation_to_string(Reservations *r){
     char *id_reser = get_id_reservations(r);
     char *user_id = get_user_id(r);
     char *hotel_id = get_hotel_id(r);
@@ -380,6 +380,34 @@ char *reservation_toString(Reservations *r){
     includes_breakfast, room_details, rating, comments, nights, price_res);
     return res;
 }
+
+Reservations *search_reservation(CACHE_RESERVATIONS *cache_reservations, char *id_res){
+    Reservations *reservations = cache_reservations_lookup(cache_reservations, id_res);
+    if(reservations != NULL) return reservations;
+
+    FILE *fp = fopen("entrada/reservations_valid.csv", "r");
+    if(!fp) return NULL;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        Reservations *r = create_reservations(buffer2);
+        if(strcmp(get_id_reservations(r), id_res) == 0){
+            reservations = r;
+            insert_cache_reservations(cache_reservations, reservations);
+            free(buffer2);
+            fclose(fp);
+            return reservations;
+        }
+        delete_reservations(r);
+        free(buffer2);
+    }
+    fclose(fp);
+    return NULL;
+}
+
 
 // ---------------- funcoes update users ----------------
 

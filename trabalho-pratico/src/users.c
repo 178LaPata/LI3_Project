@@ -457,3 +457,30 @@ int verify_user(char *id){
     fclose(fp);
     return val;
 }
+
+Users *search_user(CACHE_USERS *cache_users, char *id){
+    Users *users = cache_users_lookup(cache_users, id);
+    if(users == NULL){
+        FILE *fp = fopen("entrada/users_valid.csv", "r");
+        if(!fp) return NULL;
+
+        char buffer[1000000];
+        char *buffer2 = NULL;  
+        char *id2 = NULL;
+        int val = 0;
+
+        while(fgets(buffer, 1000000, fp)){
+            buffer2 = strdup(buffer); 
+            id2 = strsep(&buffer2, ";");
+            if(strcmp(id, id2) == 0) {
+                users = create_users(buffer);
+                insert_cache_users(cache_users, users);
+                val = 1;
+            }
+        }
+
+        fclose(fp);
+        if(val == 0) return NULL;
+    }
+    return users;
+}

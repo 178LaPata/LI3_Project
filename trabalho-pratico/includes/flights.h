@@ -50,6 +50,7 @@ void insert_cache_flights(CACHE_FLIGHTS *cache_flights, Flights *flights);
 Flights *cache_flights_lookup(CACHE_FLIGHTS *cache_flights, char *id);
 Flights *create_flights(char *line);
 int create_flights_valid_file(char *file);
-char *flights_toString(Flights *fli);
+char *flights_to_string(Flights *fli);
+Flights *search_flight(CACHE_FLIGHTS *cache_flights, char *flight_id);
 int verify_flight(char *id);
 

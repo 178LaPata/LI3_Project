@@ -33,16 +33,16 @@ CACHE_PASSENGERS *create_new_cache_passengers(int capacity){
 }
 
 void insert_cache_passengers(CACHE_PASSENGERS *cache_passengers, Passengers *passengers){
-    if(g_hash_table_contains(cache_passengers->passengers_cache, passengers->flight_id)){
+    if(g_hash_table_contains(cache_passengers->passengers_cache, passengers->user_id)){
         g_queue_remove(cache_passengers->passengers_queue, passengers);
         g_queue_push_head(cache_passengers->passengers_queue, passengers);
     }
     else{
         if(g_queue_get_length(cache_passengers->passengers_queue) == cache_passengers->capacity){
             Passengers *p = g_queue_pop_tail(cache_passengers->passengers_queue);
-            g_hash_table_remove(cache_passengers->passengers_cache, p->flight_id);
+            g_hash_table_remove(cache_passengers->passengers_cache, p->user_id);
         }
-        g_hash_table_insert(cache_passengers->passengers_cache, passengers->flight_id, passengers);
+        g_hash_table_insert(cache_passengers->passengers_cache, passengers->user_id, passengers);
         g_queue_push_head(cache_passengers->passengers_queue, passengers);
     }
 }
@@ -169,6 +169,33 @@ int get_number_passengers(char *flight_id){
     fclose(fp);
     return i;
 }
+
+Passengers *search_passenger(CACHE_PASSENGERS *cache_passengers, char *user_id){
+    Passengers *passengers = cache_passengers_lookup(cache_passengers, user_id);
+    if(passengers != NULL) return passengers;
+
+    FILE *fp = fopen("entrada/passengers_valid.csv", "r");
+    if(!fp) return NULL;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+
+    while (fgets(buffer, 1000000, fp) != NULL) {
+        buffer2 = strdup(buffer);
+        char *id = strsep(&buffer2, ";");
+        if (strcmp(id, user_id) == 0) {
+            passengers = create_passengers(buffer);
+            insert_cache_passengers(cache_passengers, passengers);
+            free(buffer2);
+            fclose(fp);
+            return passengers;
+        }
+        free(buffer2);
+    }
+    fclose(fp);
+    return NULL;
+}
+
 
 int verify_passenger(char *user_id){
     FILE *fp = fopen("entrada/passengers_valid.csv", "r");

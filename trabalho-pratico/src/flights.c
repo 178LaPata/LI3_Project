@@ -342,7 +342,7 @@ int create_flights_valid_file(char *file){
     return 0;
 }
 
-char *flights_toString(Flights *fli){
+char *flights_to_string(Flights *fli){
     char *id_fli = get_id_flights(fli);
     char *airline = get_airline(fli);
     char *plane = get_plane(fli);
@@ -363,6 +363,31 @@ char *flights_toString(Flights *fli){
 
 }
 
+Flights *search_flight(CACHE_FLIGHTS *cache_flights, char *flight_id){
+    Flights *flights = cache_flights_lookup(cache_flights, flight_id);
+    if(flights != NULL) return flights;
+
+    FILE *fp = fopen("entrada/flights_valid.csv", "r");
+    if(!fp) return NULL;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+
+    while (fgets(buffer, 1000000, fp) != NULL) {
+        buffer2 = strdup(buffer);
+        char *id = strsep(&buffer2, ";");
+        if (strcmp(id, flight_id) == 0) {
+            flights = create_flights(buffer);
+            insert_cache_flights(cache_flights, flights);
+            free(buffer2);
+            return flights;
+        }
+        free(buffer2);
+    }
+    fclose(fp);
+    return NULL;
+}
+
 int verify_flight(char *id){
     FILE *fp = fopen("entrada/flights_valid.csv", "r");
     if(!fp) return 1;
@@ -381,5 +406,3 @@ int verify_flight(char *id){
     fclose(fp);
     return val;
 }
-
-

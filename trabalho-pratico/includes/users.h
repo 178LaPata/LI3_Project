@@ -61,4 +61,5 @@ void add_reservations_total(Users *users, int value);
 void add_spent_total(Users *users, double value);
 int compare_users(const void *a, const void *b);
 int sort_users_by_name(char *file);
+Users *search_user(CACHE_USERS *cache_users, char *id);
 int verify_user(char *id);

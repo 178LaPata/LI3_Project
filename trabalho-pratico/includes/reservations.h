@@ -53,7 +53,8 @@ Reservations *cache_reservations_lookup(CACHE_RESERVATIONS *cache_reservations, 
 Reservations *create_reservations(char *line);
 int create_reservations_valid_file(char *file);
 double calculate_total_price(Reservations *reservations);
-char *reservation_toString(Reservations *r);
+char *reservation_to_string(Reservations *r);
+Reservations *search_reservation(CACHE_RESERVATIONS *cache_reservations, char *id_res);
 int verify_user_reservation(char *user_id);
 double calculate_total_price_user(char *user_id);
 gint data_mais_recente(gconstpointer a, gconstpointer b);
