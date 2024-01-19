@@ -1,6 +1,5 @@
 #include "../includes/users.h"
 
-// estrutura dos users
 struct users {
     char *id;
     char *name;
@@ -19,10 +18,10 @@ struct users {
     int reservations_total;
     double spent_total;
 };
-
-// estrutura da hashtable dos users
-struct cat_users {
-    GHashTable *users_hashtable;
+struct cache_users {
+    GHashTable *users_cache;
+    GQueue *users_queue;
+    int capacity;
 };
 
 char *get_id(Users *users){
@@ -85,7 +84,6 @@ double get_spent_total(Users *users){
     return users->spent_total;
 }
 
-
 void set_id(Users *users, char *id){
     users->id = strdup(id);
 }
@@ -146,21 +144,56 @@ void set_spent_total(Users *users, double spent_total){
     users->spent_total = spent_total;
 }
 
-void valid_user_to_file(Users *u, char *filename){
-    char file[BUFFER];
-    sprintf(file, "./Entrada/%s_valid.csv", filename);
-    FILE *fp_guardar = fopen(file, "a");
-    if(fp_guardar != NULL) {
-        fprintf(fp_guardar, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%.3f\n",
-                u->id, u->name, u->email, u->phone_number,
-                date_to_string(u->birth_date), u->sex, u->passport,
-                u->country_code, u->adress, datetime_to_string(u->account_creation),
-                payMethod_to_string(u->pay_method), accountStatus_to_string(u->account_status),
-                u->flights_total, u->reservations_total, u->spent_total);
-        fclose(fp_guardar);
-    } else {
-        printf("Error opening file %s\n", file);
+void delete_users(void *data){
+    Users *users = (Users *) data;
+    free(users->id);
+    free(users->name);
+    free(users->email);
+    free_date(users->birth_date);
+    free(users->sex);
+    free(users->passport);
+    free(users->country_code);
+    free(users->adress);
+    free_datetime(users->account_creation);
+    free(users);
+}
+
+void delete_cache_users(CACHE_USERS *cache_users){
+    g_hash_table_destroy(cache_users->users_cache);
+    g_queue_free(cache_users->users_queue);
+    free(cache_users);
+}
+
+CACHE_USERS *create_new_cache_users(int capacity){
+    CACHE_USERS *cache_users = malloc(sizeof(struct cache_users));
+    cache_users->users_cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_users);
+    cache_users->users_queue = g_queue_new();
+    cache_users->capacity = capacity;
+    return cache_users;
+}
+
+void insert_cache_users(CACHE_USERS *cache_users, Users *users){
+    if(g_hash_table_contains(cache_users->users_cache, users->id)){
+        g_queue_remove(cache_users->users_queue, users);
+        g_queue_push_head(cache_users->users_queue, users);
     }
+    else{
+        if(g_queue_get_length(cache_users->users_queue) == cache_users->capacity){
+            Users *u = g_queue_pop_tail(cache_users->users_queue);
+            g_hash_table_remove(cache_users->users_cache, u->id);
+        }
+        g_hash_table_insert(cache_users->users_cache, users->id, users);
+        g_queue_push_head(cache_users->users_queue, users);
+    }
+}
+
+Users *cache_users_lookup(CACHE_USERS *cache_users, char *id){
+    Users *users = g_hash_table_lookup(cache_users->users_cache, id);
+    if(users != NULL){
+        g_queue_remove(cache_users->users_queue, users);
+        g_queue_push_head(cache_users->users_queue, users);
+    }
+    return users;
 }
 
 Users *create_users(char *line){
@@ -187,7 +220,6 @@ Users *create_users(char *line){
     users->flights_total = 0;
     users->reservations_total = 0;
     users->spent_total = 0.0;
-
 
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
@@ -261,129 +293,102 @@ Users *create_users(char *line){
     users->reservations_total = 0;
     users->spent_total = 0.0;
 
-    valid_user_to_file(users, "users"); // escreve um user aka escreve tambem as variaveis que acrescentei
-    write_valids_to_file(copy_line, "users"); // este nao, escreve a linha que leu do csv
-    
     free(copy_line);
     return users;
 }
 
+int create_users_valid_file(char *file){
+    FILE *fp = fopen(file, "r");
+    if(!fp) return 1;
 
-
-
-
-
-
-
-
-
-
-
-
-
-// da free a um user e as variaveis 
-void delete_users(void *data){
-    Users *users = (Users *) data;
-    free(users->id);
-    free(users->name);
-    free(users->email);
-    free_date(users->birth_date);
-    free(users->sex);
-    free(users->passport);
-    free(users->country_code);
-    free(users->adress);
-    free_datetime(users->account_creation);
-    free(users);
-}
-
-// insere um user na hashtable
-void insert_users(CAT_USERS *cat_users, Users *users){
-    g_hash_table_insert(cat_users->users_hashtable, users->id, users);
-}
-
-// cria e preenche a hashtable dos users
-CAT_USERS *create_cat_users(char *entry_files){
-
-    FILE *fp;
-    char open[50];
-    strcpy(open, entry_files);
-    fp = fopen(open, "r");
-    if (!fp) {
-        perror("Error opening users.csv");
-        return NULL;
-    }
-
-
-    CAT_USERS *cat_users = malloc(sizeof(struct cat_users));
-    cat_users->users_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_users);
-
+    char buffer[1000000];
+    char *buffer2 = NULL;  
     char *linha = "id;name;email;phone_number;birth_date;sex;passport;country_code;address;account_creation;pay_method;account_status";
     validate_csv_error(linha, "users");
 
-    char *line = NULL;
-    size_t len = 0;
-
     clock_t start, end;
     double cpu_time_used;
-
-    int first_line = 1;
-
     start = clock();
 
-    while (getline(&line, &len, fp) > 0) {
-        if (first_line) {
-            first_line = 0;
-            continue;
+    FILE *fp2 = fopen("entrada/users_valid.csv", "w");
+    if (!fp2) return -1;
+    
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        Users *u = create_users(buffer2);
+        if(u != NULL || get_account_status(u) != 2) {
+            int i = verify_user_reservation(u->id);
+            if(i == 1){
+                add_reservations_total(u, 1);
+                add_spent_total(u, calculate_total_price_user(u->id));
+                add_flights_total(u, verify_passenger(u->id));
+            }
+            char *buffer3 = user_to_string(u);
+            fprintf(fp2, "%s\n", buffer3);
+            free(buffer3);
+            delete_users(u);
         }
-        line[strcspn(line, "\n")] = 0;
-
-        Users *u = create_users(line);
-        if (u != NULL) insert_users(cat_users, u);
-        //delete_users(u);
     }
 
     end = clock();
-
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
     printf("Time to parse users.csv: %f\n", cpu_time_used);
-
-    free(line);
     fclose(fp);
-
-    return cat_users;
+    fclose(fp2);    
+    return 0;
 }
+
+int create_users_aux_file(){
+    FILE *fp2 = fopen("entrada/users_valid.csv", "r");
+    if(!fp2) return 1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;
+    char *id = NULL;  
+    char *name = NULL;
+    FILE *fp3 = fopen("entrada/users_name.csv", "w");
+    if (!fp3) return -1;
+
+    while(fgets(buffer, 1000000, fp2)){
+        buffer2 = strdup(buffer);
+        id = strsep(&buffer2, ";");
+        name = strsep(&buffer2, ";");
+        fprintf(fp3, "%s;%s\n", id, name);
+    }
     
-// da free a hashtable dos users
-void delete_cat_users(CAT_USERS *cat_users){
-    g_hash_table_destroy(cat_users->users_hashtable);
-    free(cat_users);
+    fclose(fp2);
+    fclose(fp3);
+    sort_users_by_name("entrada/users_name.csv");
+    return 0;
 }
 
-char *display_user(CAT_USERS *user, char *id_user){
-    Users *u = g_hash_table_lookup(user->users_hashtable, id_user);
-    if(u == NULL || u->account_status == Inactive) return NULL;
+char *user_to_string(Users *user){
+    char *id = get_id(user);
+    char *name = get_name(user);
+    char *email = get_email(user);
+    char *phone_number = get_phone_number(user);
+    char *birth_date = date_to_string(get_birth_date(user));
+    char *sex = get_sex(user);
+    char *passport = get_passport(user);
+    char *country_code = get_country_code(user);
+    char *adress = get_adress(user);
+    char *account_creation = datetime_to_string(get_account_creation(user));
+    char *pay_method = payMethod_to_string(get_pay_method(user));
+    char *account_status = accountStatus_to_string(get_account_status(user));
+    int flights_total = get_flights_total(user);
+    int reservations_total = get_reservations_total(user);
+    double spent_total = get_spent_total(user);
 
-    char *name = get_name(u);
-    char *sex = get_sex(u);
-    char *age = get_age(u);
-    char *country_code = get_country_code(u);
-    char *passport = get_passport(u);
-    int flights_total = get_flights_total(u);
-    int reservations_total = get_reservations_total(u);
-    double spent_total = get_spent_total(u);
-
-    char *display = malloc(sizeof(snprintf(NULL, 0, "%s;%s;%d;%s;%s;%d;%d;%.3f\n", name, sex, age, country_code, passport, flights_total, reservations_total, spent_total)) + 1);
-    snprintf(display, 100, "%s;%s;%d;%s;%s;%d;%d;%.3f\n", name, sex, age, country_code, passport, flights_total, reservations_total, spent_total);
-    return display;
+    char *res = malloc(sizeof(char) * 1000);
+    sprintf(res, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%.3f", id, name, email, phone_number, birth_date, sex,
+            passport, country_code, adress, account_creation, pay_method, account_status, flights_total, reservations_total, spent_total);
+    return res; 
 }
-
 
 void add_flights_total(Users *users, int value){
     users->flights_total += value;
 }
 
-// funcao que adiciona um valor ao total de reservas de um user
 void add_reservations_total(Users *users, int value){
     users->reservations_total += value;
 }
@@ -392,34 +397,63 @@ void add_spent_total(Users *users, double value){
     users->spent_total += value;
 }
 
-// funcao que cria uma lista com os users em que o prefixo passado corresponde ao prefixo do id e a conta nao esta inativa
-GList *list_users_prefixo(CAT_USERS *cat_users, char *prefix){
-    GHashTableIter iter;
-    gpointer key, value;
-    GList *list = NULL;
-
-    g_hash_table_iter_init(&iter, cat_users->users_hashtable);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        Users *users = (Users *) value;
-        if(strncmp(get_name(users), prefix, strlen(prefix)) == 0 && get_account_status(users) != 2)
-            list = g_list_prepend(list, users);
-    }
-    return list;
-}
-
-// funcao que compara dois users por nome e id
-gint ordena_id(gconstpointer a, gconstpointer b){
+int compare_users(const void *a, const void *b) {
     Users *u1 = (Users *) a;
     Users *u2 = (Users *) b;
-    if(strcoll(get_name(u1), get_name(u2)) == 0)
-        return strcoll(get_id(u1), get_id(u2));
-    else
-        return strcoll(get_name(u1), get_name(u2));
+    int namecomp = strcmp(u1->name, u2->name);
+    if (namecomp == 0) return strcmp(u1->id, u2->id);
+    return namecomp;
 }
 
-// funcao que cria uma lista com os users ordenados por id
-GList *sort_users_id(CAT_USERS *cat_users, char *prefix){
-    GList *list = list_users_prefixo(cat_users, prefix);
-    list = g_list_sort(list, ordena_id);
-    return list;
+int sort_users_by_name(char *file) {
+    FILE *fp = fopen(file, "r");
+    FILE *fp2 = fopen("entrada/users_name_sorted.csv", "w");
+    if (!fp || !fp2) return -1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;
+    Users *users = NULL;
+    size_t n = 0;
+
+    while(fgets(buffer, sizeof(buffer), fp)) {
+        buffer2 = strdup(buffer);
+        users = malloc(sizeof(Users));
+        char *id = strsep(&buffer2, ";");
+        char *name = strsep(&buffer2, ";");
+        users[n].id = strdup(id);
+        users[n].name = strdup(name);
+        n++;
+    }
+
+    qsort(users, n, sizeof(Users), compare_users);
+
+    for(int i = 0; i < n; i++) {
+        fprintf(fp2, "%s;%s\n", users[i].id, users[i].name);
+        free(users[i].id);
+        free(users[i].name);
+    }
+    free(users);
+    fclose(fp);
+    fclose(fp2);
+    return 0;
+}
+
+// verifica se o user existe no ficheiro dos validos
+int verify_user(char *id){
+    FILE *fp = fopen("entrada/users_valid.csv", "r");
+    if(!fp) return 1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+    char *id2 = NULL;
+    int val = 0;
+
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        id2 = strsep(&buffer2, ";");
+        if(strcmp(id, id2) == 0) val = 1;
+    }
+
+    fclose(fp);
+    return val;
 }

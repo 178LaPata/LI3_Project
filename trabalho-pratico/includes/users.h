@@ -8,7 +8,7 @@
 #include <locale.h>
 
 typedef struct users Users;
-typedef struct cat_users CAT_USERS;
+typedef struct cache_users CACHE_USERS;
 
 #include "../includes/date.h"
 #include "../includes/valid.h"
@@ -47,15 +47,18 @@ void set_flights_total(Users *users, int flights_total);
 void set_reservations_total(Users *users, int reservations_total);
 void set_spent_total(Users *users, double spent_total);
 
-Users *create_users(char *line);
 void delete_users(void *data);
-void insert_users(CAT_USERS *cat_users, Users *users);
-CAT_USERS *create_cat_users(char *entry_files);
-void delete_cat_users(CAT_USERS *cat_users);
-Users *get_users(CAT_USERS *cat_users, char *id);
+void delete_cache_users(CACHE_USERS *cache_users);
+CACHE_USERS *create_new_cache_users(int capacity);
+void insert_cache_users(CACHE_USERS *cache_users, Users *users);
+Users *cache_users_lookup(CACHE_USERS *cache_users, char *id);
+Users *create_users(char *line);
+int create_users_valid_file(char *file);
+int create_users_aux_file();
+char *user_to_string(Users *user);
 void add_flights_total(Users *users, int value);
 void add_reservations_total(Users *users, int value);
 void add_spent_total(Users *users, double value);
-GList *list_users_prefixo(CAT_USERS *cat_users, char *prefix);
-gint ordena_id(gconstpointer a, gconstpointer b);
-GList *sort_users_id(CAT_USERS *cat_users, char *prefix);
+int compare_users(const void *a, const void *b);
+int sort_users_by_name(char *file);
+int verify_user(char *id);

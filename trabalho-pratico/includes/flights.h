@@ -6,15 +6,12 @@
 #include <stdio.h>
 
 typedef struct flights Flights; 
-typedef struct cat_flights CAT_FLIGHTS;
-typedef struct origin_passenger_count ORIGIN_PASSENGER_COUNT;  
+typedef struct cache_flights CACHE_FLIGHTS;
 
 #include "../includes/date.h"
 #include "../includes/valid.h"
 #include "../includes/passengers.h"
 
-char *get_origin_opc(ORIGIN_PASSENGER_COUNT *opc);
-int get_total_passengers_opc(ORIGIN_PASSENGER_COUNT *opc);
 char *get_id_flights(Flights *flights);
 char *get_airline(Flights *flights);
 char *get_plane(Flights *flights);
@@ -46,18 +43,13 @@ void set_notes(Flights *flights, char *notes);
 void set_num_passengers(Flights *flights, int num_passengers);
 void set_delay(Flights *flights, int delay);
 
-Flights *create_flights(char *line);
 void delete_flights(void *data);
-void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights);
-CAT_FLIGHTS *create_cat_flights(char *entry_files);
-void delete_cat_flights(CAT_FLIGHTS *cat_flights);
-void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passengers);
-char *display_flights(CAT_FLIGHTS *flights, char *id_flights);
-GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD);
-gint data_mais_recenteF(gconstpointer a, gconstpointer b);
-GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD);
-GList *list_flights_year(CAT_FLIGHTS *cat_flights, char *year);
-GList *convert_hash_to_list(GList *list);
-void free_origin_passenger_count(ORIGIN_PASSENGER_COUNT *opc);
-gint origin_with_more_passengers(gconstpointer a, gconstpointer b);
-GList *sort_flights_num_passengers(CAT_FLIGHTS *cat_flights, char *year);
+void delete_cache_flights(CACHE_FLIGHTS *cache_flights);
+CACHE_FLIGHTS *create_new_cache_flights(int capacity);
+void insert_cache_flights(CACHE_FLIGHTS *cache_flights, Flights *flights);
+Flights *cache_flights_lookup(CACHE_FLIGHTS *cache_flights, char *id);
+Flights *create_flights(char *line);
+int create_flights_valid_file(char *file);
+char *flights_toString(Flights *fli);
+int verify_flight(char *id);
+

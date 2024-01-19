@@ -17,7 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: $(SDIR)/%.c
 	mkdir -p $(@D)
 	mkdir -p Resultados
-	mkdir -p Entrada
+	mkdir -p entrada
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 # Regra para compilar o programa principal
@@ -29,6 +29,6 @@ programa-principal: $(OBJ)
 
 clean:
 	rm -f programa-principal
-	rm -r Entrada
 	rm -r $(ODIR)
 	rm -r Resultados
+	rm -r entrada

@@ -15,28 +15,16 @@ struct flights {
     char *pilot;
     char *copilot;
     char *notes;
-    
-    int num_passengers;
-    int delay;
-};
 
-// estrutura da hashtable dos flights
-struct cat_flights {
-    GHashTable *flights_hashtable;
-};
-
-struct origin_passenger_count {
-    char *origin;
     int total_passengers;
+    int median_delay;
 };
 
-char *get_origin_opc(ORIGIN_PASSENGER_COUNT *opc) {
-    return opc->origin;
-}
-
-int get_total_passengers_opc(ORIGIN_PASSENGER_COUNT *opc) {
-    return opc->total_passengers;
-}
+struct cache_flights {
+    GHashTable *flights_cache;
+    GQueue *flights_queue;
+    int capacity;
+};
 
 char *get_id_flights(Flights *flights){
     return flights->id_flights;
@@ -91,11 +79,11 @@ char *get_notes(Flights *flights){
 }
 
 int get_num_passengers(Flights *flights){
-    return flights->num_passengers;
+    return flights->total_passengers;
 }
 
 int get_delay(Flights *flights){
-    return flights->delay;
+    return flights->median_delay;
 }
 
 void set_id_flights(Flights *flights, char *id_flights){
@@ -151,14 +139,68 @@ void set_notes(Flights *flights, char *notes){
 }
 
 void set_num_passengers(Flights *flights, int num_passengers){
-    flights->num_passengers = num_passengers;
+    flights->total_passengers = num_passengers;
 }
 
 void set_delay(Flights *flights, int delay){
-    flights->delay = delay;
+    flights->median_delay = delay;
 }
 
-// cria um flights a partir de uma linha do ficheiro e verifica se os dados sao validos
+void delete_flights(void *data){
+    Flights *flights = (Flights *) data;
+    free(flights->id_flights);
+    free(flights->airline);
+    free(flights->plane_model);
+    free(flights->origin);
+    free(flights->destination);
+    free(flights->pilot);
+    free(flights->copilot);
+    free(flights->notes);
+    free_datetime(flights->schedule_departure_date);
+    free_datetime(flights->schedule_arrival_date);
+    free_datetime(flights->real_departure_date);
+    free_datetime(flights->real_arrival_date);
+    free(flights);
+}
+
+void delete_cache_flights(CACHE_FLIGHTS *cache_flights){
+    g_hash_table_destroy(cache_flights->flights_cache);
+    g_queue_free(cache_flights->flights_queue);
+    free(cache_flights);
+}
+
+CACHE_FLIGHTS *create_new_cache_flights(int capacity){
+    CACHE_FLIGHTS *cache_flights = malloc(sizeof(struct cache_flights));
+    cache_flights->flights_cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_flights);
+    cache_flights->flights_queue = g_queue_new();
+    cache_flights->capacity = capacity;
+    return cache_flights;
+}
+
+void insert_cache_flights(CACHE_FLIGHTS *cache_flights, Flights *flights){
+    if(g_hash_table_contains(cache_flights->flights_cache, flights->id_flights)){
+        g_queue_remove(cache_flights->flights_queue, flights);
+        g_queue_push_head(cache_flights->flights_queue, flights);
+    }
+    else{
+        if(g_queue_get_length(cache_flights->flights_queue) == cache_flights->capacity){
+            Flights *f = g_queue_pop_tail(cache_flights->flights_queue);
+            g_hash_table_remove(cache_flights->flights_cache, f->id_flights);
+        }
+        g_hash_table_insert(cache_flights->flights_cache, flights->id_flights, flights);
+        g_queue_push_head(cache_flights->flights_queue, flights);
+    }
+}
+
+Flights *cache_flights_lookup(CACHE_FLIGHTS *cache_flights, char *id){
+    Flights *flights = g_hash_table_lookup(cache_flights->flights_cache, id);
+    if(flights != NULL){
+        g_queue_remove(cache_flights->flights_queue, flights);
+        g_queue_push_head(cache_flights->flights_queue, flights);
+    }
+    return flights;
+}
+
 Flights *create_flights(char *line){
     Flights *flights = malloc(sizeof(Flights));
     char *buffer;
@@ -181,8 +223,7 @@ Flights *create_flights(char *line){
     flights->pilot = NULL;
     flights->copilot = NULL;
     flights->notes = NULL;
-    flights->num_passengers = 0;
-    flights->delay = 0;
+
     
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
@@ -201,6 +242,8 @@ Flights *create_flights(char *line){
             case 3: 
                 if(!verify_only_numbers(buffer)) val = 0;
                 flights->total_seats = atoi(buffer);
+                int num_passengers = get_number_passengers(flights->id_flights);
+                if(num_passengers > flights->total_seats) val = 0;
                 break;
             case 4:
                 if (strlen(buffer) != 3) val = 0;
@@ -250,7 +293,6 @@ Flights *create_flights(char *line){
                 flights->notes = strdup(buffer);
                 break;
         } 
-
         if (val == 0){
             validate_csv_error(copy_line, "flights");
             delete_flights(flights);
@@ -259,244 +301,85 @@ Flights *create_flights(char *line){
         }
     }
 
-    flights->num_passengers = 0;
-    flights->delay = 0;
-
+    flights->total_passengers = 0;
+    flights->median_delay = 0;
     free(copy_line);
     return flights;
 }
 
-// da free a um flights e as variaveis
-void delete_flights(void *data){
-    Flights *flights = (Flights *) data;
-    free(flights->id_flights);
-    free(flights->airline);
-    free(flights->plane_model);
-    free(flights->origin);
-    free(flights->destination);
-    free(flights->pilot);
-    free(flights->copilot);
-    free(flights->notes);
-    free_datetime(flights->schedule_departure_date);
-    free_datetime(flights->schedule_arrival_date);
-    free_datetime(flights->real_departure_date);
-    free_datetime(flights->real_arrival_date);
+int create_flights_valid_file(char *file){
+    FILE *fp = fopen(file, "r");
+    if(!fp) return 1;
 
-    free(flights);
-}
-
-// insere um flights na hashtable
-void insert_flights(CAT_FLIGHTS *cat_flights, Flights *flights){
-    g_hash_table_insert(cat_flights->flights_hashtable, flights->id_flights, flights);
-}
-
-// cria a hashtable dos flights
-CAT_FLIGHTS *create_cat_flights(char *entry_files){
-
-    FILE *fp;
-    char open[50];
-    strcpy(open, entry_files);
-    fp = fopen(open, "r");
-    if (!fp) {
-        perror("Error opening flights.csv");
-        return NULL;
-    }    
-
-    CAT_FLIGHTS *cat_flights = malloc(sizeof(CAT_FLIGHTS));
-    cat_flights->flights_hashtable = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_flights);
-    
+    char buffer[1000000];
+    char *buffer2 = NULL;  
     char *linha = "id;airline;plane_model;total_seats;origin;destination;schedule_departure_date;schedule_arrival_date;real_departure_date;real_arrival_date;pilot;copilot;notes";
     validate_csv_error(linha, "flights");
 
-    char *line = NULL;
-    size_t len = 0;
-    
     clock_t start, end;
     double cpu_time_used;
-
-    int first_line = 1;
-
     start = clock();
 
-    while (getline(&line, &len, fp) > 0) {
-        if (first_line) {
-            first_line = 0;
-            continue;
+    FILE *fp2 = fopen("entrada/flights_valid.csv", "w");
+    if (!fp2) return -1;
+    
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        Flights *f = create_flights(buffer2);
+        if(f != NULL) {
+            set_num_passengers(f, get_number_passengers(f->id_flights));
+            set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
+            char *buffer3 = flights_toString(f);
+            fprintf(fp2, "%s\n", buffer3);
         }
-        line[strcspn(line, "\n")] = 0;
-        Flights *flights = create_flights(line);
-        if(flights != NULL) insert_flights(cat_flights, flights);
     }
+
     end = clock();
-
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
     printf("Time to parse flights.csv: %f\n", cpu_time_used);
-
-    free(line);
     fclose(fp);
-
-    return cat_flights;
+    fclose(fp2);
+    return 0;
 }
 
-// da free a uma hashtable dos flights
-void delete_cat_flights(CAT_FLIGHTS *cat_flights){
-    g_hash_table_destroy(cat_flights->flights_hashtable);
-    free(cat_flights);
+char *flights_toString(Flights *fli){
+    char *id_fli = get_id_flights(fli);
+    char *airline = get_airline(fli);
+    char *plane = get_plane(fli);
+    int seats = get_seats(fli);
+    char *origin = get_origin(fli);
+    char *destination = get_destination(fli);
+    char *sdd = datetime_to_string(get_schedule_departure_date(fli));
+    char *sad = datetime_to_string(get_schedule_arrival_date(fli));
+    char *rdd = datetime_to_string(get_real_departure_date(fli));
+    char *rad = datetime_to_string(get_real_arrival_date(fli));
+    char *pilot = get_pilot(fli);
+    char *copilot = get_copilot(fli);
+    char *notes = get_notes(fli);
+
+    char *buffer = malloc(sizeof(char) * 1000);
+    sprintf(buffer, "%s;%s;%s;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s", id_fli, airline, plane, seats, origin, destination, sdd, sad, rdd, rad, pilot, copilot, notes);
+    return buffer;
+
 }
 
-void update_values_flights(CAT_FLIGHTS *cat_flights, CAT_PASSENGERS *cat_passengers){
-    GHashTableIter iter;
-    gpointer key, value;
+int verify_flight(char *id){
+    FILE *fp = fopen("entrada/flights_valid.csv", "r");
+    if(!fp) return 1;
 
-    g_hash_table_iter_init (&iter, cat_flights->flights_hashtable);
-    while (g_hash_table_iter_next (&iter, &key, &value)){
-        Flights *flights = (Flights *) value;
-        set_num_passengers(flights, get_num_passengers_list(cat_passengers, get_id_flights(flights)));
-        set_delay(flights, calculate_seconds(flights->schedule_departure_date, flights->real_departure_date));
-        if(get_num_passengers(flights) > get_seats(flights)){
-            // nao tenho a certeza se e suposto fazer assim, fica assim pra ja
-            //validate_csv_error(get_id_flights(flights), "flights");
-        }
-    }
-}
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+    char *id2 = NULL;
+    int val = 0;
 
-char *display_flights(CAT_FLIGHTS *flights, char *id_flights){
-    Flights *flight = g_hash_table_lookup(flights->flights_hashtable, id_flights);
-    if(flight == NULL) return NULL;
-    char *airline = get_airline(flight);
-    char *plane = get_plane(flight);
-    char *origin = get_origin(flight);
-    char *destination = get_destination(flight);
-    char *schedule_departure_date datetime_to_string(get_schedule_departure_date(flight));
-    char *schedule_arrival_date = datetime_to_string(get_schedule_arrival_date(flight));
-    int num_passengers = get_num_passengers(flight);
-    int delay = get_delay(flight);
-
-    char *display = malloc(snprintf(NULL, 0, "%s;%s;%s;%s;%s;%s;%d;%d", airline, plane, origin, destination, schedule_departure_date, schedule_arrival_date, num_passengers, delay) + 1);
-    snprintf(display, 100,"%s;%s;%s;%s;%s;%s;%d;%d", airline, plane, origin, destination, schedule_departure_date, schedule_arrival_date, num_passengers, delay);
-    return display;
-}
-
-
-
-
-
-
-
-
-
-
-// funcao que cria uma lista com os flights de uma determinada origem e entre duas datas
-GList* list_flights_origin(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD){
-    GList *list = NULL;
-    GHashTableIter iter;
-    gpointer key, value;
-
-    g_hash_table_iter_init (&iter, cat_flights->flights_hashtable);
-    while (g_hash_table_iter_next (&iter, &key, &value)){
-        Flights *flights = (Flights *) value;
-        if (strcmp(get_origin(flights), origin) == 0){
-            if(between_datetime(flights->schedule_departure_date, beginD, endD) == 1) {
-                list = g_list_append(list, flights);
-            }
-        }
-    }
-    return list;
-}
-
-// funcao compara para ordenar os flights por data
-gint data_mais_recenteF(gconstpointer a, gconstpointer b){
-    Flights *flights1 = (Flights *) a;
-    Flights *flights2 = (Flights *) b;
-    
-    if(equal_datetime(flights1->schedule_departure_date, flights2->schedule_departure_date)){
-        if(flights1->id_flights < flights2->id_flights) return -1;
-        else return 1;
-    }
-    return most_recent_datetime(flights2->schedule_departure_date, flights1->schedule_departure_date);
-}
-
-// funcao que ordena os flights por data
-GList *sort_flights_data(CAT_FLIGHTS *cat_flights, char *origin, Datetime beginD, Datetime endD){
-    GList *values = list_flights_origin(cat_flights, origin, beginD, endD);
-    return g_list_sort(values, data_mais_recenteF);
-}
-
-// funcao que cria uma lista com os flights de um determinado ano
-GList *list_flights_year(CAT_FLIGHTS *cat_flights, char *year){
-    GList *list = NULL;
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init (&iter, cat_flights->flights_hashtable);
-    while (g_hash_table_iter_next (&iter, &key, &value)){
-        Flights *flights = (Flights *) value;
-        if (strcmp(get_datetime_year(flights->schedule_departure_date), year) == 0){
-            list = g_list_append(list, flights);
-        }
-    }
-    return list;
-}
-
-// funcao que converte uma hashtable numa lista com os flights de uma determinada origem e o numero total de passageiros
-GList *convert_hash_to_list(GList *list) {
-    GHashTable *origin_passenger_counts = g_hash_table_new_full(g_str_hash, g_str_equal, free, NULL);
-
-    while (list != NULL) {
-        Flights *flight = (Flights *) list->data;
-        ORIGIN_PASSENGER_COUNT *opc = g_hash_table_lookup(origin_passenger_counts, flight->origin);
-
-        if (opc == NULL) {
-            opc = malloc(sizeof(ORIGIN_PASSENGER_COUNT));
-            opc->origin = strdup(flight->origin);
-            opc->total_passengers = flight->num_passengers;
-            g_hash_table_insert(origin_passenger_counts, opc->origin, opc);
-        } else {
-            opc->total_passengers += flight->num_passengers;
-        }
-
-        list = list->next;
+    while(fgets(buffer, 1000000, fp)){
+        buffer2 = strdup(buffer); 
+        id2 = strsep(&buffer2, ";");
+        if(strcmp(id, id2) == 0) val = 1;
     }
 
-    GList *sorted_list = NULL;
-    GHashTableIter iter;
-    gpointer key, value;
-    g_hash_table_iter_init(&iter, origin_passenger_counts);
-    while (g_hash_table_iter_next(&iter, &key, &value)) {
-        ORIGIN_PASSENGER_COUNT *original_opc = (ORIGIN_PASSENGER_COUNT *) value;
-        ORIGIN_PASSENGER_COUNT *new_opc = malloc(sizeof(ORIGIN_PASSENGER_COUNT));
-        *new_opc = *original_opc; 
-        new_opc->origin = strdup(original_opc->origin);
-        new_opc->total_passengers = original_opc->total_passengers;
-        sorted_list = g_list_prepend(sorted_list, new_opc);
-    }
-    
-    g_hash_table_destroy(origin_passenger_counts);
-
-    return sorted_list;
+    fclose(fp);
+    return val;
 }
 
-void free_origin_passenger_count(ORIGIN_PASSENGER_COUNT *opc) {
-    free(opc->origin);
-    free(opc);
-}
 
-// funcao que compara duas origens por numero de passageiros
-gint origin_with_more_passengers(gconstpointer a, gconstpointer b){
-    ORIGIN_PASSENGER_COUNT *opc1 = (ORIGIN_PASSENGER_COUNT *) a;
-    ORIGIN_PASSENGER_COUNT *opc2 = (ORIGIN_PASSENGER_COUNT *) b;
-    
-    if(opc1->total_passengers == opc2->total_passengers){
-        if(strcmp(opc1->origin, opc2->origin) < 0) return -1;
-        else return 1;
-    }
-    return opc2->total_passengers - opc1->total_passengers;
-}
-
-// funcao que ordena as origens por numero de passageiros
-GList *sort_flights_num_passengers(CAT_FLIGHTS *cat_flights, char *year) {
-    GList *values = list_flights_year(cat_flights, year);
-    GList *final = convert_hash_to_list(values);
-    GList *sorted_flights = g_list_sort(final, origin_with_more_passengers);
-    return sorted_flights;
-}

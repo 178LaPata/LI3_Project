@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 typedef struct reservations Reservations;
-typedef struct cat_reservations CAT_RESERVATIONS;
+typedef struct cache_reservations CACHE_RESERVATIONS;
 
 #include "../includes/date.h"
 #include "../includes/valid.h"
@@ -45,19 +45,18 @@ void set_comments(Reservations *reservations, char *comments);
 void set_nights(Reservations *reservations, int nights);
 void set_total_price(Reservations *reservations, double total_price);
 
-Reservations *create_reservations(char *line, CAT_USERS *cat_users);
 void delete_reservations(void *data);
-void insert_reservations(CAT_RESERVATIONS *cat_reservations, Reservations *reservations);
-CAT_RESERVATIONS *create_cat_reservations(char *entry_files, CAT_USERS *cat_users);
-GHashTable *get_reservations_hashtable(CAT_RESERVATIONS *cat_reservations);
-void delete_cat_reservations(CAT_RESERVATIONS *cat_reservations);
-char *reservations_to_line(Reservations *reservations);
-void update_values_reservations(CAT_RESERVATIONS *cat_reservations);
+void delete_cache_reservations(CACHE_RESERVATIONS *cache_reservations);
+CACHE_RESERVATIONS *create_new_cache_reservations(int capacity);
+void insert_cache_reservations(CACHE_RESERVATIONS *cache_reservations, Reservations *reservations);
+Reservations *cache_reservations_lookup(CACHE_RESERVATIONS *cache_reservations, char *id);
+Reservations *create_reservations(char *line);
+int create_reservations_valid_file(char *file);
 double calculate_total_price(Reservations *reservations);
-Reservations *get_reservations(CAT_RESERVATIONS *cat_reservations, char *id);
-double calculate_average_rating(CAT_RESERVATIONS *cat_reservations, char *hotel_id);
-GList* list_reservations_hotelID(CAT_RESERVATIONS *cat_reservations, char* hotel_id);
+char *reservation_toString(Reservations *r);
+int verify_user_reservation(char *user_id);
+double calculate_total_price_user(char *user_id);
 gint data_mais_recente(gconstpointer a, gconstpointer b);
-GList *sort_reservations_data(CAT_RESERVATIONS *cat_reservations, char *hotel_id);
+char *calculate_average_rating(char *file, char *hotel_id);
 int calculate_total_price_between_dates(Reservations *reservations, Date begin, Date end);
-int calcular_receita_total(CAT_RESERVATIONS *cat_reservations, char *hotel_id, Date begin, Date end);
+char *calculate_total_revenue(char *file, char *hotel_id, Date begin, Date end);
