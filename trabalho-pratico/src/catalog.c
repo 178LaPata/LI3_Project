@@ -23,11 +23,17 @@ void create_catalog(char *entry_files) {
     char *reservations = pointer_file(entry_files,"reservations.csv"); 
     char *passengers = pointer_file(entry_files,"passengers.csv");
 
+    int cap = 10000000;
+
+    create_new_cache_users(cap);
+    create_new_cache_flights(cap);
+    create_new_cache_reservations(cap);
+    create_new_cache_passengers(cap);
     
     create_users_valid_file(users);
-    //create_flights_valid_file(flights);
-    //create_reservations_valid_file(reservations);
-    //create_passengers_valid_file(passengers);
+    create_flights_valid_file(flights);
+    create_reservations_valid_file(reservations);
+    create_passengers_valid_file(passengers);
     //
     //create_flights_aux_file();
     //create_reservations_aux_file();
@@ -275,8 +281,7 @@ int run_batch(char* inputs_path, char* queries_path) {
 
     while (getline(&line, &len, fp) != -1) {
         line[strcspn(line, "\n")] = 0;
-        run_queries(line, op);
-        printf("%s\n", line);
+        //run_queries(line, op);
         op++;
     }
 

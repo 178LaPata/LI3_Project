@@ -197,7 +197,6 @@ Users *cache_users_lookup(CACHE_USERS *cache_users, char *id){
 }
 
 Users *create_users(char *line){
-    printf("%s\n", line);
     Users *users = malloc(sizeof(Users));
     char *buffer;
     int i = 0;
@@ -225,7 +224,6 @@ Users *create_users(char *line){
     while((buffer = strsep(&line, ";")) != NULL){
         switch(i++){
             case 0:
-                printf("%s\n", buffer);
                 if (strlen(buffer) == 0) val = 0;
                 users->id = strdup(buffer);
                 break;
@@ -312,21 +310,20 @@ int create_users_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-    int first_line = 1;
 
     FILE *fp2 = fopen("entrada/users_valid.csv", "w");
     if (!fp2) return -1;
     
-    while(fgets(buffer, 1000000, fp)){
-        if (first_line) {
-            first_line = 0;
-            continue;
-        }
+    fgets(buffer, sizeof(buffer), fp);
+
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
+        buffer2[strcspn(buffer2, "\n")] = '\0';
         Users *u = create_users(buffer2);
-        if(u != NULL || get_account_status(u) != 2) {
-            fprintf(fp2, "%s\n", buffer2);
-            free(u);
+        if(u) {
+            fprintf(fp2, "%s", buffer);
+            free(buffer2);
+            delete_users(u);
         }
     }
 
@@ -348,7 +345,7 @@ int create_users_aux_file(){
     FILE *fp4 = fopen("entrada/users_valid2.csv", "w");
     if (!fp3) return -1;
 
-    while(fgets(buffer, 1000000, fp2)){
+    while(fgets(buffer, sizeof(buffer), fp2)){
         buffer2 = strdup(buffer);
         Users *u = create_users(buffer2);
         fprintf(fp3, "%s;%s\n", u->id, u->name);
@@ -360,6 +357,9 @@ int create_users_aux_file(){
         }
         char *buffer3 = user_to_string(u);
         fprintf(fp4, "%s\n", buffer3);
+        free(buffer2);
+        free(buffer3);
+        delete_users(u);
     }
     
     fclose(fp2);
@@ -455,7 +455,7 @@ int verify_user(char *id){
     char *id2 = NULL;
     int val = 0;
 
-    while(fgets(buffer, 1000000, fp)){
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         id2 = strsep(&buffer2, ";");
         if(strcmp(id, id2) == 0) val = 1;
@@ -476,7 +476,7 @@ Users *search_user(CACHE_USERS *cache_users, char *id){
         char *id2 = NULL;
         int val = 0;
 
-        while(fgets(buffer, 1000000, fp)){
+        while(fgets(buffer, sizeof(buffer), fp)){
             buffer2 = strdup(buffer); 
             id2 = strsep(&buffer2, ";");
             if(strcmp(id, id2) == 0) {

@@ -148,6 +148,7 @@ void set_delay(Flights *flights, int delay){
 
 void delete_flights(void *data){
     Flights *flights = (Flights *) data;
+    printf("Deleting flight %s\n", flights->id_flights);
     free(flights->id_flights);
     free(flights->airline);
     free(flights->plane_model);
@@ -161,6 +162,7 @@ void delete_flights(void *data){
     free_datetime(flights->real_departure_date);
     free_datetime(flights->real_arrival_date);
     free(flights);
+    printf("Deleted flight\n");
 }
 
 void delete_cache_flights(CACHE_FLIGHTS *cache_flights){
@@ -319,24 +321,23 @@ int create_flights_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-    int first_line = 1;
 
     FILE *fp2 = fopen("entrada/flights_valid.csv", "w");
     if (!fp2) return -1;
-    
-    while(fgets(buffer, 1000000, fp)){
-        if (first_line) {
-            first_line = 0;
-            continue;
-        }
+    fgets(buffer, sizeof(buffer), fp);
+
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Flights *f = create_flights(buffer2);
-        if(f != NULL) fprintf(fp2, "%s\n", buffer2);
+        if(f) fprintf(fp2, "%s", buffer);
+        free(buffer2);
+        delete_flights(f);   
     }
 
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse flights.csv: %f\n", cpu_time_used);
+
     fclose(fp);
     fclose(fp2);
     return 0;
@@ -353,15 +354,16 @@ int create_flights_aux_file(){
     FILE *fp2 = fopen("entrada/flights_valid2.csv", "w");
     if (!fp2) return -1;
 
-    while(fgets(buffer, 1000000, fp)){
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Flights *f = create_flights(buffer2);
-        if(f != NULL) {
-            set_num_passengers(f, get_number_passengers(f->id_flights));
-            set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
-            char *buffer3 = flights_to_string(f);
-            fprintf(fp2, "%s\n", buffer3);
-        }
+        set_num_passengers(f, get_number_passengers(f->id_flights));
+        set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
+        char *buffer3 = flights_to_string(f);
+        fprintf(fp2, "%s\n", buffer3);
+        free(buffer3);
+        free(buffer2);
+        delete_flights(f);
     }
 
     fclose(fp);

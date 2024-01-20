@@ -138,6 +138,7 @@ int create_passengers_valid_file(char *file){
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Time to parse flights.csv: %f\n", cpu_time_used);
+
     fclose(fp);
     fclose(fp2);
     return 0;

@@ -323,19 +323,18 @@ int create_reservations_valid_file(char *file){
     clock_t start, end;
     double cpu_time_used;
     start = clock();
-    int first_line = 1;
+
     
     FILE *fp2 = fopen("entrada/reservations_valid.csv", "w");
     if (!fp2) return -1;
+    fgets(buffer, sizeof(buffer), fp);
     
-    while(fgets(buffer, 1000000, fp)){
-        if (first_line) {
-            first_line = 0;
-            continue;
-        }
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Reservations *r = create_reservations(buffer2);
-        if(r != NULL) fprintf(fp2, "%s\n", buffer2);
+        if(r) fprintf(fp2, "%s", buffer);
+        free(buffer2);
+        delete_reservations(r);
     }
 
     end = clock();
@@ -356,17 +355,16 @@ int create_reservations_aux_file(){
     FILE *fp2 = fopen("entrada/reservations_valid2.csv", "w");
     if (!fp2) return -1;
 
-    while(fgets(buffer, 1000000, fp)){
+    while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Reservations *r = create_reservations(buffer2);
-        if(r != NULL) {
-            set_nights(r, calculate_days(r->begin_date, r->end_date));
-            set_total_price(r, calculate_total_price(r));
-            char *buffer3 = reservation_to_string(r);
-            fprintf(fp2, "%s\n", buffer3);
-            free(buffer3);
-            delete_reservations(r);
-        }
+        set_nights(r, calculate_days(r->begin_date, r->end_date));
+        set_total_price(r, calculate_total_price(r));
+        char *buffer3 = reservation_to_string(r);
+        fprintf(fp2, "%s\n", buffer3);
+        free(buffer3);
+        free(buffer2);
+        delete_reservations(r);
     }
     fclose(fp);
     fclose(fp2);
