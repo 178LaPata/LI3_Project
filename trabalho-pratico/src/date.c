@@ -294,3 +294,24 @@ int between_datetime(Datetime date1, Datetime beginD, Datetime endD){
     if(most_recent_datetime(date1, beginD) == 1 && most_recent_datetime(endD, date1) == 1) return 1;
     else return 0;
 }
+
+Date copy_date(Date date)
+{
+    Date copy = malloc(sizeof(struct date));
+    copy->day = strdup(date->day);
+    copy->month = strdup(date->month);
+    copy->year = strdup(date->year);
+    return copy;
+}
+
+Datetime copy_datetime(Datetime datetime)
+{
+    Datetime copy = malloc(sizeof(struct datetime));
+    copy->day = strdup(datetime->day);
+    copy->month = strdup(datetime->month);
+    copy->year = strdup(datetime->year);
+    copy->hour = strdup(datetime->hour);
+    copy->minute = strdup(datetime->minute);
+    copy->second = strdup(datetime->second);
+    return copy;
+}

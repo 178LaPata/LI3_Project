@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
-#include <glib.h>
 
 #define DATE "2023/10/01"
 #define DATETIME "2023/10/01 00:00:00"
@@ -30,3 +29,5 @@ int equal_dates(Date date1, Date date2);
 int equal_datetime(Datetime date1, Datetime date2);
 int between_date(Date date1, Date date2, Date date3);
 int between_datetime(Datetime date1, Datetime beginD, Datetime endD);
+Date copy_date(Date date);
+Datetime copy_datetime(Datetime datetime);

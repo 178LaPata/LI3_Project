@@ -154,6 +154,8 @@ void set_total_price(Reservations *reservations, double price_res){
 }
 
 void delete_reservations(void *data){
+    if (data == NULL)
+        return;
     Reservations *reservations = (Reservations *) data;
     free(reservations->id_res);
     free(reservations->user_id);
@@ -207,7 +209,86 @@ Reservations *cache_reservations_lookup(CACHE_RESERVATIONS *cache_reservations, 
     return reservations;
 }
 
-Reservations *create_reservations(char *line){
+Reservations *create_valid_reservations(char *line){
+    Reservations *reservations = malloc(sizeof(Reservations));
+    char *buffer;
+    int i = 0;
+    char *copy_line =strdup(line);
+
+    Date begin = NULL, end = NULL;
+    char *r = NULL;
+    reservations->id_res = NULL;
+    reservations->user_id = NULL;
+    reservations->hotel_id = NULL;
+    reservations->hotel_name = NULL;
+    reservations->hotel_stars = 0;
+    reservations->city_tax = 0;
+    reservations->adress = NULL;
+    reservations->begin_date = NULL;
+    reservations->end_date = NULL;
+    reservations->price_per_night = 0;
+    reservations->includes_breakfast = NULL;
+    reservations->room_details = NULL;
+    reservations->rating = NULL;
+    reservations->comments = NULL;
+    reservations->nights = 0;
+    reservations->price_res = 0.0;
+
+    while((buffer = strsep(&line, ";")) != NULL){
+        switch(i++){
+            case 0:
+                reservations->id_res = strdup(buffer);
+                break;
+            case 1:
+                reservations->user_id = strdup(buffer);
+                break;
+            case 2:
+                reservations->hotel_id = strdup(buffer);
+                break;
+            case 3:
+                reservations->hotel_name = strdup(buffer);
+                break;
+            case 4:
+                reservations->hotel_stars = verify_stars(buffer);
+                break;
+            case 5:
+                reservations->city_tax = verify_maior_igual_que_zero(buffer);
+                break;
+            case 6:
+                reservations->adress = strdup(buffer);
+                break;
+            case 7:
+                begin = valid_date(buffer);
+                reservations->begin_date = begin;
+                break;
+            case 8:
+                end = valid_date(buffer);
+                reservations->end_date = end;
+                break;
+            case 9:
+                reservations->price_per_night = verify_maior_que_zero(buffer);
+                break;
+            case 10:
+                reservations->includes_breakfast = verify_includes_breakfast(buffer);
+                break;
+            case 11:
+                reservations->room_details = strdup(buffer);
+                break;
+            case 12:
+                r = verify_rating(buffer);
+                reservations->rating = r;
+                break;
+            case 13:
+                if(strlen(buffer) == 0) reservations->comments = "";
+                reservations->comments = strdup(buffer);
+                break;
+        }
+    }
+    free(copy_line);
+    return reservations;
+}
+
+Reservations *create_reservations(char *line, CACHE_USERS *cache_users){
     Reservations *reservations = malloc(sizeof(Reservations));
     char *buffer;
     int i = 0;
@@ -242,7 +323,10 @@ Reservations *create_reservations(char *line){
             case 1:
                 if (strlen(buffer) == 0) val = 0;
                 reservations->user_id = strdup(buffer);
-                if(verify_user(reservations->user_id) == 0) val = 0;
+                Users* user = search_user(cache_users, reservations->user_id);
+                if (user == NULL) val = 0;
+                else delete_users(user);
+                // if(verify_user(reservations->user_id) == 0) val = 0;
                 break;
             case 2:
                 if (strlen(buffer) == 0) val = 0;
@@ -311,7 +395,7 @@ Reservations *create_reservations(char *line){
     return reservations;
 }
 
-int create_reservations_valid_file(char *file){
+int create_reservations_valid_file(char *file, CACHE_USERS *cache_users){
     FILE *fp = fopen(file, "r");
     if(!fp) return 1;
 
@@ -331,7 +415,7 @@ int create_reservations_valid_file(char *file){
     
     while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
-        Reservations *r = create_reservations(buffer2);
+        Reservations *r = create_reservations(buffer2, cache_users);
         if(r) fprintf(fp2, "%s", buffer);
         free(buffer2);
         delete_reservations(r);
@@ -357,7 +441,7 @@ int create_reservations_aux_file(){
 
     while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
-        Reservations *r = create_reservations(buffer2);
+        Reservations *r = create_valid_reservations(buffer2);
         set_nights(r, calculate_days(r->begin_date, r->end_date));
         set_total_price(r, calculate_total_price(r));
         char *buffer3 = reservation_to_string(r);
@@ -417,7 +501,7 @@ Reservations *search_reservation(CACHE_RESERVATIONS *cache_reservations, char *i
 
     while(fgets(buffer, 1000000, fp)){
         buffer2 = strdup(buffer); 
-        Reservations *r = create_reservations(buffer2);
+        Reservations *r = create_valid_reservations(buffer2);
         if(strcmp(get_id_reservations(r), id_res) == 0){
             reservations = r;
             insert_cache_reservations(cache_reservations, reservations);

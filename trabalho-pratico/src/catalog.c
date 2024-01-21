@@ -23,21 +23,22 @@ void create_catalog(char *entry_files) {
     char *reservations = pointer_file(entry_files,"reservations.csv"); 
     char *passengers = pointer_file(entry_files,"passengers.csv");
 
-    int cap = 10000000;
+    int cap = 100000;
 
-    create_new_cache_users(cap);
-    create_new_cache_flights(cap);
-    create_new_cache_reservations(cap);
-    create_new_cache_passengers(cap);
+    CACHE_USERS *cache_users = create_new_cache_users(cap);
+    CACHE_FLIGHTS *cache_flights = create_new_cache_flights(cap);
+    CACHE_RESERVATIONS *cache_reservations = create_new_cache_reservations(cap);
+    CACHE_PASSENGERS *cache_passengers = create_new_cache_passengers(cap);
     
     create_users_valid_file(users);
     create_flights_valid_file(flights);
-    create_reservations_valid_file(reservations);
-    create_passengers_valid_file(passengers);
-    //
-    //create_flights_aux_file();
+    create_reservations_valid_file(reservations, cache_users);
+    create_passengers_valid_file(passengers, cache_users, cache_flights);
+    
+    create_flights_aux_file();
     //create_reservations_aux_file();
-    //create_users_aux_file();
+    //create_users_aux_file(cache_passengers);
+    //create_passengers_aux_file();
 
     free(users);
     free(flights);
@@ -277,12 +278,12 @@ int run_batch(char* inputs_path, char* queries_path) {
 
     char *line = NULL;
     size_t len = 0;
-    int op = 1;
+    //int op = 1;
 
     while (getline(&line, &len, fp) != -1) {
         line[strcspn(line, "\n")] = 0;
         //run_queries(line, op);
-        op++;
+        //op++;
     }
 
     free(line);

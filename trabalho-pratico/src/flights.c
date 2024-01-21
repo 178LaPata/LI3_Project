@@ -147,8 +147,8 @@ void set_delay(Flights *flights, int delay){
 }
 
 void delete_flights(void *data){
+    if (data == NULL) return;
     Flights *flights = (Flights *) data;
-    printf("Deleting flight %s\n", flights->id_flights);
     free(flights->id_flights);
     free(flights->airline);
     free(flights->plane_model);
@@ -162,7 +162,6 @@ void delete_flights(void *data){
     free_datetime(flights->real_departure_date);
     free_datetime(flights->real_arrival_date);
     free(flights);
-    printf("Deleted flight\n");
 }
 
 void delete_cache_flights(CACHE_FLIGHTS *cache_flights){
@@ -200,6 +199,110 @@ Flights *cache_flights_lookup(CACHE_FLIGHTS *cache_flights, char *id){
         g_queue_remove(cache_flights->flights_queue, flights);
         g_queue_push_head(cache_flights->flights_queue, flights);
     }
+    return flights;
+}
+
+Flights *create_valid_flights(char *line){
+    Flights *flights = malloc(sizeof(Flights));
+    char *buffer;
+    int i = 0;
+    char *copy_line = strdup(line);
+
+    Datetime sdd = NULL, sad = NULL, rdd = NULL, rad = NULL;
+
+    flights->id_flights = NULL;
+    flights->airline = NULL;
+    flights->plane_model = NULL;
+    flights->total_seats = 0;
+    flights->origin = NULL;
+    flights->destination = NULL;
+    flights->schedule_departure_date = NULL;
+    flights->schedule_arrival_date = NULL;
+    flights->real_departure_date = NULL;
+    flights->real_arrival_date = NULL;
+    flights->pilot = NULL;
+    flights->copilot = NULL;
+    flights->notes = NULL;
+
+    
+    while((buffer = strsep(&line, ";")) != NULL){
+        switch(i++){
+            case 0:
+                flights->id_flights = strdup(buffer);
+                break;
+            case 1:
+                flights->airline = strdup(buffer);
+                break;
+            case 2:
+                flights->plane_model = strdup(buffer);
+                break; 
+            case 3: 
+                flights->total_seats = atoi(buffer);
+                break;
+            case 4:
+                for(int j = 0; buffer[j]; j++){
+                    buffer[j] = toupper(buffer[j]);
+                }
+                flights->origin = strdup(buffer);
+                break;
+            case 5:
+                for(int j = 0; buffer[j]; j++){
+                    buffer[j] = toupper(buffer[j]);
+                }
+                flights->destination = strdup(buffer);
+                break;
+            case 6:
+                sdd = valid_date_time(buffer);
+                flights->schedule_departure_date = sdd;
+                break;
+            case 7:
+                sad = valid_date_time(buffer);
+                flights->schedule_arrival_date = sad;
+                break;
+            case 8:
+                rdd = valid_date_time(buffer);
+                flights->real_departure_date = rdd;
+                break;
+            case 9:
+                rad = valid_date_time(buffer);
+                flights->real_arrival_date = rad;
+                break;
+            case 10:
+                flights->pilot = strdup(buffer);
+                break;
+            case 11:
+                flights->copilot = strdup(buffer);
+                break;
+            case 12:
+                flights->notes = strdup(buffer);
+                break;
+        } 
+    }
+
+    flights->total_passengers = 0;
+    flights->median_delay = 0;
+
+    free(copy_line);
+    return flights;
+}
+
+Flights *copy_flights(Flights *flight){
+    Flights *flights = malloc(sizeof(Flights));
+    flights->id_flights = strdup(flight->id_flights);
+    flights->airline = strdup(flight->airline);
+    flights->plane_model = strdup(flight->plane_model);
+    flights->total_seats = flight->total_seats;
+    flights->origin = strdup(flight->origin);
+    flights->destination = strdup(flight->destination);
+    flights->schedule_departure_date = copy_datetime(flight->schedule_departure_date);
+    flights->schedule_arrival_date = copy_datetime(flight->schedule_arrival_date);
+    flights->real_departure_date = copy_datetime(flight->real_departure_date);
+    flights->real_arrival_date = copy_datetime(flight->real_arrival_date);
+    flights->pilot = strdup(flight->pilot);
+    flights->copilot = strdup(flight->copilot);
+    flights->notes = strdup(flight->notes);
+    flights->total_passengers = flight->total_passengers;
+    flights->median_delay = flight->median_delay;
     return flights;
 }
 
@@ -329,9 +432,11 @@ int create_flights_valid_file(char *file){
     while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Flights *f = create_flights(buffer2);
-        if(f) fprintf(fp2, "%s", buffer);
+        if(f) {
+            fprintf(fp2, "%s", buffer);
+            delete_flights(f);   
+        }
         free(buffer2);
-        delete_flights(f);   
     }
 
     end = clock();
@@ -357,13 +462,15 @@ int create_flights_aux_file(){
     while(fgets(buffer, sizeof(buffer), fp)){
         buffer2 = strdup(buffer); 
         Flights *f = create_flights(buffer2);
-        set_num_passengers(f, get_number_passengers(f->id_flights));
-        set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
-        char *buffer3 = flights_to_string(f);
-        fprintf(fp2, "%s\n", buffer3);
-        free(buffer3);
+        if(f) {
+            set_num_passengers(f, get_number_passengers(f->id_flights));
+            set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
+            char *buffer3 = flights_to_string(f);
+            fprintf(fp2, "%s\n", buffer3);
+            free(buffer3);
+            delete_flights(f);
+        }
         free(buffer2);
-        delete_flights(f);
     }
 
     fclose(fp);
@@ -393,45 +500,25 @@ char *flights_to_string(Flights *fli){
 }
 
 Flights *search_flight(CACHE_FLIGHTS *cache_flights, char *flight_id){
-    Flights *flights = cache_flights_lookup(cache_flights, flight_id);
-    if(flights != NULL) return flights;
+    Flights *fli = cache_users_lookup(cache_flights, flight_id);
+    if(fli == NULL){
+        FILE *fp = fopen("entrada/flights_valid.csv", "r");
+        if(!fp) return NULL;
 
-    FILE *fp = fopen("entrada/flights_valid.csv", "r");
-    if(!fp) return NULL;
+        char buffer[1000000];
+        int val = 0;
 
-    char buffer[1000000];
-    char *buffer2 = NULL;  
-
-    while (fgets(buffer, 1000000, fp) != NULL) {
-        buffer2 = strdup(buffer);
-        char *id = strsep(&buffer2, ";");
-        if (strcmp(id, flight_id) == 0) {
-            flights = create_flights(buffer);
-            insert_cache_flights(cache_flights, flights);
-            free(buffer2);
-            return flights;
+        while(fgets(buffer, sizeof(buffer), fp)){
+            int aux = strchr(buffer, ';') - buffer;
+            if(strncmp(flight_id, buffer, aux) == 0) {
+                fli = create_valid_flights(buffer);
+                insert_cache_flights(cache_flights, fli);
+                val = 1;
+            }
         }
-        free(buffer2);
+
+        fclose(fp);
+        if(val == 0) return NULL;
     }
-    fclose(fp);
-    return NULL;
-}
-
-int verify_flight(char *id){
-    FILE *fp = fopen("entrada/flights_valid.csv", "r");
-    if(!fp) return 1;
-
-    char buffer[1000000];
-    char *buffer2 = NULL;  
-    char *id2 = NULL;
-    int val = 0;
-
-    while(fgets(buffer, 1000000, fp)){
-        buffer2 = strdup(buffer); 
-        id2 = strsep(&buffer2, ";");
-        if(strcmp(id, id2) == 0) val = 1;
-    }
-
-    fclose(fp);
-    return val;
+    return copy_flights(fli);
 }

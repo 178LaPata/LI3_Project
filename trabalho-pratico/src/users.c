@@ -22,6 +22,7 @@ struct cache_users {
     GHashTable *users_cache;
     GQueue *users_queue;
     int capacity;
+    // FILE *logs;
 };
 
 char *get_id(Users *users){
@@ -146,9 +147,11 @@ void set_spent_total(Users *users, double spent_total){
 
 void delete_users(void *data){
     Users *users = (Users *) data;
+    if (data == NULL) return;
     free(users->id);
     free(users->name);
     free(users->email);
+    free(users->phone_number);
     free_date(users->birth_date);
     free(users->sex);
     free(users->passport);
@@ -169,6 +172,7 @@ CACHE_USERS *create_new_cache_users(int capacity){
     cache_users->users_cache = g_hash_table_new_full(g_str_hash, g_str_equal, NULL, delete_users);
     cache_users->users_queue = g_queue_new();
     cache_users->capacity = capacity;
+    // cache_users->logs = fopen("logs.txt", "w");
     return cache_users;
 }
 
@@ -193,6 +197,104 @@ Users *cache_users_lookup(CACHE_USERS *cache_users, char *id){
         g_queue_remove(cache_users->users_queue, users);
         g_queue_push_head(cache_users->users_queue, users);
     }
+    return users;
+}
+
+Users *create_valid_users(char *line){
+    Users *users = malloc(sizeof(Users));
+    char *buffer;
+    int i = 0;
+    char *copy_line = strdup(line);
+
+    Date bd = NULL;
+    Datetime ac = NULL;
+    users->id = NULL;
+    users->name = NULL;
+    users->email = NULL;
+    users->phone_number = NULL;
+    users->birth_date = NULL;
+    users->sex = NULL;
+    users->passport = NULL;
+    users->country_code = NULL;
+    users->adress = NULL;
+    users->account_creation = NULL;
+    users->pay_method = noPayMethod;
+    users->account_status = NoStatus;
+    users->flights_total = 0;
+    users->reservations_total = 0;
+    users->spent_total = 0.0;
+
+    while((buffer = strsep(&line, ";")) != NULL){
+        switch(i++){
+            case 0:
+                users->id = strdup(buffer);
+                break;
+            case 1:
+                users->name = strdup(buffer);
+                break;
+            case 2:
+                users->email = verify_email(buffer);
+                break;
+            case 3:
+                users->phone_number = strdup(buffer);
+                break;
+            case 4:
+                bd = valid_date(buffer);
+                users->birth_date = bd; 
+                break;
+            case 5:
+                users->sex = strdup(buffer);
+                break;
+            case 6:
+                users->passport = verify_passport(buffer);
+                break;
+            case 7:
+                users->country_code = strdup(buffer);
+                break;
+            case 8:
+                users->adress = strdup(buffer);
+                break;
+            case 9:
+                ac = valid_date_time(buffer);
+                users->account_creation = ac;  
+                break;
+            case 10:
+                users->pay_method = verify_payMethod(buffer); 
+                break;
+            case 11:
+                users->account_status = verify_accountStatus(buffer);
+                break;
+        }
+    }
+
+    users->flights_total = 0;
+    users->reservations_total = 0;
+    users->spent_total = 0.0;
+
+    free(copy_line);
+    return users;
+}
+
+
+Users *copy_users(Users* user){
+    Users *users = malloc(sizeof(Users));
+
+    users->id = strdup(user->id);
+    users->name = strdup(user->name);
+    users->email = strdup(user->email);
+    users->phone_number = strdup(user->phone_number);
+    users->birth_date = copy_date(user->birth_date);
+    users->sex = strdup(user->sex);
+    users->passport = strdup(user->passport);
+    users->country_code = strdup(user->country_code);
+    users->adress = strdup(user->adress);
+    users->account_creation = copy_datetime(user->account_creation);
+    users->pay_method = user->pay_method;
+    users->account_status = user->account_status;
+    users->flights_total = user->flights_total;
+    users->reservations_total = user->reservations_total;
+    users->spent_total = user->spent_total;
+
     return users;
 }
 
@@ -238,9 +340,8 @@ Users *create_users(char *line){
                 break;
             case 3:
                 if (strlen(buffer) == 0) val = 0;
-                char *ph= verify_phone_number(buffer);
-                users->phone_number = ph;
-                free(ph);
+                // char *ph= verify_phone_number(buffer);
+                users->phone_number = strdup(buffer);
                 break;
             case 4:
                 if(strlen(buffer) == 0) val = 0;
@@ -322,9 +423,9 @@ int create_users_valid_file(char *file){
         Users *u = create_users(buffer2);
         if(u) {
             fprintf(fp2, "%s", buffer);
-            free(buffer2);
             delete_users(u);
         }
+        free(buffer2);
     }
 
     end = clock();
@@ -335,7 +436,7 @@ int create_users_valid_file(char *file){
     return 0;
 }
 
-int create_users_aux_file(){
+int create_users_aux_file(CACHE_PASSENGERS *cache_passengers){
     FILE *fp2 = fopen("entrada/users_valid.csv", "r");
     if(!fp2) return 1;
 
@@ -353,7 +454,8 @@ int create_users_aux_file(){
         if(i == 1){
             add_reservations_total(u, 1);
             add_spent_total(u, calculate_total_price_user(u->id));
-            add_flights_total(u, verify_passenger(u->id));
+            Passengers *p = search_passenger(cache_passengers, u->id);
+            if(p) add_flights_total(u, 1);
         }
         char *buffer3 = user_to_string(u);
         fprintf(fp4, "%s\n", buffer3);
@@ -459,6 +561,7 @@ int verify_user(char *id){
         buffer2 = strdup(buffer); 
         id2 = strsep(&buffer2, ";");
         if(strcmp(id, id2) == 0) val = 1;
+        free(buffer2);
     }
 
     fclose(fp);
@@ -472,15 +575,12 @@ Users *search_user(CACHE_USERS *cache_users, char *id){
         if(!fp) return NULL;
 
         char buffer[1000000];
-        char *buffer2 = NULL;  
-        char *id2 = NULL;
         int val = 0;
 
         while(fgets(buffer, sizeof(buffer), fp)){
-            buffer2 = strdup(buffer); 
-            id2 = strsep(&buffer2, ";");
-            if(strcmp(id, id2) == 0) {
-                users = create_users(buffer);
+            int aux = strchr(buffer, ';') - buffer;
+            if(strncmp(id, buffer, aux) == 0) {
+                users = create_valid_users(buffer);
                 insert_cache_users(cache_users, users);
                 val = 1;
             }
@@ -488,6 +588,12 @@ Users *search_user(CACHE_USERS *cache_users, char *id){
 
         fclose(fp);
         if(val == 0) return NULL;
+        // else
+        //     fprintf(cache_users->logs, "Recovered %s from file.\n", users->id);
     }
-    return users;
+    // else
+    // {
+    //     fprintf(cache_users->logs, "Recovered %s from cache.\n", users->id);
+    // }
+    return copy_users(users);
 }

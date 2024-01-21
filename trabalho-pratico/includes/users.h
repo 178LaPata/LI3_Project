@@ -54,7 +54,7 @@ void insert_cache_users(CACHE_USERS *cache_users, Users *users);
 Users *cache_users_lookup(CACHE_USERS *cache_users, char *id);
 Users *create_users(char *line);
 int create_users_valid_file(char *file);
-int create_users_aux_file();
+int create_users_aux_file(CACHE_PASSENGERS *cache_passengers);
 char *user_to_string(Users *user);
 void add_flights_total(Users *users, int value);
 void add_reservations_total(Users *users, int value);
