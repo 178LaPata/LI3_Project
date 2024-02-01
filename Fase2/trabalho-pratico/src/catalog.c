@@ -41,10 +41,12 @@ Catalog *create_catalog(char *entry_files) {
 
     create_users_valid_file(users);
     create_flights_valid_file(flights);
-    create_passengers_valid_file(passengers, cat->cache_flights, cat->cache_passengers, cat->cache_reservations, cat->cache_users);
-    create_reservations_valid_file(reservations, cat->cache_passengers, cat->cache_reservations, cat->cache_users);
+    create_reservations_valid_file(reservations, cat->cache_users);
+    create_passengers_valid_file(passengers, cat->cache_flights, cat->cache_users);
     
+    create_users_aux_file2(cat->cache_reservations, cat->cache_passengers);
     create_users_aux_file();
+    create_flights_aux_file();
 
     free(users);
     free(flights);
@@ -66,8 +68,9 @@ char *query1(char *input, Catalog *cat){
     if(verify_only_numbers(input)==1) output = display_flight(input, cat->cache_flights);
     else {
         if(strncmp(input, "Book", 4)==0) output = display_reservation(input, cat->cache_reservations);
-        else output = display_user(input, cat->cache_passengers, cat->cache_reservations, cat->cache_users);
+        else output = display_user(input, cat->cache_users);
     }
+    if(output == NULL) output = "\0";
     return output;
 }
 
@@ -102,12 +105,11 @@ char **query4(char *input){
     return output;
 }
 
-char **query5(char *input){
-    char *origin = strsep(&input, " ");
-    Datetime begin_date = valid_date_time(strsep(&input, " "));
-    Datetime end_date = valid_date_time(strsep(&input, " "));
+char **query5(char *input, char *begin_date, char *end_date){
+    Datetime bd = valid_date_time(begin_date);
+    Datetime ed = valid_date_time(end_date);
     char **output = NULL;
-    GList *list = sort_flights_data(origin, begin_date, end_date);
+    GList *list = sort_flights_data(input, bd, ed);
     if (list) {
         output = malloc(sizeof(char *) * (g_list_length(list) + 1));
         int i = 0;
@@ -131,13 +133,10 @@ char **query5(char *input){
 //    char **output = 
 //}
 
-char *query8(char *input){
-    char *id = strsep(&input, " ");
-    char *begin_date = strsep(&input, " ");
-    char *end_date = strsep(&input, " ");
+char *query8(char *input, char *begin_date, char *end_date){
     Date bd = valid_date(begin_date);
     Date ed = valid_date(end_date);
-    char *output = calculate_total_revenue(id, bd, ed);
+    char *output = calculate_total_revenue(input, bd, ed);
     return output;
 }
 
@@ -145,11 +144,6 @@ char **query9(char *input){
     char **output = search_users_with_prefix(input); 
     return output;
 }
-
-
-
-
-
 
 /*
 
@@ -274,7 +268,10 @@ void run_queries(char *queries_path, int query, Catalog *cat){
             //    write_to_file_mul_line(query5F(arg_query), query);
             }
             else{
-                //write_to_file_mul_line(query5(queries_path), query);
+                //char *arg_query = strsep(&queries_path, " ");
+                //char *arg_query2 = strsep(&queries_path, " ");
+                //char *arg_query3 = strsep(&queries_path, " ");
+                //write_to_file_mul_line(query5(arg_query, arg_query2, arg_query3), query);
             }
             break;
         case 6:
@@ -298,7 +295,10 @@ void run_queries(char *queries_path, int query, Catalog *cat){
             //    write_to_file_mul_line(query8F(arg_query), query);
             }
             else{
-                write_to_file_one_line(query8(queries_path), query);
+                char *arg_query = strsep(&queries_path, " ");
+                char *arg_query2 = strsep(&queries_path, " ");
+                char *arg_query3 = strsep(&queries_path, " ");
+                write_to_file_one_line(query8(arg_query, arg_query2, arg_query3), query);
             }
             break;
         case 9:
@@ -424,6 +424,12 @@ int run_interactive(){
     printf("\n");
     print_entry_menu();
     int op = 0;
+    char **output;
+    char *output2;
+    char input[15];
+    char input2[15];
+    char input3[15];
+
     while(op == 0){
         printf("\nInsira um número de 1 a 10 para escolher a query a executar ou 0 para sair: \n");
         char query_arg[15];
@@ -435,53 +441,109 @@ int run_interactive(){
         switch(op){
             case 1:
                 printf("Insira o id de um voo/utilizador/reserva: \n");
-                //char input[15];
-                //fgets(input, 15, stdin);
-                //char *output = query1(input);
+                if(fgets(input, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
+                output2 = query1(input, cat);
+                write_to_terminal(output2);
                 break;
             case 2:
-                printf("Insira o id do utilizador: \n");
-
+                //printf("Insira o id do utilizador: \n");
+                //if(fgets(input, 15, stdin) == NULL){
+                //    perror("fgets failed");
+                //    return -1;
+                //}
+                //output = query2(input);
+                //write_to_terminal_mul_line(output);
                 break;
             case 3:
                 printf("Insira o id do hotel: \n");
-                char input[15];
                 if(fgets(input, 15, stdin) == NULL){
                     perror("fgets failed");
                     return -1;
                 }
-                char *output = query3(input);
-                write_to_terminal(output);
+                output2 = query3(input);
+                write_to_terminal(output2);
                 break;
             case 4:
                 printf("Insira o id do hotel: \n");
-                char input[15];
                 if(fgets(input, 15, stdin) == NULL){
                     perror("fgets failed");
                     return -1;
                 }
-                char **output = query4(input);
+                output = query4(input);
                 write_to_terminal_mul_line(output);
                 break;
             case 5:
                 printf("Insira a origem: \n");
+                if(fgets(input, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
                 printf("Insira a data de inicio: \n");
+                if(fgets(input2, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
                 printf("Insira a data de fim: \n");
+                if(fgets(input3, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
+                output = query5(input, input2, input3);
+                write_to_terminal_mul_line(output);
                 break;
             case 6:
-                printf("Insira o ano: \n");
-                printf("Insira o número máximo de aeroportos a apresentar: \n");
+                //printf("Insira o ano: \n");
+                //if(fgets(input, 15, stdin) == NULL){
+                //    perror("fgets failed");
+                //    return -1;
+                //}
+                //printf("Insira o número máximo de aeroportos a apresentar: \n");
+                //if(fgets(input2, 15, stdin) == NULL){
+                //    perror("fgets failed");
+                //    return -1;
+                //}
+                //output = query6(input, input2);
+                //write_to_terminal_mul_line(output);
                 break;
             case 7:
-                printf("Insira o número máximo de aeroportos a apresentar: \n");
+                //printf("Insira o número máximo de aeroportos a apresentar: \n");
+                //if(fgets(input, 15, stdin) == NULL){
+                //    perror("fgets failed");
+                //    return -1;
+                //}
+                //output = query7(input);
+                //write_to_terminal_mul_line(output);
                 break;
             case 8:
                 printf("Insira o id do hotel: \n");
+                if(fgets(input, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
                 printf("Insira a data de inicio: \n");
+                if(fgets(input2, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
                 printf("Insira a data de fim: \n");
+                if(fgets(input3, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
+                output2 = query8(input, input2, input3);
+                write_to_terminal(output2);
                 break;
             case 9:
                 printf("Insira o prefixo: \n");
+                if(fgets(input, 15, stdin) == NULL){
+                    perror("fgets failed");
+                    return -1;
+                }
+                output = query9(input);
+                write_to_terminal_mul_line(output);
                 break;
             case 10:    
             // nao faco ideia

@@ -175,7 +175,7 @@ CACHE_USERS *create_new_cache_users(int capacity){
     return cache_users;
 }
 
-Users *insert_cache_users(CACHE_USERS *cache_users, Users *users, CACHE_RESERVATIONS *cache_reservations, CACHE_PASSENGERS *cache_passengers){
+Users *insert_cache_users(CACHE_USERS *cache_users, Users *users){
     if(g_hash_table_contains(cache_users->users_cache, users->id)){
         g_queue_remove(cache_users->users_queue, users);
         g_queue_push_head(cache_users->users_queue, users);
@@ -185,22 +185,6 @@ Users *insert_cache_users(CACHE_USERS *cache_users, Users *users, CACHE_RESERVAT
         if(g_queue_get_length(cache_users->users_queue) == cache_users->capacity){
             Users *u = g_queue_pop_tail(cache_users->users_queue);
             g_hash_table_remove(cache_users->users_cache, u->id);
-        }
-
-        char *id_reserva = verify_user_has_reservation(users->id);
-        if(id_reserva){
-            Reservations *r = search_reservation(cache_reservations, id_reserva);
-            if(r){
-                add_reservations_total(users, 1);
-                add_spent_total(users, get_total_price(r));
-            }
-            delete_reservations(r);
-        }
-        free(id_reserva);
-        Passengers *p = search_passenger(cache_passengers, users->id);
-        if(p) {
-            add_flights_total(users, 1);
-            delete_passengers(p);
         }
         g_hash_table_insert(cache_users->users_cache, users->id, users);
         g_queue_push_head(cache_users->users_queue, users);
@@ -505,6 +489,47 @@ int create_users_aux_file(){
     return 0;
 }
 
+int create_users_aux_file2(CACHE_RESERVATIONS *cache_reservations, CACHE_PASSENGERS *cache_passengers){
+    FILE *fp2 = fopen("entrada/users_valid.csv", "r");
+    FILE *fp3 = fopen("entrada/users_valid2.csv", "w");
+    if (!fp2 || !fp3) return -1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;
+
+    while(fgets(buffer, sizeof(buffer), fp2)) {
+        buffer2 = strdup(buffer);
+        Users *users = create_valid_users(buffer2);
+        char *id_reserva = verify_user_has_reservation(users->id);
+        if(id_reserva){
+            Reservations *r = search_reservation(cache_reservations, id_reserva);
+            if(r != NULL){
+                int aux = users->reservations_total + 1;
+                double aux2 = users->spent_total + get_total_price(r);
+                set_reservations_total(users, aux);
+                set_spent_total(users, aux2);
+            }
+            delete_reservations(r);
+        }
+        Passengers *p = search_passenger(cache_passengers, users->id);
+        if(p) {
+            int aux = users->flights_total + 1;
+            set_flights_total(users, aux);
+            delete_passengers(p);
+        }
+
+        buffer2 = user_to_string(users);
+        fprintf(fp3, "%s\n", buffer2);
+        free(buffer2);
+        free(id_reserva);
+        delete_users(users);
+    }
+
+    fclose(fp2);
+    fclose(fp3);
+    return 0;
+}
+
 char *user_to_string(Users *user){
     char *id = get_id(user);
     char *name = get_name(user);
@@ -523,26 +548,14 @@ char *user_to_string(Users *user){
     double spent_total = get_spent_total(user);
 
     char *res = malloc(sizeof(char) * 1000);
-    sprintf(res, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%9d;%9.3f", id, name, email, phone_number, birth_date, sex,
+    sprintf(res, "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%d;%d;%.3f", id, name, email, phone_number, birth_date, sex,
             passport, country_code, adress, account_creation, pay_method, account_status, flights_total, reservations_total, spent_total);
     free(account_creation);
     free(birth_date);
     return res; 
 }
 
-void add_flights_total(Users *users, int value){
-    users->flights_total += value;
-}
-
-void add_reservations_total(Users *users, int value){
-    users->reservations_total += value;
-}
-
-void add_spent_total(Users *users, double value){
-    users->spent_total += value;
-}
-
-Users *search_user(char *id, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users){
+Users *search_user(char *id, CACHE_USERS *cache_users){
     Users *users = cache_users_lookup(cache_users, id);
     if(users == NULL){
         FILE *fp = fopen("entrada/users_valid.csv", "r");
@@ -555,7 +568,7 @@ Users *search_user(char *id, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATI
             int aux = strchr(buffer, ';') - buffer;
             if(strncmp(id, buffer, aux) == 0) {
                 users = create_valid_users(buffer);
-                users = insert_cache_users(cache_users, users, cache_reservations, cache_passengers);
+                users = insert_cache_users(cache_users, users);
                 val = 1;
             }
         }
@@ -566,9 +579,34 @@ Users *search_user(char *id, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATI
     return copy_users(users);
 }
 
+Users *search_user_queries(char *id, CACHE_USERS *cache_users){
+    Users *users = cache_users_lookup(cache_users, id);
+    if(users == NULL){
+        FILE *fp = fopen("entrada/users_valid2.csv", "r");
+        if(!fp) return NULL;
+
+        char buffer[1000000];
+        int val = 0;
+
+        while(fgets(buffer, sizeof(buffer), fp)){
+            int aux = strchr(buffer, ';') - buffer;
+            if(strncmp(id, buffer, aux) == 0) {
+                users = create_valid_users(buffer);
+                users = insert_cache_users(cache_users, users);
+                val = 1;
+            }
+        }
+
+        fclose(fp);
+        if(val == 0) return NULL;
+    }
+    return copy_users(users);
+}
+
+
 //query1
-char *display_user(char *user_id, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users){
-    Users *users = search_user(user_id, cache_passengers, cache_reservations, cache_users);
+char *display_user(char *user_id, CACHE_USERS *cache_users){
+    Users *users = search_user_queries(user_id, cache_users);
     if(users == NULL) return NULL;
     char *name = get_name(users);
     char *sex = get_sex(users);

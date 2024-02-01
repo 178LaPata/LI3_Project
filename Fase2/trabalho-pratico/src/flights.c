@@ -189,9 +189,6 @@ Flights *insert_cache_flights(CACHE_FLIGHTS *cache_flights, Flights *flights){
             Flights *f = g_queue_pop_tail(cache_flights->flights_queue);
             g_hash_table_remove(cache_flights->flights_cache, f->id_flights);
         }
-
-        set_num_passengers(flights, get_number_passengers(flights->id_flights));
-        set_delay(flights, calculate_seconds(flights->schedule_departure_date, flights->real_departure_date));
         g_hash_table_insert(cache_flights->flights_cache, flights->id_flights, flights);
         g_queue_push_head(cache_flights->flights_queue, flights);
         return flights;
@@ -458,6 +455,33 @@ int create_flights_valid_file(char *file){
     return 0;
 }
 
+int create_flights_aux_file(){
+    FILE *fp = fopen("entrada/flights_valid.csv", "r");
+    FILE *fp2 = fopen("entrada/flights_valid2.csv", "w");
+    if(!fp || !fp2) return 1;
+
+    char buffer[1000000];
+    char *buffer2 = NULL;  
+
+    while(fgets(buffer, sizeof(buffer), fp)){
+        buffer2 = strdup(buffer); 
+        buffer2[strcspn(buffer2, "\n")] = '\0';
+        Flights *f = create_valid_flights(buffer2);
+        if(f) {
+            set_delay(f, calculate_seconds(f->schedule_departure_date, f->real_departure_date));
+            set_num_passengers(f, get_number_passengers(f->id_flights));
+            buffer2 = flights_to_string(f);
+            fprintf(fp2, "%s\n", buffer2);
+            delete_flights(f);   
+        }
+        free(buffer2);
+    }
+
+    fclose(fp);
+    fclose(fp2);
+    return 0;
+}
+
 char *flights_to_string(Flights *fli){
     char *id_fli = get_id_flights(fli);
     char *airline = get_airline(fli);
@@ -509,9 +533,33 @@ Flights *search_flight(CACHE_FLIGHTS *cache_flights, char *flight_id){
     return copy_flights(fli);
 }
 
+Flights *search_flight_queries(CACHE_FLIGHTS *cache_flights, char *flight_id){
+    Flights *fli = cache_flights_lookup(cache_flights, flight_id);
+    if(fli == NULL){
+        FILE *fp = fopen("entrada/flights_valid2.csv", "r");
+        if(!fp) return NULL;
+
+        char buffer[1000000];
+        int val = 0;
+
+        while(fgets(buffer, sizeof(buffer), fp)){
+            int aux = strchr(buffer, ';') - buffer;
+            if(strncmp(flight_id, buffer, aux) == 0) {
+                fli = create_valid_flights(buffer);
+                fli = insert_cache_flights(cache_flights, fli);
+                val = 1;
+            }
+        }
+
+        fclose(fp);
+        if(val == 0) return NULL;
+    }
+    return copy_flights(fli);
+}
+
 // query 1
 char *display_flight(char *flight_id, CACHE_FLIGHTS *cache_flights){
-    Flights *fli = search_flight(cache_flights, flight_id);
+    Flights *fli = search_flight_queries(cache_flights, flight_id);
     if(fli == NULL) return NULL;
     char *airline = get_airline(fli);
     char *plane = get_plane(fli);
@@ -533,7 +581,7 @@ char *display_flight(char *flight_id, CACHE_FLIGHTS *cache_flights){
 // query 5
 // funcao que cria uma lista com os flights de uma determinada origem e entre duas datas
 GList* list_flights_origin(char *origin, Datetime beginD, Datetime endD){
-    FILE *fp = fopen("entrada/flights_valid.csv", "r");
+    FILE *fp = fopen("entrada/flights_valid2.csv", "r");
     if(!fp) return NULL;
 
     char buffer[1000000];

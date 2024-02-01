@@ -21,7 +21,9 @@ void delete_catalog(Catalog *cat);
 
 char *query1(char *input, Catalog *cat);
 char *query3(char *input);
-char *query8(char *input);
+char **query4(char *input);
+char **query5(char *input, char *begin_date, char *end_date);
+char *query8(char *input, char *begin_date, char *end_date);
 char **query9(char *input);
 
 int run_batch(char* inputs_path, char* queries_path);
