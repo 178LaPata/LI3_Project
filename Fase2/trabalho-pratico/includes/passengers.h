@@ -23,7 +23,7 @@ void insert_cache_passengers(CACHE_PASSENGERS *cache_passengers, Passengers *pas
 Passengers *cache_passengers_lookup(CACHE_PASSENGERS *cache_passengers, char *id);
 Passengers *create_valid_passengers(char *line);
 Passengers *copy_passengers(Passengers *passengers);
-Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_USERS *cache_users);
-int create_passengers_valid_file(char *file, CACHE_FLIGHTS *cache_flights, CACHE_USERS *cache_users);
+Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users);
+int create_passengers_valid_file(char *file, CACHE_FLIGHTS *cache_flights, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users);
 int get_number_passengers(char *flight_id);
 Passengers *search_passenger(CACHE_PASSENGERS *cache_passengers, char *user_id);

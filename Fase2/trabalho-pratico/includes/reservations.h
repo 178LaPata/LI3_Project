@@ -53,8 +53,8 @@ Reservations *insert_cache_reservations(CACHE_RESERVATIONS *cache_reservations, 
 Reservations *cache_reservations_lookup(CACHE_RESERVATIONS *cache_reservations, char *id);
 Reservations *create_valid_reservations(char *line);
 Reservations *copy_reservations(Reservations *reservations);
-Reservations *create_reservations(char *line, CACHE_USERS *cache_users);
-int create_reservations_valid_file(char *file, CACHE_USERS *cache_users);
+Reservations *create_reservations(char *line, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users);
+int create_reservations_valid_file(char *file, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users);
 double calculate_total_price(Reservations *reservations);
 char *reservation_to_string(Reservations *r);
 Reservations *search_reservation(CACHE_RESERVATIONS *cache_reservations, char *id_res);

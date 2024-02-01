@@ -87,7 +87,7 @@ Passengers *copy_passengers(Passengers *passengers){
 }
 
 
-Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_USERS *cache_users){
+Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users){
     Passengers *passengers = malloc(sizeof(Passengers));
     char *buffer;
     int i = 0;
@@ -109,7 +109,7 @@ Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_US
             case 1:
                 if (strlen(buffer) == 0) val = 0;
                 passengers->user_id = strdup(buffer);
-                Users* user = search_user(passengers->user_id, cache_users);
+                Users* user = search_user(passengers->user_id, cache_passengers, cache_reservations, cache_users);
                 if (user == NULL) val = 0;
                 delete_users(user);
                 break;
@@ -126,7 +126,7 @@ Passengers *create_passengers(char *line, CACHE_FLIGHTS *cache_flights, CACHE_US
     return passengers;
 }
 
-int create_passengers_valid_file(char *file, CACHE_FLIGHTS *cache_flights, CACHE_USERS *cache_users){
+int create_passengers_valid_file(char *file, CACHE_FLIGHTS *cache_flights, CACHE_PASSENGERS *cache_passengers, CACHE_RESERVATIONS *cache_reservations, CACHE_USERS *cache_users){
     FILE *fp = fopen(file, "r");
     if(!fp) return 0;
 
@@ -151,7 +151,7 @@ int create_passengers_valid_file(char *file, CACHE_FLIGHTS *cache_flights, CACHE
     while (fgets(buffer, 1000000, fp)) {
         buffer2 = strdup(buffer); 
         buffer2[strcspn(buffer2, "\n")] = '\0';
-        Passengers *p = create_passengers(buffer2, cache_flights, cache_users);
+        Passengers *p = create_passengers(buffer2, cache_flights, cache_passengers, cache_reservations, cache_users);
         if(p) {
             fprintf(fp2, "%s", buffer);
             delete_passengers(p);
